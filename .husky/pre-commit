@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run Biome checks (linting and formatting)
+echo "🔍 Running Biome checks..."
+npm run check
+
+# Run tests
+echo "🧪 Running tests..."
+npm test
+
+echo "✅ All checks passed! Proceeding with commit..."
