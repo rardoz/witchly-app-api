@@ -1,5 +1,6 @@
 import express, { type Request, type Response } from 'express';
 
+// Initialize Express application
 const app = express();
 
 // Middleware to parse JSON requests

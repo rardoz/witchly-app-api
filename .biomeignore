@@ -2,3 +2,4 @@ dist/
 node_modules/
 *.d.ts
 coverage/
+package-lock.json

@@ -1,6 +1,6 @@
-# Run Biome checks (linting and formatting)
-echo "🔍 Running Biome checks..."
-npm run check
+# Run lint-staged (Biome checks on staged files only)
+echo "🔍 Running Biome checks on staged files..."
+npx lint-staged
 
 # Run tests
 echo "🧪 Running tests..."
