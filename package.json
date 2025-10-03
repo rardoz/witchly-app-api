@@ -55,7 +55,7 @@
     "*.js": [
       "biome check --write"
     ],
-    "*.json": [
+    "*.{json,jsonc}": [
       "biome format --write"
     ]
   }
