@@ -3,8 +3,6 @@ import express, { type Request, type Response } from 'express';
 // Initialize Express application with TypeScript support
 const app = express();
 
-// Small change to test the setup
-
 // Middleware to parse JSON requests
 app.use(express.json());
 
