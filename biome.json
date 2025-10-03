@@ -28,10 +28,14 @@
       },
       "style": {
         "noNonNullAssertion": "warn",
-        "useTemplate": "error"
+        "useTemplate": "error",
+        "noParameterAssign": "off"
       },
       "suspicious": {
         "noExplicitAny": "warn"
+      },
+      "complexity": {
+        "noUselessConstructor": "off"
       }
     }
   },
@@ -46,6 +50,9 @@
       "bracketSameLine": false,
       "quoteStyle": "single",
       "attributePosition": "auto"
+    },
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
     }
   },
   "json": {

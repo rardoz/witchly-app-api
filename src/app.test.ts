@@ -7,7 +7,7 @@ describe('Express App', () => {
       const response = await request(app).get('/');
 
       expect(response.status).toBe(200);
-      expect(response.text).toBe('Hello, Express API!');
+      expect(response.text).toBe('Hello, Express API with GraphQL!');
     });
   });
 
