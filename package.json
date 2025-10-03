@@ -12,11 +12,12 @@
     "test:coverage": "jest --coverage",
     "test:ci": "jest --ci --coverage --watchAll=false",
     "lint": "biome lint src/",
-    "lint:fix": "biome lint --write src/",
-    "format": "biome format --write src/",
-    "format:check": "biome format src/",
-    "check": "biome check src/",
-    "check:fix": "biome check --write src/",
+    "lint:fix": "biome lint --write",
+    "format": "biome format --write",
+    "format:check": "biome format",
+    "check": "biome check",
+    "check:fix": "biome check --write",
+    "type-check": "tsc --noEmit",
     "prepare": "husky"
   },
   "repository": {
@@ -48,7 +49,11 @@
     "typescript": "^5.9.3"
   },
   "lint-staged": {
-    "*.{ts,tsx,js,jsx}": [
+    "*.{ts,tsx}": [
+      "biome check --write",
+      "bash -c 'npm run type-check'"
+    ],
+    "*.{js,jsx}": [
       "biome check --write"
     ],
     "*.{json,md}": [
