@@ -49,14 +49,13 @@
     "typescript": "^5.9.3"
   },
   "lint-staged": {
-    "*.{ts,tsx}": [
-      "biome check --write",
-      "bash -c 'npm run type-check'"
-    ],
-    "*.{js,jsx}": [
+    "*.ts": [
       "biome check --write"
     ],
-    "*.{json,md}": [
+    "*.js": [
+      "biome check --write"
+    ],
+    "*.json": [
       "biome format --write"
     ]
   }

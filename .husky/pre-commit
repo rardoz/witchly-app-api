@@ -2,6 +2,10 @@
 echo "🔍 Running Biome checks on staged files..."
 npx lint-staged
 
+# Run TypeScript compilation check
+echo "🔧 Running TypeScript compilation check..."
+npm run type-check
+
 # Run tests
 echo "🧪 Running tests..."
 npm test
