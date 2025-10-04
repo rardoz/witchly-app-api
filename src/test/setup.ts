@@ -1,8 +1,23 @@
 // Global test setup file
-// This file runs before all tests
+// This file runs before each test file
 
-// Set test environment variables
-process.env.NODE_ENV = 'test';
+import request from 'supertest';
+import { app, initializeServer } from '../app';
 
-// Increase timeout for slower systems
-jest.setTimeout(10000);
+// Global variables for tests
+declare global {
+  var testRequest: ReturnType<typeof request>;
+}
+
+// Initialize server once and create global test request instance
+beforeAll(async () => {
+  console.log('🚀 Initializing server globally for all tests...');
+  await initializeServer();
+
+  // Create global test request instance
+  global.testRequest = request(app);
+
+  console.log('✅ Server initialized globally - testRequest available');
+}, 30000);
+
+jest.setTimeout(30000);

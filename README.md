@@ -8,6 +8,7 @@ A modern TypeScript Express.js API with GraphQL and MongoDB integration, featuri
 - **Framework**: Express.js 5.x
 - **Database**: MongoDB with Mongoose ODM
 - **API**: GraphQL with Apollo Server v5 and type-graphql
+- **Authentication**: JWT with OAuth2 Client Credentials flow
 - **Testing**: Jest with Supertest for HTTP testing
 - **Code Quality**: Biome for linting and formatting
 - **Git Hooks**: Husky with lint-staged for pre-commit checks
@@ -40,6 +41,7 @@ cp .env.example .env
 MONGODB_URI=mongodb://localhost:27017/witchly-app-dev
 NODE_ENV=development
 PORT=3000
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
 ```
 
 ### 3. Start Development
@@ -64,19 +66,29 @@ src/
 ├── config/
 │   └── database.ts          # MongoDB connection configuration
 ├── models/
-│   └── User.ts              # Mongoose models and interfaces
+│   ├── User.ts              # User model and interface
+│   └── Client.ts            # OAuth2 client model for authentication
+├── services/
+│   └── jwt.service.ts       # JWT token generation and validation
+├── middleware/
+│   └── auth.middleware.ts   # JWT authentication middleware
+├── controllers/
+│   └── auth.controller.ts   # OAuth2 token endpoint
 ├── graphql/
 │   ├── types/
-│   │   └── User.ts          # GraphQL type definitions
+│   │   ├── User.ts          # GraphQL type definitions
+│   │   └── ClientType.ts    # Client management types
 │   ├── inputs/
 │   │   └── UserInput.ts     # Input types for mutations
 │   ├── resolvers/
-│   │   └── UserResolver.ts  # GraphQL resolvers
-│   └── server.ts            # Apollo Server setup
+│   │   ├── UserResolver.ts  # User operations
+│   │   └── ClientResolver.ts # Client management (admin only)
+│   └── server.ts            # Apollo Server setup with auth context
 ├── test/
 │   ├── setup.ts             # Jest test configuration
-│   └── app.ts               # Test-specific app configuration
-├── app.ts                   # Express app with GraphQL integration
+│   ├── app.test.ts          # Basic app tests
+│   └── auth.test.ts         # Authentication flow tests
+├── app.ts                   # Express app with GraphQL and auth
 └── index.ts                 # Server entry point
 ```
 
@@ -159,6 +171,243 @@ export class UserResolver {
 ### GraphQL Playground
 
 In development mode, you can explore the API using GraphQL introspection at `http://localhost:3000/graphql`.
+
+## 🔐 JWT Authentication (Client Credentials)
+
+This API implements **OAuth2 Client Credentials** flow using JWT tokens for application-to-application authentication. This ensures only authorized applications can access your API.
+
+### Authentication Flow Overview
+
+```mermaid
+sequenceDiagram
+    participant App as Client Application
+    participant API as Witchly API
+    participant DB as Database
+
+    App->>API: POST /oauth/token (client_id, client_secret)
+    API->>DB: Validate client credentials
+    DB-->>API: Client found & secret verified
+    API-->>App: JWT Access Token (Bearer token)
+    App->>API: GraphQL Request + Authorization: Bearer <token>
+    API->>API: Validate JWT token
+    API-->>App: GraphQL Response
+```
+
+### 1. Environment Setup
+
+Add to your `.env` file:
+
+```env
+# JWT Configuration
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-min-256-bits
+```
+
+**🚨 Security Note**: Use a strong, random secret (256+ bits) in production. Generate one with:
+```bash
+openssl rand -hex 32
+```
+
+### 2. Client Registration (Admin Required)
+
+First, create a client application to get credentials:
+
+```graphql
+mutation CreateClient {
+  createClient(input: {
+    name: "My Mobile App"
+    description: "iOS/Android mobile application"
+    allowedScopes: ["read", "write"]
+    tokenExpiresIn: 3600
+  }) {
+    clientId      # client_abc123def456...
+    clientSecret  # def789ghi012... (SAVE THIS - only shown once!)
+  }
+}
+```
+
+**Available Scopes:**
+- `read` - Read access to data
+- `write` - Create/update operations
+- `admin` - Full access including client management
+
+### 3. Get Access Token
+
+Exchange your client credentials for a JWT access token:
+
+```bash
+curl -X POST http://localhost:3000/oauth/token \
+  -H "Content-Type: application/json" \
+  -d '{
+    "grant_type": "client_credentials",
+    "client_id": "client_abc123def456...",
+    "client_secret": "def789ghi012...",
+    "scope": "read write"
+  }'
+```
+
+**Response:**
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "scope": "read write"
+}
+```
+
+### 4. Use Access Token
+
+Include the token in the Authorization header for all API requests:
+
+```bash
+# GraphQL Request
+curl -X POST http://localhost:3000/graphql \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
+  -H "Content-Type: application/json" \
+  -d '{"query": "{ users { id name email } }"}'
+```
+
+### Integration Examples
+
+#### JavaScript/Node.js
+
+```javascript
+class WitchlyAPIClient {
+  constructor(clientId, clientSecret, baseURL = 'http://localhost:3000') {
+    this.clientId = clientId;
+    this.clientSecret = clientSecret;
+    this.baseURL = baseURL;
+    this.accessToken = null;
+  }
+
+  async authenticate() {
+    const response = await fetch(`${this.baseURL}/oauth/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        grant_type: 'client_credentials',
+        client_id: this.clientId,
+        client_secret: this.clientSecret,
+        scope: 'read write'
+      })
+    });
+
+    const data = await response.json();
+    this.accessToken = data.access_token;
+    return this.accessToken;
+  }
+
+  async graphqlQuery(query, variables = {}) {
+    if (!this.accessToken) await this.authenticate();
+
+    const response = await fetch(`${this.baseURL}/graphql`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ query, variables })
+    });
+
+    return response.json();
+  }
+}
+
+// Usage
+const client = new WitchlyAPIClient('your_client_id', 'your_client_secret');
+const users = await client.graphqlQuery('{ users { id name email } }');
+```
+
+### Client Management Operations
+
+#### List All Clients (Admin Only)
+```graphql
+query {
+  clients {
+    id
+    clientId
+    name
+    description
+    isActive
+    allowedScopes
+    lastUsed
+    createdAt
+  }
+}
+```
+
+#### Update Client (Admin Only)
+```graphql
+mutation {
+  updateClient(
+    clientId: "client_abc123..."
+    input: {
+      name: "Updated App Name"
+      allowedScopes: ["read"]
+      isActive: false
+    }
+  ) {
+    id
+    name
+    isActive
+    allowedScopes
+  }
+}
+```
+
+#### Regenerate Client Secret (Admin Only)
+```graphql
+mutation {
+  regenerateClientSecret(clientId: "client_abc123...")  # Returns new secret
+}
+```
+
+#### Delete Client (Admin Only)
+```graphql
+mutation {
+  deleteClient(clientId: "client_abc123...")  # Returns true/false
+}
+```
+
+### Error Handling
+
+The API returns standard OAuth2 error responses:
+
+```json
+{
+  "error": "invalid_client",
+  "error_description": "Invalid client_id or client not found"
+}
+```
+
+**Common Error Codes:**
+- `invalid_request` - Missing required parameters
+- `invalid_client` - Invalid client_id or client_secret
+- `invalid_scope` - Requested scope not allowed for client
+- `unsupported_grant_type` - Only client_credentials supported
+
+### Security Best Practices
+
+1. **Store credentials securely** - Never commit client secrets to code
+2. **Use environment variables** - Store credentials in secure environment
+3. **Rotate secrets regularly** - Use regenerateClientSecret mutation
+4. **Scope limitation** - Request only needed scopes
+5. **Token expiration** - Handle token refresh in your applications
+6. **HTTPS in production** - Never send credentials over HTTP
+
+### Testing Authentication
+
+Test the authentication flow:
+
+```bash
+# Test token generation
+npm run test -- --testPathPatterns=auth.test.ts
+
+# Manual testing with curl
+curl -X POST http://localhost:3000/oauth/token \
+  -H "Content-Type: application/json" \
+  -d '{"grant_type":"client_credentials","client_id":"test","client_secret":"test"}'
+```
 
 ## 🧪 Testing
 
@@ -288,6 +537,15 @@ npm start
 - `MONGODB_URI` - MongoDB connection string
 - `NODE_ENV=production`
 - `PORT` - Server port (optional, defaults to 3000)
+- `JWT_SECRET` - Strong secret for JWT signing (256+ bits recommended)
+
+**Security Checklist for Production**:
+- ✅ Use HTTPS for all client communication
+- ✅ Generate strong JWT secret: `openssl rand -hex 32`
+- ✅ Configure MongoDB with authentication
+- ✅ Set up proper CORS policies
+- ✅ Use environment variables for all secrets
+- ✅ Enable rate limiting (consider implementing per-client limits)
 
 ## 🔧 Development Workflow
 
@@ -309,7 +567,16 @@ MONGODB_URI=mongodb://localhost:27017/witchly-app-dev
 # Server
 NODE_ENV=development
 PORT=3000
+
+# JWT Authentication
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
 ```
+
+**Production Notes:**
+- Use a strong JWT secret (256+ bits): `openssl rand -hex 32`
+- Set `NODE_ENV=production`
+- Use MongoDB Atlas or secure MongoDB instance
+- Consider environment-specific JWT secrets
 
 ## 🤝 Contributing
 

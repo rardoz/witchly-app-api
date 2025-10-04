@@ -4,7 +4,12 @@ import { HeaderMap } from '@apollo/server';
 import cors from 'cors';
 import express, { type Request, type Response } from 'express';
 import { connectDB } from './config/database';
+import { tokenEndpoint } from './controllers/auth.controller';
 import { createApolloServer } from './graphql/server';
+import {
+  createGraphQLContext,
+  optionalAuth,
+} from './middleware/auth.middleware';
 
 // Initialize Express application with TypeScript support
 const app = express();
@@ -13,16 +18,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Initialize MongoDB and GraphQL only if not in test environment
-const initializeServer = async () => {
-  // Skip initialization in test environment
-  if (process.env.NODE_ENV === 'test') {
-    console.log(
-      '🧪 Skipping MongoDB/GraphQL initialization in test environment'
-    );
-    return;
-  }
+// OAuth2 Token Endpoint
+app.post('/oauth/token', tokenEndpoint);
 
+// Initialize MongoDB and GraphQL
+const initializeServer = async () => {
   try {
     // Connect to MongoDB
     await connectDB();
@@ -32,7 +32,7 @@ const initializeServer = async () => {
     await apolloServer.start();
 
     // Simple GraphQL endpoint
-    app.all('/graphql', async (req, res) => {
+    app.all('/graphql', optionalAuth, async (req, res) => {
       try {
         // Create proper HeaderMap
         const headerMap = new HeaderMap();
@@ -56,14 +56,33 @@ const initializeServer = async () => {
             search,
             body: req.body,
           },
-          context: async () => ({}),
+          context: async () => createGraphQLContext(req),
         });
 
         res.status(response.status || 200);
         for (const [key, value] of response.headers) {
           res.setHeader(key, value);
         }
-        res.send(response.body);
+
+        // Handle response body - parse JSON if it's a string
+        let responseBody: unknown = response.body;
+        if (
+          typeof responseBody === 'object' &&
+          responseBody &&
+          'kind' in responseBody &&
+          (responseBody as { kind: string }).kind === 'complete' &&
+          'string' in responseBody
+        ) {
+          try {
+            responseBody = JSON.parse(
+              (responseBody as { string: string }).string
+            );
+          } catch {
+            responseBody = (responseBody as { string: string }).string;
+          }
+        }
+
+        res.json(responseBody);
       } catch (error) {
         console.error('GraphQL execution error:', error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -73,20 +92,15 @@ const initializeServer = async () => {
     console.log('🚀 GraphQL server ready at /graphql');
   } catch (error) {
     console.error('❌ Failed to initialize server:', error);
-    process.exit(1);
+    if (process.env.NODE_ENV !== 'test') {
+      process.exit(1);
+    }
   }
 };
 
-// Initialize server
-initializeServer();
-
-// Fallback GraphQL route for test environment
-if (process.env.NODE_ENV === 'test') {
-  app.all('/graphql', (_req, res) => {
-    res.status(200).json({
-      data: { message: 'GraphQL endpoint (test mode)' },
-    });
-  });
+// Initialize server only if not in test environment or if explicitly requested
+if (process.env.NODE_ENV !== 'test') {
+  initializeServer();
 }
 
 // Example GET route (for testing)
@@ -98,6 +112,9 @@ app.get('/', (_req: Request, res: Response) => {
 app.get('/health', (_req: Request, res: Response) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
+
+// Export initialization function for tests
+export { initializeServer };
 
 export { app };
 export default app;
