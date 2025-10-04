@@ -216,7 +216,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetUsers($limit: Float, $offset: Float){\n    users(limit: $limit, offset: $offset) {\n        id\n        name\n        email\n        userType\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        handle\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }\n}",
+								"query": "query GetUsers($limit: Float, $offset: Float){\n    users(limit: $limit, offset: $offset) {\n        id\n        name\n        email\n        handle\n        userType\n        emailVerified\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }\n}",
 								"variables": "{\n    \"limit\": 10,\n    \"offset\": 0\n}"
 							}
 						},
@@ -254,7 +254,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetUser($id: ID!) {\n    user(id: $id) {\n        id\n        name\n        email\n        userType\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        handle\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }\n }",
+								"query": "query GetUser($id: ID!) {\n    user(id: $id) {\n        id\n        name\n        email\n        handle\n        userType\n        emailVerified\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }\n }",
 								"variables": "{\n    \"id\": \"68e093203e9a0767c092581e\"\n}"
 							}
 						},
@@ -292,7 +292,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation CreateUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n     id\n        name\n        email\n        userType\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        handle\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }  \n}",
+								"query": "mutation CreateUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n     id\n        name\n        email\n        handle\n        userType\n        emailVerified\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }  \n}",
 								"variables": "{\n    \"input\": {\n        \"name\": \"John Doe\",\n        \"email\": \"john.doe@example.com\",\n        \"userType\": \"admin\",\n        \"profileImageUrl\": \"https://test.com\",\n        \"bio\": \"This is a bio\",\n        \"shortBio\": \"this is a short bio\",\n        \"handle\": \"handle\",\n        \"backdropImageUrl\": \"https://handle.com\",\n        \"instagramHandle\": \"instagram\",\n        \"tikTokHandle\": \"tik\",\n        \"twitterHandle\": \"twit\",\n        \"websiteUrl\": \"https://test.com\",\n        \"facebookUrl\": \"fb\",\n        \"snapchatHandle\": \"snap\",\n        \"primaryColor\": \"red\",\n        \"sign\": \"leo\",\n        \"sex\": \"male\",\n        \"location\": \"New York, NY\",\n        \"birthDate\": \"1990-05-15\",\n        \"pronouns\": \"he/him\"\n    }\n  }"
 							}
 						},
@@ -330,7 +330,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {\n    updateUser(id: $id, input: $input) {\n        id\n        name\n        email\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        handle\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }\n}",
+								"query": "mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {\n    updateUser(id: $id, input: $input) {\n        id\n        name\n        email\n        handle\n        userType\n        emailVerified\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }\n}",
 								"variables": "{\n    \"id\": \"68e07ce509c33f9b96339e25\",\n    \"input\": {\n        \"name\": \"John Doe\",\n        \"email\": \"johnzz.doe@example.com\",\n        \"userType\": \"admin\",\n        \"profileImageUrl\": \"https://test.com\",\n        \"bio\": \"This is a bio\",\n        \"shortBio\": \"this is a short bio\",\n        \"handle\": \"handlez\",\n        \"backdropImageUrl\": \"https://handle.com\",\n        \"instagramHandle\": \"instagram\",\n        \"tikTokHandle\": \"tik\",\n        \"twitterHandle\": \"twit\",\n        \"websiteUrl\": \"https://test.com\",\n        \"facebookUrl\": \"fb\",\n        \"snapchatHandle\": \"snap\",\n        \"primaryColor\": \"red\",\n        \"sign\": \"leo\",\n        \"sex\": \"male\",\n        \"location\": \"San Francisco, CA\",\n        \"birthDate\": \"1985-12-10\",\n        \"pronouns\": \"they/them\"\n    }\n  }"
 							}
 						},
