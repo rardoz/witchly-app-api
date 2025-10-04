@@ -101,12 +101,18 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/",
+							"raw": "{{baseUrl}}/?",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								""
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null
+								}
 							]
 						},
 						"description": "Basic API welcome message"
