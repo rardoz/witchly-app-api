@@ -35,6 +35,7 @@ export class SignupResolver {
     }
 
     const { email } = input;
+    const emailFormatted = email.toLowerCase();
 
     try {
       // Validate email format
@@ -43,7 +44,7 @@ export class SignupResolver {
       }
 
       // Check if user already exists
-      const existingUser = await User.findOne({ email: email.toLowerCase() });
+      const existingUser = await User.findOne({ email: emailFormatted });
       if (existingUser) {
         throw new ConflictError(
           'An account with this email address already exists'
@@ -52,7 +53,7 @@ export class SignupResolver {
 
       // Check for existing unverified code first
       const existingVerification = await EmailVerification.findOne({
-        email: email.toLowerCase(),
+        email: emailFormatted,
         verified: false,
       });
 
@@ -68,13 +69,13 @@ export class SignupResolver {
 
       // Clean up any existing unverified codes for this email
       await EmailVerification.deleteMany({
-        email: email.toLowerCase(),
+        email: emailFormatted,
         verified: false,
       });
 
       // Clean up any existing pending signup for this email
       await Signup.deleteMany({
-        email: email.toLowerCase(),
+        email: emailFormatted,
       });
 
       // Generate 6-digit verification code
@@ -86,7 +87,7 @@ export class SignupResolver {
 
       // Create verification record
       const verification = new EmailVerification({
-        email: email.toLowerCase(),
+        email: emailFormatted,
         code: hashedCode,
         expiresAt,
         attempts: 0,
@@ -97,7 +98,7 @@ export class SignupResolver {
 
       // Store minimal pending signup (only email)
       const pendingSignup = new Signup({
-        email: email.toLowerCase(),
+        email: emailFormatted,
       });
 
       await pendingSignup.save();
@@ -140,7 +141,7 @@ export class SignupResolver {
       throw new UnauthorizedError('Write access required');
     }
     const { email, verificationCode } = input;
-
+    const emailFormatted = email.toLowerCase();
     try {
       // Validate email format
       if (!validator.isEmail(email)) {
@@ -154,7 +155,7 @@ export class SignupResolver {
 
       // Find verification record
       const verification = await EmailVerification.findOne({
-        email: email.toLowerCase(),
+        email: emailFormatted,
         verified: false,
         expiresAt: { $gt: new Date() },
       });
@@ -191,7 +192,7 @@ export class SignupResolver {
       }
 
       // Check if user already exists (double-check)
-      const existingUser = await User.findOne({ email: email.toLowerCase() });
+      const existingUser = await User.findOne({ email: emailFormatted });
       if (existingUser) {
         throw new ConflictError(
           'An account with this email address already exists'
@@ -200,7 +201,7 @@ export class SignupResolver {
 
       // Get the pending signup data
       const pendingSignup = await Signup.findOne({
-        email: email.toLowerCase(),
+        email: emailFormatted,
       });
       if (!pendingSignup) {
         throw new NotFoundError(
@@ -213,7 +214,7 @@ export class SignupResolver {
 
       // Create minimal user with just email and auto-generated handle
       const user = new User({
-        email: email.toLowerCase(),
+        email: emailFormatted,
         userType: 'basic',
         emailVerified: true,
         handle,
@@ -224,8 +225,8 @@ export class SignupResolver {
       await user.save();
 
       // Clean up verification and pending signup
-      await EmailVerification.deleteOne({ email: email.toLowerCase() });
-      await Signup.deleteOne({ email: email.toLowerCase() });
+      await EmailVerification.deleteOne({ email: emailFormatted });
+      await Signup.deleteOne({ email: emailFormatted });
 
       return {
         success: true,
