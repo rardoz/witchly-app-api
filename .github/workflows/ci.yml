@@ -2,36 +2,40 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   test:
     name: Test and Build
     runs-on: ubuntu-latest
+    environment: test
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '22.18.0'
-        cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.18.0"
+          cache: "npm"
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Run linting
-      run: npm run check
+      - name: Run linting
+        run: npm run check
 
-    - name: Run TypeScript checks
-      run: npm run type-check
+      - name: Run TypeScript checks
+        run: npm run type-check
 
-    - name: Run tests with coverage
-      run: npm run test:coverage
+      - name: Run tests with coverage
+        run: npm run test:coverage
+        env:
+          # Map your GitHub environment secrets to environment variables
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
 
-    - name: Build application
-      run: npm run build
+      - name: Build application
+        run: npm run build && rm -rf dist

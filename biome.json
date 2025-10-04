@@ -6,7 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["src/**/*", "package.json", "package-lock.json"],
+    "includes": ["**/*"],
     "ignoreUnknown": false
   },
   "formatter": {
@@ -29,7 +29,8 @@
       "style": {
         "noNonNullAssertion": "warn",
         "useTemplate": "error",
-        "noParameterAssign": "off"
+        "noParameterAssign": "off",
+        "useImportType": "off"
       },
       "suspicious": {
         "noExplicitAny": "warn"

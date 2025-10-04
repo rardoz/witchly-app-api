@@ -1,70 +1,120 @@
-import { Arg, ID, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, Ctx, ID, Mutation, Query, Resolver } from 'type-graphql';
+import { GraphQLContext } from '../../middleware/auth.middleware';
 import { User as UserModel } from '../../models/User';
+import {
+  ConflictError,
+  isMongoError,
+  NotFoundError,
+  UnauthorizedError,
+  ValidationError,
+} from '../../utils/errors';
 import { CreateUserInput, UpdateUserInput } from '../inputs/UserInput';
 import { User as UserType } from '../types/User';
+
+// Type guard for MongoDB duplicate key errors
 
 @Resolver(() => UserType)
 export class UserResolver {
   @Query(() => [UserType])
-  async users(): Promise<UserType[]> {
-    const users = await UserModel.find();
-    return users.map((user) => ({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    }));
+  async users(
+    @Ctx() context: GraphQLContext,
+    @Arg('limit', () => Number, { nullable: true, defaultValue: 10 })
+    limit: number,
+    @Arg('offset', () => Number, { nullable: true, defaultValue: 0 })
+    offset: number
+  ): Promise<UserType[]> {
+    if (!context.isAuthenticated || !context.hasScope('read')) {
+      throw new UnauthorizedError('Read access required');
+    }
+
+    // Validate pagination parameters
+    if (limit < 1 || limit > 100) {
+      throw new ValidationError('Limit must be between 1 and 100');
+    }
+    if (offset < 0) {
+      throw new ValidationError('Offset must be non-negative');
+    }
+
+    const users = await UserModel.find()
+      .skip(offset)
+      .limit(limit)
+      .sort({ createdAt: -1 }); // Sort by newest first
+
+    return users as UserType[];
   }
 
   @Query(() => UserType, { nullable: true })
-  async user(@Arg('id', () => ID) id: string): Promise<UserType | null> {
-    const user = await UserModel.findById(id);
-    if (!user) return null;
+  async user(
+    @Ctx() context: GraphQLContext,
+    @Arg('id', () => ID) id: string
+  ): Promise<UserType | null> {
+    if (!context.isAuthenticated || !context.hasScope('read')) {
+      throw new UnauthorizedError('Read access required');
+    }
 
-    return {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    };
+    const user = await UserModel.findById(id);
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    return user as UserType;
   }
 
   @Mutation(() => UserType)
   async createUser(
+    @Ctx() context: GraphQLContext,
     @Arg('input', () => CreateUserInput) input: CreateUserInput
   ): Promise<UserType> {
-    const user = await UserModel.create(input);
-    return {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    };
+    if (!context.isAuthenticated || !context.hasScope('write')) {
+      throw new UnauthorizedError('Write access required');
+    }
+
+    try {
+      const user = await UserModel.create(input);
+      return user as UserType;
+    } catch (error: unknown) {
+      if (isMongoError(error) && error.code === 11000) {
+        // MongoDB duplicate key error
+        throw new ConflictError(
+          'User with this email or handle already exists'
+        );
+      }
+      throw error;
+    }
   }
 
-  @Mutation(() => UserType, { nullable: true })
+  @Mutation(() => UserType)
   async updateUser(
+    @Ctx() context: GraphQLContext,
     @Arg('id', () => ID) id: string,
     @Arg('input', () => UpdateUserInput) input: UpdateUserInput
-  ): Promise<UserType | null> {
-    const user = await UserModel.findByIdAndUpdate(id, input, { new: true });
-    if (!user) return null;
+  ): Promise<UserType> {
+    if (!context.isAuthenticated || !context.hasScope('write')) {
+      throw new UnauthorizedError('Write access required');
+    }
 
-    return {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    };
+    const user = await UserModel.findByIdAndUpdate(id, input, { new: true });
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    return user as UserType;
   }
 
   @Mutation(() => Boolean)
-  async deleteUser(@Arg('id', () => ID) id: string): Promise<boolean> {
-    const result = await UserModel.findByIdAndDelete(id);
-    return !!result;
+  async deleteUser(
+    @Ctx() context: GraphQLContext,
+    @Arg('id', () => ID) id: string
+  ): Promise<boolean> {
+    if (!context.isAuthenticated || !context.hasScope('write')) {
+      throw new UnauthorizedError('Write access required');
+    }
+
+    const user = await UserModel.findByIdAndDelete(id);
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    return true;
   }
 }
