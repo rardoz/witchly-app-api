@@ -186,6 +186,130 @@ export class UserResolver {
 
 In development mode, you can explore the API using GraphQL introspection at `http://localhost:3000/graphql`.
 
+## ⚠️ Error Handling with HTTP Status Codes
+
+The GraphQL API properly handles HTTP status codes for different error scenarios, providing both GraphQL errors and appropriate HTTP status codes.
+
+### Custom Error Classes
+
+The API includes custom error classes in `src/utils/errors.ts`:
+
+- `NotFoundError` (404) - Resource not found
+- `ValidationError` (400) - Validation failed  
+- `UnauthorizedError` (401) - Authentication required
+- `ForbiddenError` (403) - Access denied
+- `ConflictError` (409) - Resource already exists
+- `InternalServerError` (500) - Server error
+
+### Error Examples
+
+#### 1. Unauthorized Access (401)
+```graphql
+query {
+  users {
+    id
+    name
+  }
+}
+```
+**Without authentication**, this returns:
+- HTTP Status: `401`
+- GraphQL Error: `"Unauthorized: Read access required"`
+
+#### 2. Resource Not Found (404)
+```graphql
+query {
+  user(id: "64f1234567890abcdef12345") {
+    id
+    name
+  }
+}
+```
+**With non-existent ID**, this returns:
+- HTTP Status: `404`
+- GraphQL Error: `"User not found"`
+
+#### 3. Validation Error (400)
+```graphql
+query {
+  users(limit: 150) {
+    id
+    name
+  }
+}
+```
+**With invalid limit**, this returns:
+- HTTP Status: `400`
+- GraphQL Error: `"Limit must be between 1 and 100"`
+
+#### 4. Conflict Error (409)
+```graphql
+mutation {
+  createUser(input: {
+    name: "John Doe"
+    email: "existing@example.com"
+    userType: "user"
+  }) {
+    id
+    name
+  }
+}
+```
+**With duplicate email**, this returns:
+- HTTP Status: `409`
+- GraphQL Error: `"User with this email or handle already exists"`
+
+### Error Response Format
+
+Errors are returned in this format:
+```json
+{
+  "errors": [
+    {
+      "message": "User not found",
+      "locations": [{"line": 2, "column": 3}],
+      "path": ["user"],
+      "extensions": {
+        "code": "NOT_FOUND",
+        "http": {
+          "status": 404
+        }
+      }
+    }
+  ],
+  "data": null
+}
+```
+
+### Testing Error Handling
+
+Test unauthorized access:
+```bash
+curl -X POST http://localhost:3002/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query": "{ users { id name } }"}' \
+  -w "HTTP Status: %{http_code}\n"
+```
+
+Test with authentication:
+```bash
+# First get a token
+curl -X POST http://localhost:3002/oauth/token \
+  -H "Content-Type: application/json" \
+  -d '{
+    "grant_type": "client_credentials",
+    "client_id": "your-client-id",
+    "client_secret": "your-client-secret"
+  }'
+
+# Then use the token
+curl -X POST http://localhost:3002/graphql \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -d '{"query": "{ users { id name } }"}' \
+  -w "HTTP Status: %{http_code}\n"
+```
+
 ## 🔐 JWT Authentication (Client Credentials)
 
 This API implements **OAuth2 Client Credentials** flow using JWT tokens for application-to-application authentication. This ensures only authorized applications can access your API.

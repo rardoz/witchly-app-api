@@ -89,7 +89,9 @@ export function verifyAccessToken(token: string): JWTPayload | null {
 
     return decoded;
   } catch (error) {
-    console.error('JWT verification failed:', error);
+    if (process.env.NODE_ENV !== 'test') {
+      console.error('JWT verification failed:', error);
+    }
     return null;
   }
 }

@@ -59,12 +59,10 @@ const initializeServer = async () => {
           context: async () => createGraphQLContext(req),
         });
 
-        res.status(response.status || 200);
-        for (const [key, value] of response.headers) {
-          res.setHeader(key, value);
-        }
+        // Extract status code from GraphQL errors if present
+        let statusCode = response.status || 200;
 
-        // Handle response body - parse JSON if it's a string
+        // Parse response body to check for GraphQL errors with custom status codes
         let responseBody: unknown = response.body;
         if (
           typeof responseBody === 'object' &&
@@ -74,12 +72,29 @@ const initializeServer = async () => {
           'string' in responseBody
         ) {
           try {
-            responseBody = JSON.parse(
+            const parsedBody = JSON.parse(
               (responseBody as { string: string }).string
             );
+            responseBody = parsedBody;
+
+            // Check for GraphQL errors with custom HTTP status codes
+            if (parsedBody?.errors && Array.isArray(parsedBody.errors)) {
+              const errorWithStatus = parsedBody.errors.find(
+                (error: { extensions?: { http?: { status?: number } } }) =>
+                  error.extensions?.http?.status
+              );
+              if (errorWithStatus) {
+                statusCode = errorWithStatus.extensions.http.status;
+              }
+            }
           } catch {
             responseBody = (responseBody as { string: string }).string;
           }
+        }
+
+        res.status(statusCode);
+        for (const [key, value] of response.headers) {
+          res.setHeader(key, value);
         }
 
         res.json(responseBody);

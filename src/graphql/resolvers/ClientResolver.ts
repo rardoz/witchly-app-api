@@ -7,6 +7,11 @@ import {
   hashClientSecret,
 } from '../../services/jwt.service';
 import {
+  ForbiddenError,
+  NotFoundError,
+  UnauthorizedError,
+} from '../../utils/errors';
+import {
   ClientCredentials,
   ClientType,
   CreateClientInput,
@@ -19,7 +24,7 @@ export class ClientResolver {
   async clients(@Ctx() context: GraphQLContext): Promise<ClientType[]> {
     // Only allow authenticated clients with admin scope
     if (!context.isAuthenticated || !context.hasScope('admin')) {
-      throw new Error('Unauthorized: Admin access required');
+      throw new UnauthorizedError('Admin access required');
     }
 
     const clients = await Client.find({}).sort({ createdAt: -1 });
@@ -44,15 +49,15 @@ export class ClientResolver {
   ): Promise<ClientType | null> {
     // Allow clients to view their own info, or admins to view any client
     if (!context.isAuthenticated) {
-      throw new Error('Unauthorized: Authentication required');
+      throw new UnauthorizedError('Authentication required');
     }
 
     const isOwnClient = context.client?.clientId === clientId;
     const isAdmin = context.hasScope('admin');
 
     if (!isOwnClient && !isAdmin) {
-      throw new Error(
-        'Unauthorized: Can only view own client info or need admin access'
+      throw new ForbiddenError(
+        'Can only view own client info or need admin access'
       );
     }
 
@@ -82,7 +87,7 @@ export class ClientResolver {
   ): Promise<ClientCredentials> {
     // Only allow authenticated clients with admin scope
     if (!context.isAuthenticated || !context.hasScope('admin')) {
-      throw new Error('Unauthorized: Admin access required');
+      throw new UnauthorizedError('Admin access required');
     }
 
     // Generate credentials
@@ -117,12 +122,12 @@ export class ClientResolver {
   ): Promise<ClientType> {
     // Only allow authenticated clients with admin scope
     if (!context.isAuthenticated || !context.hasScope('admin')) {
-      throw new Error('Unauthorized: Admin access required');
+      throw new UnauthorizedError('Admin access required');
     }
 
     const client = await Client.findOne({ clientId });
     if (!client) {
-      throw new Error('Client not found');
+      throw new NotFoundError('Client not found');
     }
 
     // Update fields
@@ -157,7 +162,7 @@ export class ClientResolver {
   ): Promise<boolean> {
     // Only allow authenticated clients with admin scope
     if (!context.isAuthenticated || !context.hasScope('admin')) {
-      throw new Error('Unauthorized: Admin access required');
+      throw new UnauthorizedError('Admin access required');
     }
 
     const result = await Client.deleteOne({ clientId });
@@ -171,12 +176,12 @@ export class ClientResolver {
   ): Promise<string> {
     // Only allow authenticated clients with admin scope
     if (!context.isAuthenticated || !context.hasScope('admin')) {
-      throw new Error('Unauthorized: Admin access required');
+      throw new UnauthorizedError('Admin access required');
     }
 
     const client = await Client.findOne({ clientId });
     if (!client) {
-      throw new Error('Client not found');
+      throw new NotFoundError('Client not found');
     }
 
     // Generate new secret
