@@ -1,0 +1,630 @@
+{
+	"info": {
+		"_postman_id": "49009646-56180f25-810e-486a-b932-a790b875dca6",
+		"name": "Witchly App API",
+		"description": "Comprehensive API collection for Witchly App - includes OAuth2 authentication, GraphQL queries and mutations for user and client management",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "🔐 Authentication",
+			"item": [
+				{
+					"name": "Get OAuth2 Access Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f43bb924-be21-42d9-86c4-1dff5985f8f4",
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('accessToken', response.data.authenticate.access_token);",
+									"    console.log('Access token saved to collection variable');",
+									"} else {",
+									"    console.log('Failed to get access token');",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"id": "49009646-78b4f094-a336-425a-8cf6-6160fccfe311",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation Authenticate($grantType: String!, $clientId: String!, $clientSecret: String!, $scope: String) { \n        authenticate(grant_type: $grantType, client_id: $clientId, client_secret: $clientSecret, scope: $scope) { \n            access_token \n            token_type \n            expires_in scope \n        } \n    }",
+								"variables": "{\n    \"grantType\": \"client_credentials\",\n    \"clientId\": \"xxx\",\n    \"clientSecret\": \"xxx\",\n    \"scope\": \"read write\"\n  }"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get an OAuth2 access token using client credentials flow. Replace client_id and client_secret with actual values."
+					},
+					"response": []
+				}
+			],
+			"id": "49009646-ba3cd696-4f9d-4610-9908-2abb38ee20a7",
+			"description": "OAuth2 Client Credentials authentication endpoints"
+		},
+		{
+			"name": "🏥 Health & Status",
+			"item": [
+				{
+					"name": "Health Check",
+					"id": "49009646-5dccaf62-9323-4d4d-bd9f-fb1f5e606f04",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "Check API health status"
+					},
+					"response": []
+				},
+				{
+					"name": "Root Endpoint",
+					"id": "49009646-cef0d06b-f478-444a-a213-e53ce009be1b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								""
+							]
+						},
+						"description": "Basic API welcome message"
+					},
+					"response": []
+				}
+			],
+			"id": "49009646-92f008f8-e307-49e1-9783-d484d5d1e238",
+			"description": "Basic health and status endpoints"
+		},
+		{
+			"name": "👤 User Management (GraphQL)",
+			"item": [
+				{
+					"name": "Get All Users",
+					"id": "49009646-cd14a714-9c3a-4706-8c85-395de253319c",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetUsers($limit: Float, $offset: Float){\n    users(limit: $limit, offset: $offset) {\n        id\n        name\n        email\n        userType\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        handle\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n    }\n}",
+								"variables": "{\n    \"limit\": 10,\n    \"offset\": 0\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Retrieve all users (public access)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by ID",
+					"id": "49009646-3fb83463-7980-4098-9982-8300c2c16633",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetUser($id: ID!) {\n    user(id: $id) {\n        id\n        name\n        email\n        userType\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        handle\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n    }\n }",
+								"variables": "{\n    \"id\": \"68e093203e9a0767c092581e\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get a specific user by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"id": "49009646-6d120086-9187-4907-9f73-4c588e6d6d3d",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation CreateUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n     id\n        name\n        email\n        userType\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        handle\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n    }  \n}",
+								"variables": "{\n    \"input\": {\n        \"name\": \"John Doe\",\n        \"email\": \"john.doe@example.com\",\n        \"userType\": \"admin\",\n        \"profileImageUrl\": \"https://test.com\",\n        \"bio\": \"This is a bio\",\n        \"shortBio\": \"this is a short bio\",\n        \"handle\": \"handle\",\n        \"backdropImageUrl\": \"https://handle.com\",\n        \"instagramHandle\": \"instagram\",\n        \"tikTokHandle\": \"tik\",\n        \"twitterHandle\": \"twit\",\n        \"websiteUrl\": \"https://test.com\",\n        \"facebookUrl\": \"fb\",\n        \"snapchatHandle\": \"snap\",\n        \"primaryColor\": \"red\",\n        \"sign\": \"leo\",\n        \"sex\": \"male\"\n    }\n  }"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Create a new user"
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"id": "49009646-86f4292c-9f49-425b-acf9-e8e151f0962a",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {\n    updateUser(id: $id, input: $input) {\n        id\n        name\n        email\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        handle\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n    }\n}",
+								"variables": "{\n    \"id\": \"68e07ce509c33f9b96339e25\",\n    \"input\": {\n        \"name\": \"John Doe\",\n        \"email\": \"johnzz.doe@example.com\",\n        \"userType\": \"admin\",\n        \"profileImageUrl\": \"https://test.com\",\n        \"bio\": \"This is a bio\",\n        \"shortBio\": \"this is a short bio\",\n        \"handle\": \"handlez\",\n        \"backdropImageUrl\": \"https://handle.com\",\n        \"instagramHandle\": \"instagram\",\n        \"tikTokHandle\": \"tik\",\n        \"twitterHandle\": \"twit\",\n        \"websiteUrl\": \"https://test.com\",\n        \"facebookUrl\": \"fb\",\n        \"snapchatHandle\": \"snap\",\n        \"primaryColor\": \"red\",\n        \"sign\": \"leo\",\n        \"sex\": \"male\"\n    }\n  }"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Update an existing user"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"id": "49009646-b1b905f8-001b-4b1e-bacb-1a7629ffcf5c",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation DeleteUser( $id: ID! ) {\n        deleteUser(id: $id)\n }",
+								"variables": "{\n    \"id\": \"68e093203e9a0767c092581e\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Delete a user by ID"
+					},
+					"response": []
+				}
+			],
+			"id": "49009646-7e081069-bb16-4b40-8ba5-c56cf66521e2",
+			"description": "User management operations via GraphQL"
+		},
+		{
+			"name": "🔑 Client Management (GraphQL)",
+			"item": [
+				{
+					"name": "Get All Clients (Admin Only)",
+					"id": "49009646-29d38c5e-92bf-48ef-9ceb-b745cee05c1d",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query GetClients {\\n    clients {\\n      id\\n      clientId\\n      name\\n      description\\n      isActive\\n      allowedScopes\\n      tokenExpiresIn\\n      lastUsed\\n      createdAt\\n      updatedAt\\n    }\\n  }\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get all OAuth2 clients (requires admin scope)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Client by ID",
+					"id": "49009646-cdc147fb-cc47-4a51-95c5-163644c277e1",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query GetClient($clientId: String!) {\\n    client(clientId: $clientId) {\\n      id\\n      clientId\\n      name\\n      description\\n      isActive\\n      allowedScopes\\n      tokenExpiresIn\\n      lastUsed\\n      createdAt\\n      updatedAt\\n    }\\n  }\",\n  \"variables\": {\n    \"clientId\": \"CLIENT_ID_HERE\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get a specific client by clientId (clients can view their own, admins can view any)"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Client (Admin Only)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.createClient) {",
+									"        console.log('Created Client ID:', response.data.createClient.clientId);",
+									"        console.log('Created Client Secret:', response.data.createClient.clientSecret);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript",
+								"id": "c8bc4040-0862-4a7c-97bc-544f87d21013"
+							}
+						}
+					],
+					"id": "49009646-e60a1064-ca7a-417c-95bf-8b8fd86587a6",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation CreateClient($input: CreateClientInput!) {\\n    createClient(input: $input) {\\n      clientId\\n      clientSecret\\n    }\\n  }\",\n  \"variables\": {\n    \"input\": {\n      \"name\": \"Test Client\",\n      \"description\": \"A test OAuth2 client\",\n      \"allowedScopes\": [\"read\", \"write\"]\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Create a new OAuth2 client (requires admin scope). Returns clientId and clientSecret."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Client (Admin Only)",
+					"id": "49009646-13d49c1e-e043-48c6-b74f-8f388fafead6",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation UpdateClient($clientId: String!, $input: UpdateClientInput!) {\\n    updateClient(clientId: $clientId, input: $input) {\\n      id\\n      clientId\\n      name\\n      description\\n      isActive\\n      allowedScopes\\n      tokenExpiresIn\\n      updatedAt\\n    }\\n  }\",\n  \"variables\": {\n    \"clientId\": \"CLIENT_ID_HERE\",\n    \"input\": {\n      \"name\": \"Updated Client Name\",\n      \"description\": \"Updated description\",\n      \"isActive\": true,\n      \"allowedScopes\": [\"read\", \"write\", \"admin\"]\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Update an existing OAuth2 client (requires admin scope)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Client (Admin Only)",
+					"id": "49009646-99437999-ff6f-4d65-a30a-4b31ab46af40",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation DeleteClient($clientId: String!) {\\n    deleteClient(clientId: $clientId)\\n  }\",\n  \"variables\": {\n    \"clientId\": \"CLIENT_ID_HERE\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Delete an OAuth2 client (requires admin scope)"
+					},
+					"response": []
+				},
+				{
+					"name": "Regenerate Client Secret (Admin Only)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.regenerateClientSecret) {",
+									"        console.log('New Client Secret:', response.data.regenerateClientSecret);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript",
+								"id": "d48b5d0f-074c-419b-8950-d89b2004adac"
+							}
+						}
+					],
+					"id": "49009646-fcf0321c-83d2-4d8a-a508-99c644123ec5",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation RegenerateClientSecret($clientId: String!) {\\n    regenerateClientSecret(clientId: $clientId)\\n  }\",\n  \"variables\": {\n    \"clientId\": \"CLIENT_ID_HERE\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Regenerate the secret for an OAuth2 client (requires admin scope)"
+					},
+					"response": []
+				}
+			],
+			"id": "49009646-872df14d-0e27-45ef-be5f-f1aaaae96e9d",
+			"description": "OAuth2 client management operations via GraphQL"
+		},
+		{
+			"name": "🔍 GraphQL Introspection",
+			"item": [
+				{
+					"name": "GraphQL Schema Introspection",
+					"id": "49009646-498ee20f-264a-4edd-851d-edb8218d313d",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query IntrospectionQuery {\\n    __schema {\\n      queryType {\\n        name\\n        fields {\\n          name\\n          description\\n          type {\\n            name\\n          }\\n        }\\n      }\\n      mutationType {\\n        name\\n        fields {\\n          name\\n          description\\n          type {\\n            name\\n          }\\n        }\\n      }\\n      types {\\n        name\\n        description\\n        kind\\n      }\\n    }\\n  }\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get the GraphQL schema structure and available operations"
+					},
+					"response": []
+				}
+			],
+			"id": "49009646-ebe6ffae-bb8b-4df9-94e9-a523ad12c54b",
+			"description": "GraphQL schema exploration and introspection"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3002",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
