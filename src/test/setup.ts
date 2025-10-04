@@ -1,6 +1,15 @@
 // Global test setup file
 // This file runs before each test file
 
+// Mock the email service globally for all tests before any imports
+jest.mock('../config/email', () => ({
+  emailService: {
+    sendVerificationCode: jest.fn().mockResolvedValue(undefined),
+    sendEmail: jest.fn().mockResolvedValue(undefined),
+    testConnection: jest.fn().mockResolvedValue(true),
+  },
+}));
+
 import request from 'supertest';
 import { app, initializeServer } from '../app';
 import { disconnectDB, forceCloseDB } from '../config/database';

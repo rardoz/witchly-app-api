@@ -44,6 +44,12 @@ export class ConflictError extends CustomGraphQLError {
   }
 }
 
+export class TooManyRequestsError extends CustomGraphQLError {
+  constructor(message: string = 'Too many requests') {
+    super(message, 'TOO_MANY_REQUESTS', 429);
+  }
+}
+
 export class InternalServerError extends CustomGraphQLError {
   constructor(message: string = 'Internal server error') {
     super(message, 'INTERNAL_SERVER_ERROR', 500);
