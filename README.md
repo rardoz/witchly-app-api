@@ -56,8 +56,22 @@ npm start
 ```
 
 The API will be available at:
-- **REST endpoints**: `http://localhost:3000`
-- **GraphQL endpoint**: `http://localhost:3000/graphql`
+- **REST endpoints**: `http://localhost:3002`
+- **GraphQL endpoint**: `http://localhost:3002/graphql`
+
+### 4. Create OAuth2 Clients
+
+Create your first OAuth2 client to start using the API:
+
+```bash
+# Create an admin client (full access)
+npm run setup:client -- --preset admin --name "My Admin Client"
+
+# Or create a standard client (read/write access)
+npm run setup:client -- --preset read-write --name "My App"
+```
+
+💡 **See the [Authentication section](#-jwt-authentication-client-credentials) for detailed client setup options and usage.**
 
 ## 🏗️ Project Structure
 
@@ -207,7 +221,96 @@ JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-min-256-bits
 openssl rand -hex 32
 ```
 
-### 2. Client Registration (Admin Required)
+### 2. OAuth2 Client Setup
+
+The API includes a powerful client setup tool that allows you to create OAuth2 clients with different permission levels. This is the **easiest way** to get started with authentication.
+
+#### Quick Setup Commands
+
+```bash
+# Create admin client (full permissions)
+npm run setup:client -- --preset admin --name "Admin Dashboard"
+
+# Create standard user client (read + write)
+npm run setup:client -- --preset read-write --name "Mobile App"
+
+# Create read-only client (monitoring/analytics)
+npm run setup:client -- --preset read-only --name "Analytics Service"
+
+# Create service account (long-lived, automated)
+npm run setup:client -- --preset service --name "Background Service"
+```
+
+#### Available Client Types
+
+| Preset | Scopes | Duration | Use Case |
+|--------|--------|----------|----------|
+| `admin` | `read`, `write`, `admin` | 1 hour | Admin interfaces, management tools |
+| `read-write` | `read`, `write` | 2 hours | Standard applications, web/mobile apps |
+| `read-only` | `read` | 4 hours | Analytics, monitoring, reporting |
+| `service` | `read`, `write` | 24 hours | Background jobs, integrations |
+
+#### Custom Client Creation
+
+```bash
+# Custom scopes and expiration
+npm run setup:client -- --scopes read,write --name "Custom API Client" --expires 1800
+
+# With custom description
+npm run setup:client -- --scopes read --name "Public API" --description "Read-only public access"
+```
+
+#### Management Commands
+
+```bash
+# List all existing clients
+npm run setup:client -- --list
+
+# Force create (bypass duplicate check)
+npm run setup:client -- --preset admin --name "Admin Client" --force
+
+# Show help and usage
+npm run setup:client -- --help
+```
+
+#### Example Output
+
+When you create a client, you'll receive:
+
+```
+✅ 👤 user client created successfully!
+
+📋 Client Credentials:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Name:          Mobile App
+Type:          user
+Client ID:     client_abc123def456...
+Client Secret: 789xyz456abc123def...
+Scopes:        read, write
+Token Expires: 7200 seconds (2.0 hours)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔐 Save these credentials securely!
+💡 Use these in your Postman collection or API client
+
+📝 Example OAuth2 request:
+{
+  "grant_type": "client_credentials",
+  "client_id": "client_abc123def456...",
+  "client_secret": "789xyz456abc123def...",
+  "scope": "read write"
+}
+```
+
+**🔐 Important**: Save the `Client Secret` immediately - it cannot be retrieved later (only regenerated).
+
+#### Permission Scopes Explained
+
+- **`read`**: Query operations (view users, clients, data)
+- **`write`**: Create and update operations (add/modify records)
+- **`admin`**: Full administrative access (manage clients, delete operations)
+
+### 3. Manual Client Registration (Alternative)
 
 First, create a client application to get credentials:
 
@@ -230,7 +333,7 @@ mutation CreateClient {
 - `write` - Create/update operations
 - `admin` - Full access including client management
 
-### 3. Get Access Token
+### 4. Get Access Token
 
 Exchange your client credentials for a JWT access token:
 
@@ -255,7 +358,7 @@ curl -X POST http://localhost:3000/oauth/token \
 }
 ```
 
-### 4. Use Access Token
+### 5. Use Access Token
 
 Include the token in the Authorization header for all API requests:
 
@@ -646,6 +749,7 @@ Configuration in `.husky/pre-commit` and `package.json`.
 | `npm run test:watch` | Run tests in watch mode |
 | `npm run test:coverage` | Run tests with coverage report |
 | `npm run test:ci` | Run tests for CI environment |
+| `npm run setup:client` | Create OAuth2 clients with different permission levels |
 | `npm run lint` | Run Biome linting |
 | `npm run lint:fix` | Fix auto-fixable lint issues |
 | `npm run format` | Format code with Biome |

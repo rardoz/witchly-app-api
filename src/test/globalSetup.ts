@@ -1,11 +1,11 @@
 // Global setup file - runs once before all tests
 
-import 'dotenv/config';
+import { config } from 'dotenv';
 
+// Load test environment variables first
+config({ path: '.env.test' });
+// Then load .env as fallback for any missing variables
+config({ path: '.env' });
 export default async (): Promise<void> => {
-  // Set test environment variables
-  process.env.NODE_ENV = 'test';
-  process.env.JWT_SECRET = 'test-jwt-secret-for-testing-only';
-
   console.log('🚀 Global test setup - environment configured');
 };

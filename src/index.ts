@@ -1,6 +1,7 @@
+import 'dotenv/config';
 import app from './app';
 
-const PORT: number = 3000;
+const PORT: number = Number(process.env.PORT) || 3000;
 
 // Start server
 app.listen(PORT, () => {

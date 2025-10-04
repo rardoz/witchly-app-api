@@ -18,6 +18,7 @@
     "check": "biome check",
     "check:fix": "biome check --write",
     "type-check": "tsc --noEmit",
+    "setup:client": "ts-node scripts/setup-admin-client.ts",
     "prepare": "husky"
   },
   "repository": {
