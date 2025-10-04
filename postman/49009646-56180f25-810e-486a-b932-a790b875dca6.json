@@ -369,7 +369,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation DeleteUser( $id: ID! ) {\n        deleteUser(id: $id)\n }",
-								"variables": "{\n    \"id\": \"68e093203e9a0767c092581e\"\n}"
+								"variables": "{\n    \"id\": \"68e1a10a3360e5cd78e88071\"\n}"
 							}
 						},
 						"url": {
