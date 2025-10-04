@@ -60,5 +60,21 @@
     "formatter": {
       "enabled": true
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": [
+        "postman/**/*.json",
+        ".vscode/**/*.json",
+        "package.json",
+        "package-lock.json"
+      ],
+      "formatter": {
+        "enabled": false
+      },
+      "linter": {
+        "enabled": false
+      }
+    }
+  ]
 }
