@@ -1,15 +1,19 @@
 import { Field, ID, ObjectType } from 'type-graphql';
+import { BaseProfileObjectType } from '../../shared/profile.schema';
 
 @ObjectType()
-export class User {
+export class User extends BaseProfileObjectType {
   @Field(() => ID)
   id: string;
 
   @Field()
-  name: string;
+  email: string;
 
   @Field()
-  email: string;
+  emailVerified: boolean;
+
+  @Field()
+  handle: string;
 
   @Field()
   userType: string;
@@ -19,46 +23,4 @@ export class User {
 
   @Field()
   updatedAt: Date;
-
-  @Field({ nullable: true })
-  profileImageUrl?: string;
-
-  @Field({ nullable: true })
-  bio?: string;
-
-  @Field({ nullable: true })
-  shortBio?: string;
-
-  @Field({ nullable: true })
-  handle?: string;
-
-  @Field({ nullable: true })
-  backdropImageUrl?: string;
-
-  @Field({ nullable: true })
-  instagramHandle?: string;
-
-  @Field({ nullable: true })
-  tikTokHandle?: string;
-
-  @Field({ nullable: true })
-  twitterHandle?: string;
-
-  @Field({ nullable: true })
-  websiteUrl?: string;
-
-  @Field({ nullable: true })
-  facebookUrl?: string;
-
-  @Field({ nullable: true })
-  snapchatHandle?: string;
-
-  @Field({ nullable: true })
-  primaryColor?: string;
-
-  @Field({ nullable: true })
-  sign?: string;
-
-  @Field({ nullable: true })
-  sex?: string;
 }
