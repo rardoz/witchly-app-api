@@ -6,12 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": [
-      "src/**/*",
-      "package.json",
-      "package-lock.json",
-      "jest.config.js"
-    ],
+    "includes": ["**/*"],
     "ignoreUnknown": false
   },
   "formatter": {

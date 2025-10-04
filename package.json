@@ -11,7 +11,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:ci": "jest --ci --coverage --watchAll=false",
-    "lint": "biome lint src/",
+    "lint": "biome lint",
     "lint:fix": "biome lint --write",
     "format": "biome format --write",
     "format:check": "biome format",
@@ -65,9 +65,11 @@
   },
   "lint-staged": {
     "*.ts": [
+      "biome format --write",
       "biome check --write"
     ],
     "*.js": [
+      "biome format --write",
       "biome check --write"
     ],
     "*.{json,jsonc}": [
