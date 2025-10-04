@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import 'dotenv/config';
-import { HeaderMap } from '@apollo/server';
+import { HeaderMap, type HTTPGraphQLResponse } from '@apollo/server';
 import cors from 'cors';
 import express, { type Request, type Response } from 'express';
 import { connectDB } from './config/database';
@@ -10,6 +10,46 @@ import {
   createGraphQLContext,
   optionalAuth,
 } from './middleware/auth.middleware';
+
+// Utility function to handle Apollo Server response parsing and status extraction
+function processApolloResponse(response: HTTPGraphQLResponse): {
+  body: unknown;
+  statusCode: number;
+} {
+  let statusCode = response.status || 200;
+  let responseBody: unknown = response.body;
+
+  // Handle Apollo Server v5 streamed response format
+  if (
+    typeof responseBody === 'object' &&
+    responseBody &&
+    'kind' in responseBody &&
+    (responseBody as { kind: string }).kind === 'complete' &&
+    'string' in responseBody
+  ) {
+    try {
+      const parsedBody = JSON.parse(
+        (responseBody as { string: string }).string
+      );
+      responseBody = parsedBody;
+
+      // Extract custom HTTP status codes from GraphQL errors
+      if (parsedBody?.errors && Array.isArray(parsedBody.errors)) {
+        const errorWithStatus = parsedBody.errors.find(
+          (error: { extensions?: { http?: { status?: number } } }) =>
+            error.extensions?.http?.status
+        );
+        if (errorWithStatus) {
+          statusCode = errorWithStatus.extensions.http.status;
+        }
+      }
+    } catch {
+      responseBody = (responseBody as { string: string }).string;
+    }
+  }
+
+  return { body: responseBody, statusCode };
+}
 
 // Initialize Express application with TypeScript support
 const app = express();
@@ -59,38 +99,9 @@ const initializeServer = async () => {
           context: async () => createGraphQLContext(req),
         });
 
-        // Extract status code from GraphQL errors if present
-        let statusCode = response.status || 200;
-
-        // Parse response body to check for GraphQL errors with custom status codes
-        let responseBody: unknown = response.body;
-        if (
-          typeof responseBody === 'object' &&
-          responseBody &&
-          'kind' in responseBody &&
-          (responseBody as { kind: string }).kind === 'complete' &&
-          'string' in responseBody
-        ) {
-          try {
-            const parsedBody = JSON.parse(
-              (responseBody as { string: string }).string
-            );
-            responseBody = parsedBody;
-
-            // Check for GraphQL errors with custom HTTP status codes
-            if (parsedBody?.errors && Array.isArray(parsedBody.errors)) {
-              const errorWithStatus = parsedBody.errors.find(
-                (error: { extensions?: { http?: { status?: number } } }) =>
-                  error.extensions?.http?.status
-              );
-              if (errorWithStatus) {
-                statusCode = errorWithStatus.extensions.http.status;
-              }
-            }
-          } catch {
-            responseBody = (responseBody as { string: string }).string;
-          }
-        }
+        // Process Apollo Server response and extract status code
+        const { body: responseBody, statusCode } =
+          processApolloResponse(response);
 
         res.status(statusCode);
         for (const [key, value] of response.headers) {
