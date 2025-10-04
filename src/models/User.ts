@@ -1,34 +1,24 @@
 import { type Document, model, Schema } from 'mongoose';
+import {
+  createProfileFieldsSchema,
+  IProfileFields,
+} from '../shared/profile.schema';
 
-export interface IUser extends Document {
-  name: string;
+export interface IUser extends Document, IProfileFields {
   email: string;
   userType: string;
-  profileImageUrl?: string;
-  bio?: string;
-  shortBio?: string;
-  handle?: string;
-  backdropImageUrl?: string;
-  instagramHandle?: string;
-  tikTokHandle?: string;
-  twitterHandle?: string;
-  websiteUrl?: string;
-  facebookUrl?: string;
-  snapchatHandle?: string;
-  primaryColor?: string;
-  sign?: string;
-  sex?: string;
+  emailVerified: boolean;
+  handle: string; // Made required for signup flow
   createdAt: Date;
   updatedAt: Date;
 }
 
 const userSchema = new Schema<IUser>(
   {
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+    // Profile fields from shared schema
+    ...createProfileFieldsSchema(),
+
+    // User-specific fields
     email: {
       type: String,
       required: true,
@@ -41,63 +31,17 @@ const userSchema = new Schema<IUser>(
       required: true,
       lowercase: true,
       trim: true,
+      default: 'basic', // Default for signup flow
     },
-    profileImageUrl: {
-      type: String,
-      trim: true,
-    },
-    bio: {
-      type: String,
-      trim: true,
-    },
-    shortBio: {
-      type: String,
-      trim: true,
+    emailVerified: {
+      type: Boolean,
+      required: true,
+      default: false,
     },
     handle: {
       type: String,
+      required: true, // Made required for signup flow
       unique: true,
-      sparse: true,
-      trim: true,
-    },
-    backdropImageUrl: {
-      type: String,
-      trim: true,
-    },
-    instagramHandle: {
-      type: String,
-      trim: true,
-    },
-    tikTokHandle: {
-      type: String,
-      trim: true,
-    },
-    twitterHandle: {
-      type: String,
-      trim: true,
-    },
-    websiteUrl: {
-      type: String,
-      trim: true,
-    },
-    facebookUrl: {
-      type: String,
-      trim: true,
-    },
-    snapchatHandle: {
-      type: String,
-      trim: true,
-    },
-    primaryColor: {
-      type: String,
-      trim: true,
-    },
-    sign: {
-      type: String,
-      trim: true,
-    },
-    sex: {
-      type: String,
       trim: true,
     },
   },
@@ -105,5 +49,9 @@ const userSchema = new Schema<IUser>(
     timestamps: true,
   }
 );
+
+// Indexes for performance (email and handle already indexed via unique: true)
+userSchema.index({ userType: 1 });
+userSchema.index({ emailVerified: 1 });
 
 export const User = model<IUser>('User', userSchema);

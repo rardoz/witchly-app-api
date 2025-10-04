@@ -77,9 +77,24 @@ describe('UserResolver GraphQL Endpoints', () => {
     beforeEach(async () => {
       // Create some test users
       await User.create([
-        { name: 'User 1', email: 'user1@test.com', userType: 'user' },
-        { name: 'User 2', email: 'user2@test.com', userType: 'admin' },
-        { name: 'User 3', email: 'user3@test.com', userType: 'user' },
+        {
+          name: 'User 1',
+          email: 'user1@test.com',
+          userType: 'user',
+          handle: 'user_1',
+        },
+        {
+          name: 'User 2',
+          email: 'user2@test.com',
+          userType: 'admin',
+          handle: 'user_2',
+        },
+        {
+          name: 'User 3',
+          email: 'user3@test.com',
+          userType: 'user',
+          handle: 'user_3',
+        },
       ]);
     });
 
@@ -209,6 +224,7 @@ describe('UserResolver GraphQL Endpoints', () => {
         email: 'test.user@example.com',
         userType: 'user',
         bio: 'Test biography',
+        handle: 'test_user',
       });
       createdUserId = user.id;
     });
@@ -340,6 +356,7 @@ describe('UserResolver GraphQL Endpoints', () => {
         name: 'Existing User',
         email: 'duplicate@example.com',
         userType: 'user',
+        handle: 'existing_user',
       });
 
       const mutation = `
@@ -362,6 +379,7 @@ describe('UserResolver GraphQL Endpoints', () => {
               name: 'Another User',
               email: 'duplicate@example.com',
               userType: 'user',
+              handle: 'another_user',
             },
           },
         });
@@ -404,6 +422,7 @@ describe('UserResolver GraphQL Endpoints', () => {
         email: 'original@example.com',
         userType: 'user',
         bio: 'Original bio',
+        handle: 'original_user',
       });
       createdUserId = user.id;
     });
@@ -516,6 +535,7 @@ describe('UserResolver GraphQL Endpoints', () => {
         name: 'To Be Deleted',
         email: 'delete@example.com',
         userType: 'user',
+        handle: 'to_be_deleted',
       });
       createdUserId = user.id;
     });
@@ -605,6 +625,7 @@ describe('UserResolver GraphQL Endpoints', () => {
               name: 'Lifecycle Test User',
               email: 'lifecycle@example.com',
               userType: 'user',
+              handle: 'lifecycle_test',
             },
           },
         });

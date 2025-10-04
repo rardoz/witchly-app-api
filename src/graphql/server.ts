@@ -8,6 +8,7 @@ import { type GraphQLFormattedError } from 'graphql';
 import { buildSchema } from 'type-graphql';
 import { AuthResolver } from './resolvers/AuthResolver';
 import { ClientResolver } from './resolvers/ClientResolver';
+import { SignupResolver } from './resolvers/SignupResolver';
 import { UserResolver } from './resolvers/UserResolver';
 
 // Comprehensive plugin to handle Apollo Server v5 response processing and HTTP status codes
@@ -86,7 +87,7 @@ const responseProcessingPlugin: ApolloServerPlugin<BaseContext> = {
 
 export const createApolloServer = async (): Promise<ApolloServer> => {
   const schema = await buildSchema({
-    resolvers: [UserResolver, ClientResolver, AuthResolver],
+    resolvers: [UserResolver, ClientResolver, AuthResolver, SignupResolver],
     validate: false,
   });
 
