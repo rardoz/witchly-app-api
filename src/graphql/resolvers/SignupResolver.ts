@@ -1,7 +1,8 @@
 import bcrypt from 'bcrypt';
-import { Arg, Mutation, Resolver } from 'type-graphql';
+import { Arg, Ctx, Mutation, Resolver } from 'type-graphql';
 import validator from 'validator';
 import { emailService } from '../../config/email';
+import { GraphQLContext } from '../../middleware/auth.middleware';
 import { EmailVerification } from '../../models/EmailVerification';
 import { Signup } from '../../models/Signup';
 import { User } from '../../models/User';
@@ -9,6 +10,7 @@ import {
   ConflictError,
   NotFoundError,
   TooManyRequestsError,
+  UnauthorizedError,
   ValidationError,
 } from '../../utils/errors';
 import {
@@ -25,8 +27,13 @@ import { User as GraphQLUser } from '../types/User';
 export class SignupResolver {
   @Mutation(() => InitiateSignupResponse)
   async initiateSignup(
+    @Ctx() context: GraphQLContext,
     @Arg('input') input: InitiateSignupInput
   ): Promise<InitiateSignupResponse> {
+    if (!context.isAuthenticated || !context.hasScope('write')) {
+      throw new UnauthorizedError('Write access required');
+    }
+
     const { email } = input;
 
     try {
@@ -126,8 +133,12 @@ export class SignupResolver {
 
   @Mutation(() => CompleteSignupResponse)
   async completeSignup(
+    @Ctx() context: GraphQLContext,
     @Arg('input') input: CompleteSignupInput
   ): Promise<CompleteSignupResponse> {
+    if (!context.isAuthenticated || !context.hasScope('write')) {
+      throw new UnauthorizedError('Write access required');
+    }
     const { email, verificationCode } = input;
 
     try {

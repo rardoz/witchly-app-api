@@ -4,11 +4,13 @@ export interface EmailConfig {
   host: string;
   port: number;
   secure: boolean;
+  requireTLS?: boolean;
   auth: {
     user: string;
     pass: string;
   };
   from: string;
+  fromName?: string; // Optional display name
 }
 
 export interface EmailTemplate {
@@ -22,12 +24,24 @@ export class EmailService {
   private fromAddress: string;
 
   constructor(config: EmailConfig) {
-    this.fromAddress = config.from;
+    // Format the from address with optional display name
+    if (config.fromName) {
+      this.fromAddress = `"${config.fromName}" <${config.from}>`;
+    } else {
+      this.fromAddress = config.from;
+    }
+
+    // AWS SES configuration with proper TLS settings
     this.transporter = nodemailer.createTransport({
       host: config.host,
       port: config.port,
-      secure: config.secure,
+      secure: config.secure, // false for port 587, true for port 465
+      requireTLS: config.requireTLS !== undefined ? config.requireTLS : true,
       auth: config.auth,
+      tls: {
+        // Do not fail on invalid certs for AWS SES
+        rejectUnauthorized: false,
+      },
     });
   }
 
@@ -180,15 +194,5 @@ If you have any questions, please contact our support team.
     `;
 
     return { subject, html, text };
-  }
-
-  async testConnection(): Promise<boolean> {
-    try {
-      await this.transporter.verify();
-      return true;
-    } catch (error) {
-      console.error('Email service connection test failed:', error);
-      return false;
-    }
   }
 }

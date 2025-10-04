@@ -5,11 +5,13 @@ const emailConfig: EmailConfig = {
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
   port: Number.parseInt(process.env.SMTP_PORT || '587', 10),
   secure: process.env.SMTP_SECURE === 'true',
+  requireTLS: true, // Always require TLS for AWS SES
   auth: {
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
   },
   from: process.env.EMAIL_FROM || 'noreply@witchly.app',
+  ...(process.env.EMAIL_FROM_NAME && { fromName: process.env.EMAIL_FROM_NAME }),
 };
 
 // Create and export email service instance

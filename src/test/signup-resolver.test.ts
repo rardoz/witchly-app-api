@@ -9,6 +9,8 @@ import {
 } from '../services/jwt.service';
 
 describe('SignupResolver GraphQL Endpoints', () => {
+  let accessToken: string;
+
   const testClient = {
     clientId: '',
     clientSecret: '',
@@ -36,6 +38,25 @@ describe('SignupResolver GraphQL Endpoints', () => {
       tokenExpiresIn: 3600,
     });
     await client.save();
+
+    // Get access token using GraphQL mutation
+    const authMutation = `
+      mutation {
+        authenticate(
+          grant_type: "client_credentials"
+          client_id: "${testClient.clientId}"
+          client_secret: "${testClient.clientSecret}"
+          scope: "read write"
+        ) {
+          access_token
+        }
+      }
+    `;
+
+    const tokenResponse = await testRequest
+      .post('/graphql')
+      .send({ query: authMutation });
+    accessToken = tokenResponse.body.data.authenticate.access_token;
   }, 30000);
 
   afterAll(async () => {
@@ -67,12 +88,15 @@ describe('SignupResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest.post('/graphql').send({
-        query: mutation,
-        variables: {
-          input: validSignupData,
-        },
-      });
+      const response = await testRequest
+        .post('/graphql')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          query: mutation,
+          variables: {
+            input: validSignupData,
+          },
+        });
 
       expect(response.status).toBe(200);
       expect(response.body.data.initiateSignup.success).toBe(true);
@@ -113,12 +137,15 @@ describe('SignupResolver GraphQL Endpoints', () => {
         email: 'no-name.test@example.com',
       };
 
-      const response = await testRequest.post('/graphql').send({
-        query: mutation,
-        variables: {
-          input: signupDataWithoutName,
-        },
-      });
+      const response = await testRequest
+        .post('/graphql')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          query: mutation,
+          variables: {
+            input: signupDataWithoutName,
+          },
+        });
 
       expect(response.status).toBe(200);
       expect(response.body.data.initiateSignup.success).toBe(true);
@@ -157,12 +184,15 @@ describe('SignupResolver GraphQL Endpoints', () => {
         email: 'simple-signup.test@example.com',
       };
 
-      const response = await testRequest.post('/graphql').send({
-        query: mutation,
-        variables: {
-          input: simpleSignupData,
-        },
-      });
+      const response = await testRequest
+        .post('/graphql')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          query: mutation,
+          variables: {
+            input: simpleSignupData,
+          },
+        });
 
       expect(response.status).toBe(200);
       expect(response.body.data.initiateSignup.success).toBe(true);
@@ -194,15 +224,18 @@ describe('SignupResolver GraphQL Endpoints', () => {
       `;
 
       const testEmail = 'mock.test@example.com';
-      const response = await testRequest.post('/graphql').send({
-        query: mutation,
-        variables: {
-          input: {
-            ...validSignupData,
-            email: testEmail,
+      const response = await testRequest
+        .post('/graphql')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          query: mutation,
+          variables: {
+            input: {
+              ...validSignupData,
+              email: testEmail,
+            },
           },
-        },
-      });
+        });
 
       expect(response.status).toBe(200);
       expect(response.body.data.initiateSignup.success).toBe(true);
@@ -225,15 +258,18 @@ describe('SignupResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest.post('/graphql').send({
-        query: mutation,
-        variables: {
-          input: {
-            ...validSignupData,
-            email: 'invalid-email',
+      const response = await testRequest
+        .post('/graphql')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          query: mutation,
+          variables: {
+            input: {
+              ...validSignupData,
+              email: 'invalid-email',
+            },
           },
-        },
-      });
+        });
 
       expect(response.status).toBe(400);
       expect(response.body.errors[0].extensions.code).toBe('VALIDATION_ERROR');
@@ -258,12 +294,15 @@ describe('SignupResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest.post('/graphql').send({
-        query: mutation,
-        variables: {
-          input: validSignupData,
-        },
-      });
+      const response = await testRequest
+        .post('/graphql')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          query: mutation,
+          variables: {
+            input: validSignupData,
+          },
+        });
 
       expect(response.status).toBe(409);
       expect(response.body.errors[0].extensions.code).toBe('CONFLICT');
@@ -285,19 +324,25 @@ describe('SignupResolver GraphQL Endpoints', () => {
       };
 
       // Send first request
-      const firstResponse = await testRequest.post('/graphql').send({
-        query: mutation,
-        variables: { input: testData },
-      });
+      const firstResponse = await testRequest
+        .post('/graphql')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          query: mutation,
+          variables: { input: testData },
+        });
 
       expect(firstResponse.status).toBe(200);
       expect(firstResponse.body.data.initiateSignup.success).toBe(true);
 
       // Immediately send second request - should be rate limited
-      const secondResponse = await testRequest.post('/graphql').send({
-        query: mutation,
-        variables: { input: testData },
-      });
+      const secondResponse = await testRequest
+        .post('/graphql')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          query: mutation,
+          variables: { input: testData },
+        });
 
       expect(secondResponse.status).toBe(429);
       expect(secondResponse.body.errors[0].extensions.code).toBe(
@@ -315,14 +360,17 @@ describe('SignupResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest.post('/graphql').send({
-        query: mutation,
-        variables: {
-          input: {
-            email: 'invalid-email-format', // Invalid email format
+      const response = await testRequest
+        .post('/graphql')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          query: mutation,
+          variables: {
+            input: {
+              email: 'invalid-email-format', // Invalid email format
+            },
           },
-        },
-      });
+        });
 
       expect(response.status).toBe(400);
       expect(response.body.errors[0].extensions.code).toBe('VALIDATION_ERROR');
@@ -372,15 +420,18 @@ describe('SignupResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest.post('/graphql').send({
-        query: mutation,
-        variables: {
-          input: {
-            email: testEmail,
-            verificationCode,
+      const response = await testRequest
+        .post('/graphql')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          query: mutation,
+          variables: {
+            input: {
+              email: testEmail,
+              verificationCode,
+            },
           },
-        },
-      });
+        });
 
       expect(response.status).toBe(200);
       expect(response.body.data.completeSignup.success).toBe(true);
@@ -418,15 +469,18 @@ describe('SignupResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest.post('/graphql').send({
-        query: mutation,
-        variables: {
-          input: {
-            email: testEmail,
-            verificationCode: '999999',
+      const response = await testRequest
+        .post('/graphql')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          query: mutation,
+          variables: {
+            input: {
+              email: testEmail,
+              verificationCode: '999999',
+            },
           },
-        },
-      });
+        });
 
       expect(response.status).toBe(400);
       expect(response.body.errors[0].extensions.code).toBe('VALIDATION_ERROR');
@@ -448,15 +502,18 @@ describe('SignupResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest.post('/graphql').send({
-        query: mutation,
-        variables: {
-          input: {
-            email: testEmail,
-            verificationCode,
+      const response = await testRequest
+        .post('/graphql')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          query: mutation,
+          variables: {
+            input: {
+              email: testEmail,
+              verificationCode,
+            },
           },
-        },
-      });
+        });
 
       expect(response.status).toBe(404);
       expect(response.body.errors[0].extensions.code).toBe('NOT_FOUND');
@@ -472,15 +529,18 @@ describe('SignupResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest.post('/graphql').send({
-        query: mutation,
-        variables: {
-          input: {
-            email: 'nonexistent@example.com',
-            verificationCode: '123456',
+      const response = await testRequest
+        .post('/graphql')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          query: mutation,
+          variables: {
+            input: {
+              email: 'nonexistent@example.com',
+              verificationCode: '123456',
+            },
           },
-        },
-      });
+        });
 
       expect(response.status).toBe(404);
       expect(response.body.errors[0].extensions.code).toBe('NOT_FOUND');
@@ -498,27 +558,33 @@ describe('SignupResolver GraphQL Endpoints', () => {
 
       // Make multiple failed attempts
       for (let i = 0; i < 3; i++) {
-        await testRequest.post('/graphql').send({
+        await testRequest
+          .post('/graphql')
+          .set('Authorization', `Bearer ${accessToken}`)
+          .send({
+            query: mutation,
+            variables: {
+              input: {
+                email: testEmail,
+                verificationCode: '999999',
+              },
+            },
+          });
+      }
+
+      // Next attempt should be blocked
+      const response = await testRequest
+        .post('/graphql')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
           query: mutation,
           variables: {
             input: {
               email: testEmail,
-              verificationCode: '999999',
+              verificationCode: verificationCode,
             },
           },
         });
-      }
-
-      // Next attempt should be blocked
-      const response = await testRequest.post('/graphql').send({
-        query: mutation,
-        variables: {
-          input: {
-            email: testEmail,
-            verificationCode: verificationCode,
-          },
-        },
-      });
 
       expect(response.status).toBe(429);
       expect(response.body.errors[0].extensions.code).toBe('TOO_MANY_REQUESTS');
@@ -543,10 +609,13 @@ describe('SignupResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const initiateResponse = await testRequest.post('/graphql').send({
-        query: initiateMutation,
-        variables: { input: signupData },
-      });
+      const initiateResponse = await testRequest
+        .post('/graphql')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          query: initiateMutation,
+          variables: { input: signupData },
+        });
 
       expect(initiateResponse.status).toBe(200);
       expect(initiateResponse.body.data.initiateSignup.success).toBe(true);
@@ -588,15 +657,18 @@ describe('SignupResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const completeResponse = await testRequest.post('/graphql').send({
-        query: completeMutation,
-        variables: {
-          input: {
-            email: fullFlowEmail,
-            verificationCode: testCode,
+      const completeResponse = await testRequest
+        .post('/graphql')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          query: completeMutation,
+          variables: {
+            input: {
+              email: fullFlowEmail,
+              verificationCode: testCode,
+            },
           },
-        },
-      });
+        });
 
       expect(completeResponse.status).toBe(200);
       expect(completeResponse.body.data.completeSignup.success).toBe(true);
