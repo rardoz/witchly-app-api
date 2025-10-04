@@ -615,12 +615,31 @@
 			}
 		]
 	},
-	"variable": [
+	"event": [
 		{
-			"key": "baseUrl",
-			"value": "http://localhost:3002",
-			"type": "string"
+			"listen": "prerequest",
+			"script": {
+				"id": "14bfee27-43f1-435d-bec4-2836e15bd0e0",
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
 		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "5e452c9b-6770-4b41-8e83-ed4dfec38914",
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
 		{
 			"key": "accessToken",
 			"value": "",
