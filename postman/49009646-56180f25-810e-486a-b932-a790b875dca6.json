@@ -172,7 +172,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation CompleteSignup($input: CompleteSignupInput!) {\n    completeSignup(input: $input) {\n        success\n        message\n        user {\n            id\n            email\n            handle\n            userType\n            emailVerified\n            createdAt\n            updatedAt\n            name\n            bio\n            shortBio\n            profileImageUrl\n            backdropImageUrl\n            instagramHandle\n            tikTokHandle\n            twitterHandle\n            websiteUrl\n            facebookUrl\n            snapchatHandle\n            primaryColor\n            sign\n            sex\n            location\n            birthDate\n            pronouns\n        }\n    }\n}",
-								"variables": "{\n    \"input\": {\n        \"email\": \"witchlyapp@gmail.com\",\n        \"verificationCode\": \"524101\"\n    }\n}"
+								"variables": "{\n    \"input\": {\n        \"email\": \"witchlyapp@gmail.com\",\n        \"verificationCode\": \"328394\"\n    }\n}"
 							}
 						},
 						"url": {
