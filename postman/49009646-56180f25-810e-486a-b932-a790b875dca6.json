@@ -46,7 +46,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation Authenticate($grantType: String!, $clientId: String!, $clientSecret: String!, $scope: String) { \n        authenticate(grant_type: $grantType, client_id: $clientId, client_secret: $clientSecret, scope: $scope) { \n            access_token \n            token_type \n            expires_in scope \n        } \n    }",
-								"variables": "{\n    \"grantType\": \"client_credentials\",\n    \"clientId\": \"xxx\",\n    \"clientSecret\": \"xxx\",\n    \"scope\": \"read write\"\n  }"
+								"variables": "{\n    \"grantType\": \"client_credentials\",\n    \"clientId\": \"{{clientId}}\",\n    \"clientSecret\": \"{{clientSecret}}\",\n    \"scope\": \"read write\"\n  }"
 							}
 						},
 						"url": {
