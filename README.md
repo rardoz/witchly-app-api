@@ -8,7 +8,7 @@ A modern TypeScript Express.js API with GraphQL and MongoDB integration, featuri
 - **Framework**: Express.js 5.x
 - **Database**: MongoDB with Mongoose ODM
 - **API**: GraphQL with Apollo Server v5 and type-graphql
-- **Authentication**: JWT with OAuth2 Client Credentials flow
+- **Authentication**: JWT with OAuth2 Client Credentials flow and comprehensive scope validation
 - **Testing**: Jest with Supertest for HTTP testing
 - **Code Quality**: Biome for linting and formatting
 - **Git Hooks**: Husky with lint-staged for pre-commit checks
@@ -84,6 +84,9 @@ src/
 │   └── Client.ts            # OAuth2 client model for authentication
 ├── services/
 │   └── jwt.service.ts       # JWT token generation and validation
+├── utils/
+│   ├── errors.ts            # Custom error classes
+│   └── scopes.ts            # OAuth2 scope validation system
 ├── middleware/
 │   └── auth.middleware.ts   # JWT authentication middleware
 ├── graphql/
@@ -101,7 +104,10 @@ src/
 ├── test/
 │   ├── setup.ts             # Jest test configuration
 │   ├── app.test.ts          # Basic app tests
-│   └── auth.test.ts         # Authentication flow tests
+│   ├── auth.test.ts         # Authentication flow tests
+│   ├── scopes.test.ts       # Scope validation unit tests
+│   ├── required-scope.test.ts # Required scope parameter tests
+│   └── auth-scope-validation.test.ts # Scope integration tests
 ├── app.ts                   # Express app with GraphQL and auth
 └── index.ts                 # Server entry point
 ```
@@ -590,6 +596,199 @@ scope: "admin"      # Error: Client not authorized for scopes: admin
 # ❌ Invalid: Bad format
 scope: "read-only"  # Error: Invalid scope format
 ```
+
+## 🔒 Comprehensive Scope Validation System
+
+The API implements a robust scope validation system that ensures secure access control and follows OAuth2 best practices. All scope validation happens at multiple levels to provide comprehensive security.
+
+### Scope Validation Levels
+
+#### 1. **GraphQL Schema Validation**
+- The `scope` parameter is **required** in the `authenticate` mutation
+- Missing scope parameter triggers GraphQL validation error before reaching business logic
+- Ensures all authentication requests explicitly declare required permissions
+
+#### 2. **Format Validation**
+- Scopes must contain only letters, numbers, and underscores: `/^[a-zA-Z0-9_]+$/`
+- Multiple scopes are space-separated: `"read write admin"`
+- Empty strings and invalid characters are rejected immediately
+
+#### 3. **System-Wide Scope Registry**
+- **Valid scopes**: `read`, `write`, `admin` (defined in `src/utils/scopes.ts`)
+- **Centralized management**: All valid scopes are maintained in the `VALID_SCOPES` constant
+- **Consistent validation**: Same validation logic used across authentication and client management
+
+#### 4. **Client Authorization Validation**
+- Clients can only request scopes they are authorized for (defined in `allowedScopes`)
+- Requesting unauthorized scopes returns a detailed error with the specific unauthorized scope names
+- Supports subset selection: clients can request fewer scopes than they're authorized for
+
+### Scope Validation Flow
+
+```mermaid
+flowchart TD
+    A[Authentication Request] --> B{Scope Parameter Present?}
+    B -->|No| C[GraphQL Validation Error]
+    B -->|Yes| D{Scope Non-Empty?}
+    D -->|No| E[Custom Validation Error]
+    D -->|Yes| F{Valid Scope Format?}
+    F -->|No| G[Format Error]
+    F -->|Yes| H{Scopes Exist in System?}
+    H -->|No| I[Invalid Scope Error]
+    H -->|Yes| J{Client Authorized for Scopes?}
+    J -->|No| K[Unauthorized Scope Error]
+    J -->|Yes| L[Generate JWT Token]
+    
+    C --> M[Return Error Response]
+    E --> M
+    G --> M
+    I --> M
+    K --> M
+    L --> N[Return Access Token]
+```
+
+### Detailed Error Responses
+
+#### Missing Scope Parameter
+```json
+{
+  "errors": [
+    {
+      "message": "Field \"authenticate\" argument \"scope\" of type \"String!\" is required, but it was not provided.",
+      "extensions": {
+        "code": "GRAPHQL_VALIDATION_FAILED"
+      }
+    }
+  ]
+}
+```
+
+#### Empty Scope String
+```json
+{
+  "errors": [
+    {
+      "message": "Missing required fields: scope must be a non-empty string",
+      "extensions": {
+        "code": "BAD_USER_INPUT"
+      }
+    }
+  ]
+}
+```
+
+#### Invalid Scope Format
+```json
+{
+  "errors": [
+    {
+      "message": "Invalid scope format: read-only. Scopes must contain only letters, numbers, and underscores.",
+      "extensions": {
+        "code": "BAD_USER_INPUT"
+      }
+    }
+  ]
+}
+```
+
+#### Non-Existent Scope
+```json
+{
+  "errors": [
+    {
+      "message": "Invalid scope: superuser. Valid scopes are: read, write, admin",
+      "extensions": {
+        "code": "BAD_USER_INPUT"
+      }
+    }
+  ]
+}
+```
+
+#### Unauthorized Scope for Client
+```json
+{
+  "errors": [
+    {
+      "message": "Client not authorized for scopes: admin. Allowed scopes: read, write",
+      "extensions": {
+        "code": "FORBIDDEN"
+      }
+    }
+  ]
+}
+```
+
+### Implementation Details
+
+#### Core Validation Functions
+The scope validation system is implemented in `src/utils/scopes.ts`:
+
+```typescript
+// System-wide valid scopes
+export const VALID_SCOPES = ['read', 'write', 'admin'] as const;
+
+// Parse and validate scope string format and existence
+export function parseAndValidateScopes(scopeString: string): string[]
+
+// Validate client is authorized for requested scopes  
+export function validateClientScopes(requestedScopes: string[], allowedScopes: string[]): boolean
+
+// Check if individual scope exists in system
+export function isValidScope(scope: string): boolean
+```
+
+#### Usage in Authentication Flow
+1. **Parameter Validation**: GraphQL schema enforces required `scope` parameter
+2. **Format Parsing**: `parseAndValidateScopes()` validates format and existence
+3. **Authorization Check**: `validateClientScopes()` verifies client permissions
+4. **Token Generation**: Validated scopes are included in JWT payload
+
+### Best Practices for Scope Usage
+
+#### **Principle of Least Privilege**
+```graphql
+# ✅ Good: Request only needed scopes
+scope: "read"              # For read-only operations
+
+# ❌ Avoid: Requesting unnecessary scopes  
+scope: "read write admin"  # When only read access is needed
+```
+
+#### **Scope-Specific Client Design**
+```bash
+# Create specialized clients for different use cases
+npm run setup:client -- --preset read-only --name "Analytics Dashboard"
+npm run setup:client -- --preset read-write --name "Mobile App"  
+npm run setup:client -- --preset admin --name "Admin Console"
+```
+
+#### **Progressive Scope Elevation**
+```graphql
+# Start with minimal scopes
+scope: "read"
+
+# Authenticate again with elevated scopes when needed
+scope: "read write"
+```
+
+### Testing Scope Validation
+
+The scope validation system includes comprehensive test coverage:
+
+- **Required parameter tests**: `src/test/required-scope.test.ts`
+- **Validation logic tests**: `src/test/scopes.test.ts`  
+- **Integration tests**: `src/test/auth-scope-validation.test.ts`
+
+Example test scenarios:
+- Missing scope parameter (GraphQL validation)
+- Empty scope strings (custom validation)
+- Invalid scope formats (format validation)
+- Non-existent scopes (system validation)
+- Unauthorized scope requests (client validation)
+- Valid scope combinations (success cases)
+
+This multi-layered approach ensures that scope validation is robust, secure, and provides clear feedback for developers integrating with the API.
 
 ### 5. Use Access Token
 
