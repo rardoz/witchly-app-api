@@ -1,31 +1,11 @@
 {
   "info": {
+    "_postman_id": "56180f25-810e-486a-b932-a790b875dca6",
     "name": "Witchly App API",
     "description": "Comprehensive API collection for Witchly App - includes OAuth2 authentication, GraphQL queries and mutations for user and client management",
-    "version": "1.0.0",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "variable": [
-    {
-      "key": "baseUrl",
-      "value": "http://localhost:3002",
-      "type": "string"
-    },
-    {
-      "key": "accessToken",
-      "value": "",
-      "type": "string"
-    }
-  ],
-  "auth": {
-    "type": "bearer",
-    "bearer": [
-      {
-        "key": "token",
-        "value": "{{accessToken}}",
-        "type": "string"
-      }
-    ]
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "49009646",
+    "_collection_link": "https://witchlyapp-203953.postman.co/workspace/Witchly-App's-Workspace~4783bd47-8579-42b0-89fd-82f778b422d7/collection/49009646-56180f25-810e-486a-b932-a790b875dca6?action=share&source=collection_link&creator=49009646"
   },
   "item": [
     {
@@ -46,7 +26,8 @@
                   "    console.log('Failed to get access token');",
                   "}"
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {}
               }
             }
           ],
@@ -60,7 +41,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"grant_type\": \"client_credentials\",\n  \"client_id\": \"your-client-id\",\n  \"client_secret\": \"your-client-secret\",\n  \"scope\": \"read write admin\"\n}"
+              "raw": "{\n  \"grant_type\": \"client_credentials\",\n  \"client_id\": \"xxx\",\n  \"client_secret\": \"xxxx\",\n  \"scope\": \"read write admin\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/oauth/token",
@@ -126,8 +107,11 @@
               }
             ],
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"query GetUsers {\\n    users {\\n      id\\n      name\\n      email\\n      createdAt\\n      updatedAt\\n    }\\n  }\"\n}"
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetUsers($limit: Float, $offset: Float){\n    users(limit: $limit, offset: $offset) {\n        id\n        name\n        email\n        userType\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        handle\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n    }\n}",
+                "variables": "{\n    \"limit\": 10,\n    \"offset\": 0\n}"
+              }
             },
             "url": {
               "raw": "{{baseUrl}}/graphql",
@@ -153,8 +137,11 @@
               }
             ],
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"query GetUser($id: String!) {\\n    user(id: $id) {\\n      id\\n      name\\n      email\\n      createdAt\\n      updatedAt\\n    }\\n  }\",\n  \"variables\": {\n    \"id\": \"USER_ID_HERE\"\n  }\n}"
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetUser($id: ID!) {\n    user(id: $id) {\n        id\n        name\n        email\n        userType\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        handle\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n    }\n }",
+                "variables": "{\n    \"id\": \"68e093203e9a0767c092581e\"\n}"
+              }
             },
             "url": {
               "raw": "{{baseUrl}}/graphql",
@@ -180,8 +167,11 @@
               }
             ],
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation CreateUser($input: CreateUserInput!) {\\n    createUser(input: $input) {\\n      id\\n      name\\n      email\\n      createdAt\\n    }\\n  }\",\n  \"variables\": {\n    \"input\": {\n      \"name\": \"John Doe\",\n      \"email\": \"john.doe@example.com\"\n    }\n  }\n}"
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation CreateUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n     id\n        name\n        email\n        userType\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        handle\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n    }  \n}",
+                "variables": "{\n    \"input\": {\n        \"name\": \"John Doe\",\n        \"email\": \"john.doe@example.com\",\n        \"userType\": \"admin\",\n        \"profileImageUrl\": \"https://test.com\",\n        \"bio\": \"This is a bio\",\n        \"shortBio\": \"this is a short bio\",\n        \"handle\": \"handle\",\n        \"backdropImageUrl\": \"https://handle.com\",\n        \"instagramHandle\": \"instagram\",\n        \"tikTokHandle\": \"tik\",\n        \"twitterHandle\": \"twit\",\n        \"websiteUrl\": \"https://test.com\",\n        \"facebookUrl\": \"fb\",\n        \"snapchatHandle\": \"snap\",\n        \"primaryColor\": \"red\",\n        \"sign\": \"leo\",\n        \"sex\": \"male\"\n    }\n  }"
+              }
             },
             "url": {
               "raw": "{{baseUrl}}/graphql",
@@ -207,8 +197,11 @@
               }
             ],
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation UpdateUser($id: String!, $input: UpdateUserInput!) {\\n    updateUser(id: $id, input: $input) {\\n      id\\n      name\\n      email\\n      updatedAt\\n    }\\n  }\",\n  \"variables\": {\n    \"id\": \"USER_ID_HERE\",\n    \"input\": {\n      \"name\": \"John Smith\",\n      \"email\": \"john.smith@example.com\"\n    }\n  }\n}"
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {\n    updateUser(id: $id, input: $input) {\n        id\n        name\n        email\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        handle\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n    }\n}",
+                "variables": "{\n    \"id\": \"68e07ce509c33f9b96339e25\",\n    \"input\": {\n        \"name\": \"John Doe\",\n        \"email\": \"johnzz.doe@example.com\",\n        \"userType\": \"admin\",\n        \"profileImageUrl\": \"https://test.com\",\n        \"bio\": \"This is a bio\",\n        \"shortBio\": \"this is a short bio\",\n        \"handle\": \"handlez\",\n        \"backdropImageUrl\": \"https://handle.com\",\n        \"instagramHandle\": \"instagram\",\n        \"tikTokHandle\": \"tik\",\n        \"twitterHandle\": \"twit\",\n        \"websiteUrl\": \"https://test.com\",\n        \"facebookUrl\": \"fb\",\n        \"snapchatHandle\": \"snap\",\n        \"primaryColor\": \"red\",\n        \"sign\": \"leo\",\n        \"sex\": \"male\"\n    }\n  }"
+              }
             },
             "url": {
               "raw": "{{baseUrl}}/graphql",
@@ -234,8 +227,11 @@
               }
             ],
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation DeleteUser($id: String!) {\\n    deleteUser(id: $id)\\n  }\",\n  \"variables\": {\n    \"id\": \"USER_ID_HERE\"\n  }\n}"
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DeleteUser( $id: ID! ) {\n        deleteUser(id: $id)\n }",
+                "variables": "{\n    \"id\": \"68e093203e9a0767c092581e\"\n}"
+              }
             },
             "url": {
               "raw": "{{baseUrl}}/graphql",
@@ -478,6 +474,28 @@
         }
       ],
       "description": "GraphQL schema exploration and introspection"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3002",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
     }
   ]
 }
