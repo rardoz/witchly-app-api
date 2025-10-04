@@ -9,9 +9,9 @@ export const connectDB = async (): Promise<void> => {
     }
 
     await mongoose.connect(mongoUri, { dbName: process.env.DB_NAME || 'test' });
-    console.log('✅ MongoDB connected successfully');
+    console.log('MongoDB connected successfully');
   } catch (error) {
-    console.error('❌ MongoDB connection error:', error);
+    console.error('MongoDB connection error:', error);
     if (process.env.NODE_ENV !== 'test') {
       process.exit(1);
     }
@@ -22,8 +22,27 @@ export const connectDB = async (): Promise<void> => {
 export const disconnectDB = async (): Promise<void> => {
   try {
     await mongoose.disconnect();
-    console.log('🔌 MongoDB disconnected');
+    console.log('MongoDB disconnected');
   } catch (error) {
-    console.error('❌ MongoDB disconnection error:', error);
+    console.error('MongoDB disconnection error:', error);
+  }
+};
+
+export const forceCloseDB = async (): Promise<void> => {
+  try {
+    // Force close all connections
+    await mongoose.connection.close(true);
+
+    // Force close any remaining connections
+    if (mongoose.connections) {
+      for (const connection of mongoose.connections) {
+        if (connection.readyState !== 0) {
+          await connection.close(true); // Force close
+        }
+      }
+    }
+    console.log('MongoDB connections forcefully closed');
+  } catch (error) {
+    console.error('MongoDB force close error:', error);
   }
 };

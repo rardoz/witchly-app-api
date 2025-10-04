@@ -41,14 +41,25 @@ describe('UserResolver GraphQL Endpoints', () => {
     });
     await client.save();
 
-    // Get access token
-    const tokenResponse = await testRequest.post('/oauth/token').send({
-      grant_type: 'client_credentials',
-      client_id: testClient.clientId,
-      client_secret: testClient.clientSecret,
-    });
+    // Get access token using GraphQL mutation
+    const mutation = `
+      mutation {
+        authenticate(
+          grant_type: "client_credentials"
+          client_id: "${testClient.clientId}"
+          client_secret: "${testClient.clientSecret}"
+          scope: "read write"
+        ) {
+          access_token
+        }
+      }
+    `;
 
-    accessToken = tokenResponse.body.access_token;
+    const tokenResponse = await testRequest
+      .post('/graphql')
+      .send({ query: mutation });
+
+    accessToken = tokenResponse.body.data.authenticate.access_token;
   }, 30000);
 
   afterAll(async () => {

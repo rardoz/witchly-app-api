@@ -6,6 +6,7 @@ import {
 } from '@apollo/server';
 import { type GraphQLFormattedError } from 'graphql';
 import { buildSchema } from 'type-graphql';
+import { AuthResolver } from './resolvers/AuthResolver';
 import { ClientResolver } from './resolvers/ClientResolver';
 import { UserResolver } from './resolvers/UserResolver';
 
@@ -85,7 +86,7 @@ const responseProcessingPlugin: ApolloServerPlugin<BaseContext> = {
 
 export const createApolloServer = async (): Promise<ApolloServer> => {
   const schema = await buildSchema({
-    resolvers: [UserResolver, ClientResolver],
+    resolvers: [UserResolver, ClientResolver, AuthResolver],
     validate: false,
   });
 

@@ -232,7 +232,7 @@ async function checkExistingClient(
 
 async function createClient(options: ClientOptions) {
   try {
-    console.log(`🚀 Creating ${options.type} OAuth2 client...`);
+    console.log(`Creating ${options.type} OAuth2 client...`);
 
     await connectDB();
 

@@ -3,10 +3,12 @@
 
 import 'dotenv/config'; // Load environment variables
 import mongoose from 'mongoose';
+import { disconnectDB, forceCloseDB } from '../config/database';
 
 export default async (): Promise<void> => {
   try {
     // Connect if not already connected
+    console.log('Cleaning up test database...');
     if (mongoose.connection.readyState === 0) {
       const mongoUri = process.env.MONGODB_URI;
       if (mongoUri) {
@@ -24,18 +26,26 @@ export default async (): Promise<void> => {
         process.env.NODE_ENV === 'test'
       ) {
         await mongoose.connection.db.dropDatabase();
-        console.log(`🗑️  Test database '${dbName}' dropped successfully`);
+        console.log(`Test database '${dbName}' dropped successfully`);
       } else {
         console.log(
-          `⚠️  Skipping database drop for '${dbName}' (not a test database)`
+          `Skipping database drop for '${dbName}' (not a test database)`
         );
       }
 
-      // Close all connections
-      await mongoose.connection.close();
-      console.log('🔌 MongoDB connection closed');
+      // FORCE CLOSE ALL CONNECTIONS
+      await forceCloseDB();
     }
   } catch (error) {
-    console.error('❌ Error during global test teardown:', error);
+    console.error('Error during global test teardown:', error);
+  } finally {
+    // Ensure all connections are definitely closed
+    try {
+      await disconnectDB();
+      await forceCloseDB();
+      console.log('All MongoDB connections forcefully closed');
+    } catch (finalError) {
+      console.error('Error in final cleanup:', finalError);
+    }
   }
 };

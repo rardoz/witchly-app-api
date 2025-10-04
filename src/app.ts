@@ -3,8 +3,7 @@ import 'dotenv/config';
 import { HeaderMap, type HTTPGraphQLResponse } from '@apollo/server';
 import cors from 'cors';
 import express, { type Request, type Response } from 'express';
-import { connectDB } from './config/database';
-import { tokenEndpoint } from './controllers/auth.controller';
+import { connectDB, disconnectDB, forceCloseDB } from './config/database';
 import { createApolloServer } from './graphql/server';
 import {
   createGraphQLContext,
@@ -57,10 +56,6 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
-
-// OAuth2 Token Endpoint
-app.post('/oauth/token', tokenEndpoint);
-
 // Initialize MongoDB and GraphQL
 const initializeServer = async () => {
   try {
@@ -71,7 +66,7 @@ const initializeServer = async () => {
     const apolloServer = await createApolloServer();
     await apolloServer.start();
 
-    // Simple GraphQL endpoint
+    // Main GraphQL endpoint (includes Auth, User, Client resolvers)
     app.all('/graphql', optionalAuth, async (req, res) => {
       try {
         // Create proper HeaderMap
@@ -115,9 +110,9 @@ const initializeServer = async () => {
       }
     });
 
-    console.log('🚀 GraphQL server ready at /graphql');
+    console.log('GraphQL server ready at /graphql');
   } catch (error) {
-    console.error('❌ Failed to initialize server:', error);
+    console.error('Failed to initialize server:', error);
     if (process.env.NODE_ENV !== 'test') {
       process.exit(1);
     }
@@ -138,6 +133,100 @@ app.get('/', (_req: Request, res: Response) => {
 app.get('/health', (_req: Request, res: Response) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
+
+// Graceful shutdown handler
+const gracefulShutdown = async (signal: string): Promise<void> => {
+  console.log(`\nReceived ${signal}. Starting graceful shutdown...`);
+
+  // For development, use shorter timeout
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  const timeoutDuration = isDevelopment ? 2000 : 10000; // 2s for dev, 10s for prod
+
+  // Set a timeout to force exit if graceful shutdown takes too long
+  const forceExitTimeout = setTimeout(() => {
+    console.error(
+      `Graceful shutdown timeout (${timeoutDuration}ms). Forcing exit...`
+    );
+    if (isDevelopment) {
+      // In development, force close immediately
+      forceCloseDB().finally(() => process.exit(1));
+    } else {
+      process.exit(1);
+    }
+  }, timeoutDuration);
+
+  try {
+    // Close database connections gracefully
+    await disconnectDB();
+    console.log('Database connections closed');
+
+    // Clear timeout since we completed successfully
+    clearTimeout(forceExitTimeout);
+
+    // Exit process
+    console.log('Graceful shutdown completed');
+    process.exit(0);
+  } catch (error) {
+    console.error('Error during graceful shutdown:', error);
+
+    // Force close as fallback
+    try {
+      await forceCloseDB();
+      console.log('Database connections forcefully closed');
+    } catch (forceError) {
+      console.error('Error during force close:', forceError);
+    }
+
+    // Clear timeout
+    clearTimeout(forceExitTimeout);
+    process.exit(1);
+  }
+};
+
+// Handle graceful shutdown signals
+if (process.env.NODE_ENV !== 'test') {
+  // Handle SIGTERM (docker stop, kubernetes, etc.)
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+
+  // Handle SIGINT (Ctrl+C)
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+  // Handle SIGUSR2 (nodemon restart signal) - just cleanup, don't restart
+  process.once('SIGUSR2', async () => {
+    console.log('\nNodemon restart detected - cleaning up database...');
+    try {
+      await disconnectDB();
+      console.log('Database connections closed for restart');
+    } catch (error) {
+      console.error('Error during database cleanup:', error);
+      try {
+        await forceCloseDB();
+        console.log('Database connections forcefully closed');
+      } catch (forceError) {
+        console.error('Error during force close:', forceError);
+      }
+    }
+    // Let nodemon handle the restart
+    process.kill(process.pid, 'SIGUSR2');
+  });
+
+  // Handle uncaught exceptions
+  process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+    gracefulShutdown('UNCAUGHT_EXCEPTION');
+  });
+
+  // Handle unhandled promise rejections
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    gracefulShutdown('UNHANDLED_REJECTION');
+  });
+
+  // Handle process exit (fallback)
+  process.on('exit', () => {
+    console.log('Process exit - forcing database cleanup');
+  });
+}
 
 // Export initialization function for tests
 export { initializeServer };

@@ -58,21 +58,43 @@ describe('ClientResolver GraphQL Endpoints', () => {
     });
     await userClient.save();
 
-    // Get admin access token
-    const adminTokenResponse = await testRequest.post('/oauth/token').send({
-      grant_type: 'client_credentials',
-      client_id: adminTestClient.clientId,
-      client_secret: adminTestClient.clientSecret,
-    });
-    adminAccessToken = adminTokenResponse.body.access_token;
+    // Get admin access token using GraphQL mutation
+    const adminMutation = `
+      mutation {
+        authenticate(
+          grant_type: "client_credentials"
+          client_id: "${adminTestClient.clientId}"
+          client_secret: "${adminTestClient.clientSecret}"
+          scope: "admin"
+        ) {
+          access_token
+        }
+      }
+    `;
 
-    // Get user access token
-    const userTokenResponse = await testRequest.post('/oauth/token').send({
-      grant_type: 'client_credentials',
-      client_id: userTestClient.clientId,
-      client_secret: userTestClient.clientSecret,
-    });
-    userAccessToken = userTokenResponse.body.access_token;
+    const adminTokenResponse = await testRequest
+      .post('/graphql')
+      .send({ query: adminMutation });
+    adminAccessToken = adminTokenResponse.body.data.authenticate.access_token;
+
+    // Get user access token using GraphQL mutation
+    const userMutation = `
+      mutation {
+        authenticate(
+          grant_type: "client_credentials"
+          client_id: "${userTestClient.clientId}"
+          client_secret: "${userTestClient.clientSecret}"
+          scope: "read write"
+        ) {
+          access_token
+        }
+      }
+    `;
+
+    const userTokenResponse = await testRequest
+      .post('/graphql')
+      .send({ query: userMutation });
+    userAccessToken = userTokenResponse.body.data.authenticate.access_token;
   }, 30000);
 
   afterAll(async () => {

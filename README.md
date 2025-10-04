@@ -56,8 +56,8 @@ npm start
 ```
 
 The API will be available at:
-- **REST endpoints**: `http://localhost:3002`
-- **GraphQL endpoint**: `http://localhost:3002/graphql`
+- **GraphQL endpoint**: `http://localhost:3000/graphql` (primary endpoint for all operations)
+- **GraphQL Playground**: Available in development for schema exploration
 
 ### 4. Create OAuth2 Clients
 
@@ -86,17 +86,17 @@ src/
 │   └── jwt.service.ts       # JWT token generation and validation
 ├── middleware/
 │   └── auth.middleware.ts   # JWT authentication middleware
-├── controllers/
-│   └── auth.controller.ts   # OAuth2 token endpoint
 ├── graphql/
 │   ├── types/
 │   │   ├── User.ts          # GraphQL type definitions
-│   │   └── ClientType.ts    # Client management types
+│   │   ├── ClientType.ts    # Client management types
+│   │   └── Auth.ts          # Authentication response types
 │   ├── inputs/
 │   │   └── UserInput.ts     # Input types for mutations
 │   ├── resolvers/
 │   │   ├── UserResolver.ts  # User operations
-│   │   └── ClientResolver.ts # Client management (admin only)
+│   │   ├── ClientResolver.ts # Client management (admin only)
+│   │   └── AuthResolver.ts  # Authentication mutations
 │   └── server.ts            # Apollo Server setup with auth context
 ├── test/
 │   ├── setup.ts             # Jest test configuration
@@ -173,14 +173,64 @@ export class UserResolver {
 
 ### Available Operations
 
-**Queries:**
-- `users` - Fetch all users
-- `user(id: ID!)` - Fetch user by ID
+**Authentication:**
+- `authenticate(grant_type, client_id, client_secret, scope?)` - Get JWT access token
 
-**Mutations:**
+**User Operations:**
+- `users(limit?, offset?)` - Fetch all users with pagination
+- `user(id: ID!)` - Fetch user by ID
 - `createUser(input: CreateUserInput!)` - Create new user
 - `updateUser(id: ID!, input: UpdateUserInput!)` - Update user
 - `deleteUser(id: ID!)` - Delete user
+
+**Client Operations (Admin only):**
+- `clients` - Fetch all OAuth2 clients
+- `client(clientId: String!)` - Fetch client by ID  
+- `createClient(input: CreateClientInput!)` - Create new OAuth2 client
+- `updateClient(clientId: String!, input: UpdateClientInput!)` - Update client
+- `deleteClient(clientId: String!)` - Delete client
+- `regenerateClientSecret(clientId: String!)` - Generate new client secret
+
+**Example Queries:**
+
+```graphql
+# Get all users (requires authentication)
+query {
+  users(limit: 10, offset: 0) {
+    id
+    name
+    email
+    createdAt
+  }
+}
+
+# Create a new user
+mutation {
+  createUser(input: {
+    name: "John Doe"
+    email: "john@example.com"
+    userType: "user"
+  }) {
+    id
+    name
+    email
+  }
+}
+
+# Get access token (must specify required scopes)
+mutation {
+  authenticate(
+    grant_type: "client_credentials"
+    client_id: "your_client_id"
+    client_secret: "your_client_secret"
+    scope: "read write"
+  ) {
+    access_token
+    expires_in
+    scope
+  }
+}
+```
 
 ### GraphQL Playground
 
@@ -283,36 +333,46 @@ Errors are returned in this format:
 
 ### Testing Error Handling
 
-Test unauthorized access:
-```bash
-curl -X POST http://localhost:3002/graphql \
-  -H "Content-Type: application/json" \
-  -d '{"query": "{ users { id name } }"}' \
-  -w "HTTP Status: %{http_code}\n"
+**Test unauthorized access** (no authentication header):
+```graphql
+query {
+  users {
+    id
+    name
+  }
+}
+```
+Expected: HTTP 401 with "Unauthorized: Read access required"
+
+**Test with authentication:**
+
+1. First get a token:
+```graphql
+mutation {
+  authenticate(
+    grant_type: "client_credentials"
+    client_id: "your-client-id"
+    client_secret: "your-client-secret"
+  ) {
+    access_token
+  }
+}
 ```
 
-Test with authentication:
-```bash
-# First get a token
-curl -X POST http://localhost:3002/oauth/token \
-  -H "Content-Type: application/json" \
-  -d '{
-    "grant_type": "client_credentials",
-    "client_id": "your-client-id",
-    "client_secret": "your-client-secret"
-  }'
-
-# Then use the token
-curl -X POST http://localhost:3002/graphql \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
-  -d '{"query": "{ users { id name } }"}' \
-  -w "HTTP Status: %{http_code}\n"
+2. Then use the token in Authorization header:
+```graphql
+query {
+  users {
+    id
+    name
+  }
+}
 ```
+Expected: HTTP 200 with user data
 
 ## 🔐 JWT Authentication (Client Credentials)
 
-This API implements **OAuth2 Client Credentials** flow using JWT tokens for application-to-application authentication. This ensures only authorized applications can access your API.
+This API implements **OAuth2 Client Credentials** flow using JWT tokens for application-to-application authentication. All authentication is handled through **GraphQL mutations** at the main `/graphql` endpoint.
 
 ### Authentication Flow Overview
 
@@ -322,7 +382,7 @@ sequenceDiagram
     participant API as Witchly API
     participant DB as Database
 
-    App->>API: POST /oauth/token (client_id, client_secret)
+    App->>API: GraphQL Mutation: authenticate(grant_type, client_id, client_secret)
     API->>DB: Validate client credentials
     DB-->>API: Client found & secret verified
     API-->>App: JWT Access Token (Bearer token)
@@ -459,39 +519,97 @@ mutation CreateClient {
 
 ### 4. Get Access Token
 
-Exchange your client credentials for a JWT access token:
+Exchange your client credentials for a JWT access token using GraphQL mutation:
 
-```bash
-curl -X POST http://localhost:3000/oauth/token \
-  -H "Content-Type: application/json" \
-  -d '{
-    "grant_type": "client_credentials",
-    "client_id": "client_abc123def456...",
-    "client_secret": "def789ghi012...",
-    "scope": "read write"
-  }'
+**Authentication with required scope:**
+```graphql
+mutation {
+  authenticate(
+    grant_type: "client_credentials"
+    client_id: "client_abc123def456..."
+    client_secret: "def789ghi012..."
+    scope: "read write"
+  ) {
+    access_token
+    token_type
+    expires_in
+    scope
+  }
+}
+```
+
+**Postman/HTTP Request Body:**
+```json
+{
+  "query": "mutation { authenticate(grant_type: \"client_credentials\", client_id: \"client_abc123def456...\", client_secret: \"def789ghi012...\", scope: \"read write\") { access_token token_type expires_in scope } }"
+}
 ```
 
 **Response:**
 ```json
 {
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "token_type": "Bearer",
-  "expires_in": 3600,
-  "scope": "read write"
+  "data": {
+    "authenticate": {
+      "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "token_type": "Bearer",
+      "expires_in": 3600,
+      "scope": "read write"
+    }
+  }
 }
+```
+
+**📝 Note about scopes:**
+- **System-wide scope validation**: Only `read`, `write`, and `admin` scopes are valid
+- **Format validation**: Scopes must contain only letters, numbers, and underscores
+- **Client authorization**: You can only request scopes that your client is authorized for
+- **Required parameter**: The `scope` parameter is now **required** and cannot be empty
+- **Subset selection**: You must specify which scopes you want from your client's allowed scopes
+- **Error handling**: Invalid scopes, unauthorized scopes, or malformed scope strings will return detailed error messages
+
+**Scope validation examples:**
+```graphql
+# ✅ Valid: Requesting allowed scopes
+scope: "read write"
+
+# ✅ Valid: Requesting subset of allowed scopes  
+scope: "read"
+
+# ❌ Invalid: Missing scope parameter
+# (GraphQL validation error)
+
+# ❌ Invalid: Empty scope string
+scope: ""           # Error: Scope must be a non-empty string
+
+# ❌ Invalid: Non-existent scope
+scope: "superuser"  # Error: Invalid scope
+
+# ❌ Invalid: Unauthorized scope (client only has read/write)
+scope: "admin"      # Error: Client not authorized for scopes: admin
+
+# ❌ Invalid: Bad format
+scope: "read-only"  # Error: Invalid scope format
 ```
 
 ### 5. Use Access Token
 
-Include the token in the Authorization header for all API requests:
+Include the token in the Authorization header for all subsequent GraphQL requests:
 
-```bash
-# GraphQL Request
-curl -X POST http://localhost:3000/graphql \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
-  -H "Content-Type: application/json" \
-  -d '{"query": "{ users { id name email } }"}'
+**Headers:**
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+```
+
+**Example authenticated query:**
+```graphql
+query {
+  users {
+    id
+    name
+    email
+  }
+}
 ```
 
 ### Integration Examples
@@ -508,19 +626,30 @@ class WitchlyAPIClient {
   }
 
   async authenticate() {
-    const response = await fetch(`${this.baseURL}/oauth/token`, {
+    const mutation = `
+      mutation {
+        authenticate(
+          grant_type: "client_credentials"
+          client_id: "${this.clientId}"
+          client_secret: "${this.clientSecret}"
+          scope: "read write"
+        ) {
+          access_token
+          token_type
+          expires_in
+          scope
+        }
+      }
+    `;
+
+    const response = await fetch(`${this.baseURL}/graphql`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        grant_type: 'client_credentials',
-        client_id: this.clientId,
-        client_secret: this.clientSecret,
-        scope: 'read write'
-      })
+      body: JSON.stringify({ query: mutation })
     });
 
-    const data = await response.json();
-    this.accessToken = data.access_token;
+    const result = await response.json();
+    this.accessToken = result.data.authenticate.access_token;
     return this.accessToken;
   }
 
@@ -627,13 +756,17 @@ The API returns standard OAuth2 error responses:
 Test the authentication flow:
 
 ```bash
-# Test token generation
+# Run authentication tests
 npm run test -- --testPathPatterns=auth.test.ts
+```
 
-# Manual testing with curl
-curl -X POST http://localhost:3000/oauth/token \
-  -H "Content-Type: application/json" \
-  -d '{"grant_type":"client_credentials","client_id":"test","client_secret":"test"}'
+**Manual testing with Postman/GraphQL client:**
+
+POST to `http://localhost:3000/graphql` with body:
+```json
+{
+  "query": "mutation { authenticate(grant_type: \"client_credentials\", client_id: \"test-client-id\", client_secret: \"test-client-secret\", scope: \"read write\") { access_token token_type expires_in scope } }"
+}
 ```
 
 ## 🧪 Testing
@@ -705,16 +838,24 @@ describe('JWT Authentication', () => {
   let accessToken: string;
 
   beforeAll(async () => {
-    // Get access token for protected routes
+    // Get access token using GraphQL mutation
+    const mutation = `
+      mutation {
+        authenticate(input: {
+          grant_type: "client_credentials"
+          client_id: "test-client"
+          client_secret: "test-secret"
+        }) {
+          access_token
+        }
+      }
+    `;
+
     const response = await testRequest
-      .post('/oauth/token')
-      .send({
-        grant_type: 'client_credentials',
-        client_id: 'test-client',
-        client_secret: 'test-secret'
-      });
+      .post('/graphql')
+      .send({ query: mutation });
     
-    accessToken = response.body.access_token;
+    accessToken = response.body.data.authenticate.access_token;
   });
 
   it('should access protected GraphQL endpoint', async () => {

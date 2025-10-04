@@ -10,7 +10,9 @@ import {
   ForbiddenError,
   NotFoundError,
   UnauthorizedError,
+  ValidationError,
 } from '../../utils/errors';
+import { validateClientScopes } from '../../utils/scopes';
 import {
   ClientCredentials,
   ClientType,
@@ -90,6 +92,16 @@ export class ClientResolver {
       throw new UnauthorizedError('Admin access required');
     }
 
+    // Validate scopes
+    let validatedScopes: string[];
+    try {
+      validatedScopes = validateClientScopes(input.allowedScopes);
+    } catch (error) {
+      throw new ValidationError(
+        error instanceof Error ? error.message : 'Invalid scopes provided'
+      );
+    }
+
     // Generate credentials
     const clientId = generateClientId();
     const clientSecret = generateClientSecret();
@@ -101,7 +113,7 @@ export class ClientResolver {
       clientSecret: hashedSecret,
       name: input.name,
       description: input.description,
-      allowedScopes: input.allowedScopes,
+      allowedScopes: validatedScopes,
       tokenExpiresIn: input.tokenExpiresIn,
     });
 
@@ -133,8 +145,16 @@ export class ClientResolver {
     // Update fields
     if (input.name !== undefined) client.name = input.name;
     if (input.description !== undefined) client.description = input.description;
-    if (input.allowedScopes !== undefined)
-      client.allowedScopes = input.allowedScopes;
+    if (input.allowedScopes !== undefined) {
+      // Validate scopes before updating
+      try {
+        client.allowedScopes = validateClientScopes(input.allowedScopes);
+      } catch (error) {
+        throw new ValidationError(
+          error instanceof Error ? error.message : 'Invalid scopes provided'
+        );
+      }
+    }
     if (input.tokenExpiresIn !== undefined)
       client.tokenExpiresIn = input.tokenExpiresIn;
     if (input.isActive !== undefined) client.isActive = input.isActive;

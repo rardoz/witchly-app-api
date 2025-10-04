@@ -31,103 +31,29 @@ describe('JWT Client Credentials Authentication', () => {
     await client.save();
   }, 30000);
 
-  describe('POST /oauth/token', () => {
-    it('should return access token for valid client credentials', async () => {
-      const response = await testRequest.post('/oauth/token').send({
-        grant_type: 'client_credentials',
-        client_id: testClient.clientId,
-        client_secret: testClient.clientSecret,
-      });
-
-      expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('access_token');
-      expect(response.body).toHaveProperty('token_type', 'Bearer');
-      expect(response.body).toHaveProperty('expires_in', 3600);
-      expect(response.body).toHaveProperty('scope', 'read write admin');
-    });
-
-    it('should return error for missing fields', async () => {
-      const response = await testRequest.post('/oauth/token').send({
-        grant_type: 'client_credentials',
-        client_id: testClient.clientId,
-        // missing client_secret
-      });
-
-      expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('error', 'invalid_request');
-    });
-
-    it('should return error for invalid grant type', async () => {
-      const response = await testRequest.post('/oauth/token').send({
-        grant_type: 'authorization_code',
-        client_id: testClient.clientId,
-        client_secret: testClient.clientSecret,
-      });
-
-      expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('error', 'unsupported_grant_type');
-    });
-
-    it('should return error for invalid client_id', async () => {
-      const response = await testRequest.post('/oauth/token').send({
-        grant_type: 'client_credentials',
-        client_id: 'invalid_client_id',
-        client_secret: testClient.clientSecret,
-      });
-
-      expect(response.status).toBe(401);
-      expect(response.body).toHaveProperty('error', 'invalid_client');
-    });
-
-    it('should return error for invalid client_secret', async () => {
-      const response = await testRequest.post('/oauth/token').send({
-        grant_type: 'client_credentials',
-        client_id: testClient.clientId,
-        client_secret: 'invalid_secret',
-      });
-
-      expect(response.status).toBe(401);
-      expect(response.body).toHaveProperty('error', 'invalid_client');
-    });
-
-    it('should respect requested scopes', async () => {
-      const response = await testRequest.post('/oauth/token').send({
-        grant_type: 'client_credentials',
-        client_id: testClient.clientId,
-        client_secret: testClient.clientSecret,
-        scope: 'read',
-      });
-
-      expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('scope', 'read');
-    });
-
-    it('should reject invalid scopes', async () => {
-      const response = await testRequest.post('/oauth/token').send({
-        grant_type: 'client_credentials',
-        client_id: testClient.clientId,
-        client_secret: testClient.clientSecret,
-        scope: 'invalid_scope',
-      });
-
-      expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('error', 'invalid_scope');
-    });
-  });
-
   describe('GraphQL with JWT Authentication', () => {
     let accessToken: string;
 
     beforeAll(async () => {
-      // Get access token for GraphQL tests
-      const response = await testRequest.post('/oauth/token').send({
-        grant_type: 'client_credentials',
-        client_id: testClient.clientId,
-        client_secret: testClient.clientSecret,
-        scope: 'read write admin',
-      });
+      // Get access token using GraphQL mutation
+      const mutation = `
+        mutation {
+          authenticate(
+            grant_type: "client_credentials"
+            client_id: "${testClient.clientId}"
+            client_secret: "${testClient.clientSecret}"
+            scope: "read write admin"
+          ) {
+            access_token
+          }
+        }
+      `;
 
-      accessToken = response.body.access_token;
+      const response = await testRequest
+        .post('/graphql')
+        .send({ query: mutation });
+
+      accessToken = response.body.data.authenticate.access_token;
     }, 10000);
 
     it('should allow access with valid token', async () => {
@@ -217,6 +143,162 @@ describe('JWT Client Credentials Authentication', () => {
           clientId: response.body.data.createClient.clientId,
         });
       }
+    });
+  });
+
+  describe('GraphQL Authentication Mutation', () => {
+    it('should authenticate via GraphQL mutation with valid credentials', async () => {
+      const mutation = `
+        mutation {
+          authenticate(
+            grant_type: "client_credentials"
+            client_id: "${testClient.clientId}"
+            client_secret: "${testClient.clientSecret}"
+            scope: "read write admin"
+          ) {
+            access_token
+            token_type
+            expires_in
+            scope
+          }
+        }
+      `;
+
+      const response = await testRequest
+        .post('/graphql')
+        .send({ query: mutation });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('data');
+      expect(response.body.data.authenticate).toHaveProperty('access_token');
+      expect(response.body.data.authenticate).toHaveProperty(
+        'token_type',
+        'Bearer'
+      );
+      expect(response.body.data.authenticate).toHaveProperty(
+        'expires_in',
+        3600
+      );
+      expect(response.body.data.authenticate).toHaveProperty(
+        'scope',
+        'read write admin'
+      );
+    });
+
+    it('should return validation error for missing fields via GraphQL', async () => {
+      const mutation = `
+        mutation {
+          authenticate(
+            grant_type: "client_credentials"
+            client_id: "${testClient.clientId}"
+          ) {
+            access_token
+            token_type
+            expires_in
+            scope
+          }
+        }
+      `;
+
+      const response = await testRequest
+        .post('/graphql')
+        .send({ query: mutation });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty('errors');
+      expect(response.body.errors[0].extensions.code).toBe(
+        'GRAPHQL_VALIDATION_FAILED'
+      );
+      expect(response.body.errors[0].message).toContain(
+        'Field "authenticate" argument "scope" of type "String!" is required, but it was not provided'
+      );
+    });
+
+    it('should return validation error for invalid grant type via GraphQL', async () => {
+      const mutation = `
+        mutation {
+          authenticate(
+            grant_type: "invalid_type"
+            client_id: "${testClient.clientId}"
+            client_secret: "${testClient.clientSecret}"
+            scope: "read write"
+          ) {
+            access_token
+            token_type
+            expires_in
+            scope
+          }
+        }
+      `;
+
+      const response = await testRequest
+        .post('/graphql')
+        .send({ query: mutation });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty('errors');
+      expect(response.body.errors[0].extensions.code).toBe('VALIDATION_ERROR');
+      expect(response.body.errors[0].message).toContain(
+        'Only client_credentials grant type is supported'
+      );
+    });
+
+    it('should return unauthorized error for invalid client_id via GraphQL', async () => {
+      const mutation = `
+        mutation {
+          authenticate(
+            grant_type: "client_credentials"
+            client_id: "invalid_client_id"
+            client_secret: "${testClient.clientSecret}"
+            scope: "read"
+          ) {
+            access_token
+            token_type
+            expires_in
+            scope
+          }
+        }
+      `;
+
+      const response = await testRequest
+        .post('/graphql')
+        .send({ query: mutation });
+
+      expect(response.status).toBe(401);
+      expect(response.body).toHaveProperty('errors');
+      expect(response.body.errors[0].extensions.code).toBe('UNAUTHORIZED');
+      expect(response.body.errors[0].message).toContain(
+        'Invalid client_id or client not found'
+      );
+    });
+
+    it('should support scope selection via GraphQL', async () => {
+      const mutation = `
+        mutation {
+          authenticate(
+            grant_type: "client_credentials"
+            client_id: "${testClient.clientId}"
+            client_secret: "${testClient.clientSecret}"
+            scope: "read write"
+          ) {
+            access_token
+            token_type
+            expires_in
+            scope
+          }
+        }
+      `;
+
+      const response = await testRequest
+        .post('/graphql')
+        .send({ query: mutation });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('data');
+      expect(response.body.data.authenticate).toHaveProperty(
+        'scope',
+        'read write'
+      );
     });
   });
 

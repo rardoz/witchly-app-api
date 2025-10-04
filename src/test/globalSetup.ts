@@ -7,5 +7,5 @@ config({ path: '.env.test' });
 // Then load .env as fallback for any missing variables
 config({ path: '.env' });
 export default async (): Promise<void> => {
-  console.log('🚀 Global test setup - environment configured');
+  console.log('Global test setup - environment configured');
 };
