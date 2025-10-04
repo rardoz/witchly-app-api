@@ -411,37 +411,180 @@ curl -X POST http://localhost:3000/oauth/token \
 
 ## 🧪 Testing
 
-### Test Environment
+### Test Environment Setup
 
-Tests run in isolation without requiring MongoDB:
+The testing suite uses Jest with Supertest for HTTP endpoint testing and includes comprehensive authentication testing. Tests run against a separate test database to ensure isolation.
+
+#### Prerequisites for Testing
+
+1. **MongoDB Test Database**: Tests require a MongoDB instance for integration testing
+   ```bash
+   # Option 1: Local MongoDB (recommended for development)
+   # Make sure MongoDB is running locally on default port 27017
+   
+   # Option 2: MongoDB Atlas (for CI/CD)
+   # Set TEST_MONGODB_URI in your environment
+   ```
+
+2. **Environment Variables**: Create a `.env.test` file or set test environment variables:
+   ```bash
+   NODE_ENV=test
+   MONGODB_URI=mongodb://localhost:27017/witchly-app-test
+   JWT_SECRET=test-jwt-secret-key
+   ```
+
+#### Running Tests
 
 ```bash
 # Run all tests
 npm test
 
-# Run tests with coverage
+# Run tests with coverage report
 npm run test:coverage
 
-# Run tests in watch mode
+# Run tests in watch mode (for development)
 npm run test:watch
 
-# Run tests for CI
+# Run tests for CI/CD pipelines
 npm run test:ci
 ```
 
-### Test Structure
+#### Test Database Management
 
+The test suite automatically:
+- **Initializes** the server once globally across all test files
+- **Creates** a test database with isolated test data
+- **Cleans up** all test data after test completion
+- **Drops** the test database when all tests finish
+
+**Global Test Setup**: Tests use a shared server instance and global `testRequest` helper to avoid redundant initialization.
+
+### Test Structure & Patterns
+
+#### Basic API Testing
 ```typescript
-describe('API Endpoint', () => {
-  it('should handle success case', async () => {
-    const response = await request(app).get('/health');
+describe('Express App', () => {
+  it('should return health status', async () => {
+    const response = await testRequest.get('/health');
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('status', 'OK');
   });
 });
 ```
 
-Tests use Supertest for HTTP endpoint testing and automatically skip database connections in test mode.
+#### Authentication Testing
+```typescript
+describe('JWT Authentication', () => {
+  let accessToken: string;
+
+  beforeAll(async () => {
+    // Get access token for protected routes
+    const response = await testRequest
+      .post('/oauth/token')
+      .send({
+        grant_type: 'client_credentials',
+        client_id: 'test-client',
+        client_secret: 'test-secret'
+      });
+    
+    accessToken = response.body.access_token;
+  });
+
+  it('should access protected GraphQL endpoint', async () => {
+    const response = await testRequest
+      .post('/graphql')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        query: `query { clients { clientId name } }`
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body.data).toBeDefined();
+  });
+});
+```
+
+#### GraphQL Testing
+```typescript
+describe('GraphQL API', () => {
+  it('should handle GraphQL queries', async () => {
+    const query = `
+      query {
+        users {
+          id
+          name
+          email
+        }
+      }
+    `;
+
+    const response = await testRequest
+      .post('/graphql')
+      .send({ query });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('data');
+  });
+});
+```
+
+### Test Configuration
+
+#### Jest Configuration (`jest.config.js`)
+- **Global Setup**: Initializes test environment variables
+- **Global Teardown**: Cleans up test database after all tests
+- **Setup Files**: Configures global test utilities and timeouts
+- **Coverage**: Excludes test files and type definitions from coverage
+
+#### Global Test Utilities
+- **`testRequest`**: Global Supertest instance for HTTP testing
+- **Server Initialization**: Single server instance shared across all tests
+- **Database Cleanup**: Automatic test data isolation and cleanup
+
+### Test Coverage
+
+```bash
+# Generate coverage report
+npm run test:coverage
+
+# View coverage in browser
+open coverage/lcov-report/index.html
+```
+
+**Coverage includes**:
+- All source files (`src/**/*.ts`)
+- Excludes test files, type definitions, and setup files
+- Reports in multiple formats: text, lcov, html
+
+### Debugging Tests
+
+#### Running Specific Tests
+```bash
+# Run specific test file
+npm test -- auth.test.ts
+
+# Run tests matching pattern
+npm test -- --testNamePattern="should handle authentication"
+
+# Run tests with verbose output
+npm test -- --verbose
+```
+
+#### Common Test Patterns
+- **Authentication**: OAuth2 client credentials flow testing
+- **GraphQL**: Query and mutation testing with type validation
+- **Database**: Model creation, validation, and relationship testing
+- **Middleware**: JWT validation and scope checking
+- **Error Handling**: Invalid requests and edge cases
+
+### CI/CD Testing
+
+For continuous integration, tests run with:
+- **MongoDB Atlas**: Cloud database for consistent testing environment
+- **Coverage Reports**: Automated coverage reporting and thresholds
+- **Parallel Execution**: Optimized for CI/CD pipeline performance
+
+Tests use Supertest for HTTP endpoint testing and include comprehensive JWT authentication flows.
 
 ## 🎨 Code Quality & Tooling
 
