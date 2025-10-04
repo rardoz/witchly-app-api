@@ -45,7 +45,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation Authenticate($grantType: String!, $clientId: String!, $clientSecret: String!, $scope: String) { \n        authenticate(grant_type: $grantType, client_id: $clientId, client_secret: $clientSecret, scope: $scope) { \n            access_token \n            token_type \n            expires_in scope \n        } \n    }",
+								"query": "mutation Authenticate($grantType: String!, $clientId: String!, $clientSecret: String!, $scope: String!) { \n        authenticate(grant_type: $grantType, client_id: $clientId, client_secret: $clientSecret, scope: $scope) { \n            access_token \n            token_type \n            expires_in scope \n        } \n    }",
 								"variables": "{\n    \"grantType\": \"client_credentials\",\n    \"clientId\": \"{{clientId}}\",\n    \"clientSecret\": \"{{clientSecret}}\",\n    \"scope\": \"{{scope}}\"\n  }"
 							}
 						},
@@ -716,28 +716,8 @@
 	],
 	"variable": [
 		{
-			"key": "baseUrl",
-			"value": "http://localhost:4000",
-			"type": "string"
-		},
-		{
 			"key": "accessToken",
 			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "clientId",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "clientSecret",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "scope",
-			"value": "read write",
 			"type": "string"
 		}
 	]
