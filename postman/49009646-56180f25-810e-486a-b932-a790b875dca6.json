@@ -383,7 +383,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query MySessions {\\n    mySessions {\\n        sessionId\\n        keepMeLoggedIn\\n        lastUsedAt\\n        expiresAt\\n        userAgent\\n        ipAddress\\n        isActive\\n        createdAt\\n    }\\n}",
+								"query": "query MySessions {    \n    mySessions {\n        sessionId\n        keepMeLoggedIn\n        lastUsedAt\n        expiresAt\n        userAgent\n        ipAddress\n        isActive\n        createdAt\n    }\n}",
 								"variables": "{}"
 							}
 						},
