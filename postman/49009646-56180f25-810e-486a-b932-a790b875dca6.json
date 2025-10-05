@@ -459,7 +459,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation LogoutAllSessions {\\n    logoutAllSessions {\\n        success\\n        message\\n        sessionsTerminated\\n    }\\n}",
+								"query": "mutation LogoutAllSessions {\n    logoutAllSessions {\n        success\n        message\n        sessionsTerminated\n    }\n}",
 								"variables": "{}"
 							}
 						},
