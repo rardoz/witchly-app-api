@@ -1155,19 +1155,37 @@ The API returns standard OAuth2 error responses:
 
 ### Testing Authentication
 
-Test the authentication flow:
+Test the authentication flows:
 
 ```bash
 # Run authentication tests
 npm run test -- --testPathPatterns=auth.test.ts
+
+# Run session resolver tests (includes dual authentication)
+npm run test -- --testPathPatterns=session-resolver.test.ts
 ```
 
 **Manual testing with Postman/GraphQL client:**
 
+#### OAuth2 Authentication
 POST to `http://localhost:3000/graphql` with body:
 ```json
 {
   "query": "mutation { authenticate(grant_type: \"client_credentials\", client_id: \"test-client-id\", client_secret: \"test-client-secret\", scope: \"read write\") { access_token token_type expires_in scope } }"
+}
+```
+
+#### Session Operations (Dual Authentication)
+For session operations, include both headers:
+```http
+Authorization: Bearer <oauth2_access_token>
+X-Session-Token: <user_session_token>
+```
+
+Example session query:
+```json
+{
+  "query": "query { mySessions { sessionId keepMeLoggedIn lastUsedAt expiresAt isActive } }"
 }
 ```
 
@@ -1490,6 +1508,7 @@ This testing architecture ensures the API is production-ready with high confiden
 The Witchly App API includes a comprehensive user session management system that works alongside the existing OAuth2 client credentials authentication. This system supports:
 
 - **Configurable session durations**: 4 hours (default) or 90 days ("keep me logged in")
+- **Dual authentication**: OAuth2 + session tokens for secure session operations
 - **Refresh tokens**: For long-term sessions
 - **Session tracking**: User agent, IP address, last used timestamps
 - **Session limits**: Maximum 10 concurrent sessions per user
@@ -1532,6 +1551,26 @@ The Witchly App API includes a comprehensive user session management system that
 **Unified Authentication** (`src/middleware/auth.middleware.ts`)
 - Supports both OAuth2 and user session authentication
 - Enhanced GraphQL context with session information
+- Dual authentication support via `X-Session-Token` header
+
+### Dual Authentication Requirements
+
+Session management operations require **both** OAuth2 client credentials AND user session authentication for enhanced security:
+
+#### Authentication Headers
+```http
+# OAuth2 client credentials (required)
+Authorization: Bearer <oauth2_access_token>
+
+# User session token (required for session operations)
+X-Session-Token: <user_session_token>
+```
+
+#### Why Dual Authentication?
+- **OAuth2**: Validates the client application is authorized to access the API
+- **Session Token**: Validates the specific user and their active session
+- **Enhanced Security**: Prevents unauthorized session access even with valid OAuth2 credentials
+- **User Context**: Ensures session operations are performed by the correct user
 
 ### Session API Usage
 
@@ -1581,6 +1620,12 @@ mutation RefreshSession {
 }
 ```
 
+**Required Headers:**
+```http
+Authorization: Bearer <oauth2_access_token>
+# Note: X-Session-Token not required for refresh operations
+```
+
 #### 3. View Active Sessions
 
 ```graphql
@@ -1598,6 +1643,12 @@ query MySessions {
 }
 ```
 
+**Required Headers:**
+```http
+Authorization: Bearer <oauth2_access_token>
+X-Session-Token: <user_session_token>
+```
+
 #### 4. Logout (Single Session)
 
 ```graphql
@@ -1607,6 +1658,12 @@ mutation Logout {
     message
   }
 }
+```
+
+**Required Headers:**
+```http
+Authorization: Bearer <oauth2_access_token>
+X-Session-Token: <user_session_token>
 ```
 
 #### 5. Logout All Sessions
@@ -1621,7 +1678,104 @@ mutation LogoutAllSessions {
 }
 ```
 
-### Session Configuration
+**Required Headers:**
+```http
+Authorization: Bearer <oauth2_access_token>
+X-Session-Token: <user_session_token>
+```
+
+### Dual Authentication Implementation
+
+#### Enhanced Middleware
+
+The `optionalAuth` middleware has been enhanced to support both OAuth2 and session authentication simultaneously:
+
+```typescript
+// Enhanced middleware supports dual authentication
+export function optionalAuth(req: Request, _res: Response, next: NextFunction): void {
+  const authHeader = req.headers.authorization;
+  const sessionHeader = req.headers['x-session-token'] as string;
+  const token = extractTokenFromHeader(authHeader);
+
+  // Process OAuth2 token if present
+  if (token) {
+    const clientPayload = verifyAccessToken(token);
+    if (clientPayload) {
+      req.client = clientPayload;
+    }
+  }
+
+  // Process session token if present (from Authorization header or X-Session-Token header)
+  const sessionToken = sessionHeader || (token && !req.client ? token : null);
+  
+  if (sessionToken) {
+    SessionService.validateSession(sessionToken)
+      .then((sessionInfo) => {
+        if (sessionInfo) {
+          req.sessionInfo = sessionInfo;
+        }
+        next();
+      })
+      .catch(() => next());
+    return;
+  } else {
+    next();
+  }
+}
+```
+
+#### GraphQL Context Enhancement
+
+The GraphQL context now includes both authentication types:
+
+```typescript
+export interface GraphQLContext {
+  // OAuth2 client credentials
+  client?: JWTPayload | undefined;
+  isAuthenticated: boolean;
+  hasScope: (scope: string) => boolean;
+
+  // User session info
+  sessionInfo?: SessionInfo | undefined;
+  isUserAuthenticated: boolean;
+  userId?: string | undefined;
+}
+```
+
+#### Resolver Security Pattern
+
+Session operations require both authentication types:
+
+```typescript
+@Query(() => [SessionInfoType])
+async mySessions(@Ctx() context: GraphQLContext): Promise<SessionInfoType[]> {
+  // Require OAuth2 authentication
+  if (!context.isAuthenticated || !context.hasScope('read')) {
+    throw new UnauthorizedError('Read access required');
+  }
+  
+  // Require user session authentication
+  if (!context.isUserAuthenticated || !context.sessionInfo) {
+    throw new UnauthorizedError('User session required to view sessions');
+  }
+
+  // Proceed with session operations...
+}
+```
+
+### Security Benefits
+
+#### Multi-Layer Security
+- **Client Authentication**: Validates the requesting application
+- **User Authentication**: Validates the specific user's session
+- **Scope Validation**: Ensures proper permissions for the operation
+- **Session Validation**: Confirms active and valid user session
+
+#### Attack Prevention
+- **Token Theft Protection**: Requires both OAuth2 and session tokens
+- **Application Spoofing**: OAuth2 credentials prevent unauthorized applications
+- **Session Hijacking**: Session tokens are user-specific and time-limited
+- **Privilege Escalation**: Dual validation prevents unauthorized access
 
 #### Duration Constants
 
@@ -1730,6 +1884,62 @@ SESSION_LONG_DAYS=90
 SESSION_MAX_PER_USER=10
 ```
 
+### Troubleshooting Dual Authentication
+
+#### Common Issues & Solutions
+
+**1. "Read access required" Error**
+```json
+{
+  "errors": [{"message": "Read access required", "extensions": {"code": "UNAUTHORIZED"}}]
+}
+```
+**Solution**: Missing or invalid OAuth2 access token
+- Verify `Authorization: Bearer <token>` header is present
+- Check if token has expired and re-authenticate if needed
+
+**2. "User session required" Error**  
+```json
+{
+  "errors": [{"message": "User session required to view sessions", "extensions": {"code": "UNAUTHORIZED"}}]
+}
+```
+**Solution**: Missing or invalid session token
+- Verify `X-Session-Token: <token>` header is present
+- Ensure you've completed login to get a session token
+- Check if session has expired
+
+**3. Authentication Flow for Session Operations**
+```bash
+# Step 1: Get OAuth2 access token
+POST /graphql
+{
+  "query": "mutation { authenticate(...) { access_token } }"
+}
+
+# Step 2: Complete login to get session token
+POST /graphql
+Headers: Authorization: Bearer <oauth2_token>
+{
+  "query": "mutation { completeLogin(...) { sessionToken } }"
+}
+
+# Step 3: Use both tokens for session operations
+POST /graphql
+Headers: 
+  Authorization: Bearer <oauth2_token>
+  X-Session-Token: <session_token>
+{
+  "query": "query { mySessions { ... } }"
+}
+```
+
+**4. Postman Collection Setup**
+- Ensure collection variables are set: `accessToken`, `sessionToken`
+- Run "Get OAuth2 Access Token" request first
+- Run "Complete Login" request to get session token
+- Session endpoints will automatically use both tokens
+
 ### Migration Notes
 
 For existing applications:
@@ -1779,9 +1989,28 @@ Create a Postman environment with these variables:
   "clientId": "your-client-id",
   "clientSecret": "your-client-secret", 
   "scope": "read write",
-  "accessToken": ""  // Auto-populated by auth script
+  "accessToken": "",  // Auto-populated by auth script
+  "sessionToken": ""  // Auto-populated by login script
 }
 ```
+
+#### Dual Authentication Headers
+
+Session management endpoints automatically include both authentication headers:
+
+```http
+# OAuth2 authentication (handled by collection variables)
+Authorization: Bearer {{accessToken}}
+
+# Session authentication (handled by collection variables)
+X-Session-Token: {{sessionToken}}
+```
+
+The collection includes automated scripts that:
+1. **Extract OAuth2 tokens** from authentication responses
+2. **Extract session tokens** from login responses  
+3. **Set both headers** automatically on session endpoints
+4. **Handle token refresh** for both authentication types
 
 #### Automated Token Management
 

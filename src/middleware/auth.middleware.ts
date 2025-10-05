@@ -94,28 +94,32 @@ export function optionalAuth(
   next: NextFunction
 ): void {
   const authHeader = req.headers.authorization;
+  const sessionHeader = req.headers['x-session-token'] as string;
   const token = extractTokenFromHeader(authHeader);
 
+  // Process OAuth2 token if present
   if (token) {
-    // First try OAuth2 client credentials
     const clientPayload = verifyAccessToken(token);
     if (clientPayload) {
       req.client = clientPayload;
-      next();
-    } else {
-      // Try user session token
-      SessionService.validateSession(token)
-        .then((sessionInfo) => {
-          if (sessionInfo) {
-            req.sessionInfo = sessionInfo;
-          }
-          next();
-        })
-        .catch(() => {
-          next();
-        });
-      return;
     }
+  }
+
+  // Process session token if present (from Authorization header or X-Session-Token header)
+  const sessionToken = sessionHeader || (token && !req.client ? token : null);
+
+  if (sessionToken) {
+    SessionService.validateSession(sessionToken)
+      .then((sessionInfo) => {
+        if (sessionInfo) {
+          req.sessionInfo = sessionInfo;
+        }
+        next();
+      })
+      .catch(() => {
+        next();
+      });
+    return;
   } else {
     next();
   }
