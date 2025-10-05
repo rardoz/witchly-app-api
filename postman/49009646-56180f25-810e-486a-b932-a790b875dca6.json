@@ -321,7 +321,8 @@
 									"}"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -344,8 +345,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation RefreshSession($input: RefreshSessionInput!) {\\n    refreshSession(input: $input) {\\n        sessionToken\\n        refreshToken\\n        expiresIn\\n        expiresAt\\n    }\\n}",
-								"variables": "{\\n    \\\"input\\\": {\\n        \\\"refreshToken\\\": \\\"{{refreshToken}}\\\"\\n    }\\n}"
+								"query": "mutation RefreshSession($input: RefreshSessionInput!) {    \n    refreshSession(input: $input) {        \n        sessionToken        \n        refreshToken        \n        expiresIn       \n        expiresAt    \n    }\n}",
+								"variables": "{   \n    \"input\": {\n        \"refreshToken\": \"{{refreshToken}}\"\n    }\n}"
 							}
 						},
 						"url": {
