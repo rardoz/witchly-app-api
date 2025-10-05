@@ -421,7 +421,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation Logout {\\n    logout {\\n        success\\n        message\\n    }\\n}",
+								"query": "mutation Logout {\n    logout {\n        success\n        message\n    }\n}",
 								"variables": "{}"
 							}
 						},
