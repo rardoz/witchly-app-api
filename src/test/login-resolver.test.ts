@@ -277,7 +277,6 @@ describe('LoginResolver GraphQL Endpoints', () => {
           expiresIn
           expiresAt
           userId
-          userHandle
         }
       }
     `;
@@ -328,7 +327,6 @@ describe('LoginResolver GraphQL Endpoints', () => {
       expect(response.body.data.completeLogin.userId).toBe(
         (createdTestUser._id as string).toString()
       );
-      expect(response.body.data.completeLogin.userHandle).toBe(testUser.handle);
       expect(response.body.data.completeLogin.expiresIn).toBeDefined();
       expect(response.body.data.completeLogin.expiresAt).toBeDefined();
 

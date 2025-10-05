@@ -446,7 +446,6 @@ mutation CompleteSignup {
 #### Verification Email Template
 - **Subject**: "Verify your email address"
 - **HTML Version**: Branded template with verification code
-- **Text Version**: Plain text fallback
 - **Security**: 6-digit codes, 10-minute expiration
 
 #### Rate Limiting & Security Features
@@ -1590,7 +1589,6 @@ mutation CompleteLogin {
     expiresIn
     expiresAt
     userId
-    userHandle
   }
 }
 ```

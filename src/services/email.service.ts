@@ -20,7 +20,6 @@ export interface EmailConfig {
 export interface EmailTemplate {
   subject: string;
   html: string;
-  text: string;
 }
 
 export class EmailService {
@@ -56,7 +55,6 @@ export class EmailService {
         to,
         subject: template.subject,
         html: template.html,
-        text: template.text,
       });
     } catch (error) {
       console.error('Failed to send email:', error);

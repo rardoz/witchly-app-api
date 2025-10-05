@@ -139,7 +139,6 @@ export class LoginResolver {
       expiresIn: sessionResponse.expiresIn,
       expiresAt: sessionResponse.expiresAt,
       userId: user._id as string,
-      userHandle: user.handle,
     };
   }
 }

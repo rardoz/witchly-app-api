@@ -34,9 +34,6 @@ export class LoginWithSessionResponse {
 
   @Field()
   userId!: string;
-
-  @Field()
-  userHandle!: string;
 }
 
 @ObjectType()

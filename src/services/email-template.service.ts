@@ -12,7 +12,6 @@ export interface EmailTemplateData {
 export interface CompiledEmailTemplate {
   subject: string;
   html: string;
-  text: string;
 }
 
 class EmailTemplateServiceClass {
@@ -21,7 +20,6 @@ class EmailTemplateServiceClass {
     string,
     {
       htmlTemplate: HandlebarsTemplateDelegate;
-      textTemplate: HandlebarsTemplateDelegate;
     }
   >();
 
@@ -44,33 +42,26 @@ class EmailTemplateServiceClass {
 
     // Render templates with data
     const html = templates.htmlTemplate(data);
-    const text = templates.textTemplate(data);
 
     // Get subject based on template type
     const subject = this.getSubjectForTemplate(templateName);
 
-    return { subject, html, text };
+    return { subject, html };
   }
 
   /**
-   * Load and compile HTML and text templates
+   * Load and compile HTML tempalate
    */
   private async loadTemplate(templateName: string): Promise<void> {
     try {
       const htmlPath = path.join(this.templatesDir, `${templateName}.html`);
-      const textPath = path.join(this.templatesDir, `${templateName}.txt`);
 
-      const [htmlContent, textContent] = await Promise.all([
-        fs.readFile(htmlPath, 'utf-8'),
-        fs.readFile(textPath, 'utf-8'),
-      ]);
+      const htmlContent = await fs.readFile(htmlPath, 'utf-8');
 
       const htmlTemplate = Handlebars.compile(htmlContent);
-      const textTemplate = Handlebars.compile(textContent);
 
       this.templateCache.set(templateName, {
         htmlTemplate,
-        textTemplate,
       });
     } catch (error) {
       throw new Error(
@@ -96,23 +87,6 @@ class EmailTemplateServiceClass {
    */
   clearCache(): void {
     this.templateCache.clear();
-  }
-
-  /**
-   * Preload commonly used templates
-   */
-  async preloadTemplates(): Promise<void> {
-    const templateNames = ['signup-verification', 'login-verification'];
-
-    await Promise.all(
-      templateNames.map(async (templateName) => {
-        try {
-          await this.loadTemplate(templateName);
-        } catch (error) {
-          console.warn(`Failed to preload template '${templateName}':`, error);
-        }
-      })
-    );
   }
 }
 
