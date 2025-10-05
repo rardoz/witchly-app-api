@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "49009646-56180f25-810e-486a-b932-a790b875dca6",
 		"name": "Witchly App API",
-		"description": "Comprehensive API collection for Witchly App - includes OAuth2 authentication, user login/session management, GraphQL queries and mutations for user and client management with complete profile support",
+		"description": "Comprehensive API collection for Witchly App - includes OAuth2 authentication, GraphQL queries and mutations for user and client management",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -193,293 +193,7 @@
 			"description": "Signup flow endpoints - initiate with email and complete with verification code"
 		},
 		{
-			"name": "🔑 Login & Sessions (GraphQL)",
-			"item": [
-				{
-					"name": "Initiate Login",
-					"id": "49009646-login-initiate-001",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{accessToken}}"
-							}
-						],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "mutation InitiateLogin($input: InitiateLoginInput!) {\\n    initiateLogin(input: $input) {\\n        success\\n        message\\n        expiresAt\\n    }\\n}",
-								"variables": "{\\n    \\\"input\\\": {\\n        \\\"email\\\": \\\"user@example.com\\\"\\n    }\\n}"
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/graphql",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"graphql"
-							]
-						},
-						"description": "Start the login process for an existing user by providing their email address. This will send a verification code to the email."
-					},
-					"response": []
-				},
-				{
-					"name": "Complete Login (Unified)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "session-token-save",
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    const response = pm.response.json();",
-									"    if (response.data && response.data.completeLogin) {",
-									"        pm.collectionVariables.set('sessionToken', response.data.completeLogin.sessionToken);",
-									"        pm.collectionVariables.set('userId', response.data.completeLogin.userId);",
-									"        if (response.data.completeLogin.refreshToken) {",
-									"            pm.collectionVariables.set('refreshToken', response.data.completeLogin.refreshToken);",
-									"            console.log('Long session with refresh token saved');",
-									"        } else {",
-									"            console.log('Short session token saved');",
-									"        }",
-									"    }",
-									"} else {",
-									"    console.log('Failed to complete login');",
-									"}"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"id": "49009646-login-complete-001",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{accessToken}}"
-							}
-						],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "mutation CompleteLogin($input: LoginWithSessionInput!) {\\n    completeLogin(input: $input) {\\n        success\\n        message\\n        sessionToken\\n        refreshToken\\n        expiresIn\\n        expiresAt\\n        userId\\n        userHandle\\n    }\\n}",
-								"variables": "{\\n    \\\"input\\\": {\\n        \\\"email\\\": \\\"user@example.com\\\",\\n        \\\"verificationCode\\\": \\\"123456\\\",\\n        \\\"keepMeLoggedIn\\\": false\\n    }\\n}"
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/graphql",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"graphql"
-							]
-						},
-						"description": "Complete the login process with a verification code. Set keepMeLoggedIn to true for 90-day session with refresh token, false for 4-hour session."
-					},
-					"response": []
-				},
-				{
-					"name": "Refresh Session",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "refresh-session-token",
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    const response = pm.response.json();",
-									"    if (response.data && response.data.refreshSession) {",
-									"        pm.collectionVariables.set('sessionToken', response.data.refreshSession.sessionToken);",
-									"        if (response.data.refreshSession.refreshToken) {",
-									"            pm.collectionVariables.set('refreshToken', response.data.refreshSession.refreshToken);",
-									"        }",
-									"        console.log('Session refreshed and new tokens saved');",
-									"    }",
-									"} else {",
-									"    console.log('Failed to refresh session');",
-									"}"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"id": "49009646-session-refresh-001",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{sessionToken}}"
-							}
-						],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "mutation RefreshSession($input: RefreshSessionInput!) {\\n    refreshSession(input: $input) {\\n        sessionToken\\n        refreshToken\\n        expiresIn\\n        expiresAt\\n    }\\n}",
-								"variables": "{\\n    \\\"input\\\": {\\n        \\\"refreshToken\\\": \\\"{{refreshToken}}\\\"\\n    }\\n}"
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/graphql",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"graphql"
-							]
-						},
-						"description": "Refresh an existing long-term session using a refresh token. Only available for sessions created with keepMeLoggedIn: true."
-					},
-					"response": []
-				},
-				{
-					"name": "Get My Sessions",
-					"id": "49009646-sessions-list-001",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{sessionToken}}"
-							}
-						],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "query MySessions {\\n    mySessions {\\n        sessionId\\n        keepMeLoggedIn\\n        lastUsedAt\\n        expiresAt\\n        userAgent\\n        ipAddress\\n        isActive\\n        createdAt\\n    }\\n}",
-								"variables": "{}"
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/graphql",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"graphql"
-							]
-						},
-						"description": "List all active sessions for the authenticated user. Requires session-based authentication."
-					},
-					"response": []
-				},
-				{
-					"name": "Logout (Current Session)",
-					"id": "49009646-session-logout-001",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{sessionToken}}"
-							}
-						],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "mutation Logout {\\n    logout {\\n        success\\n        message\\n    }\\n}",
-								"variables": "{}"
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/graphql",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"graphql"
-							]
-						},
-						"description": "Logout from the current session. This will invalidate the current session token."
-					},
-					"response": []
-				},
-				{
-					"name": "Logout All Sessions",
-					"id": "49009646-session-logout-all-001",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{sessionToken}}"
-							}
-						],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "mutation LogoutAllSessions {\\n    logoutAllSessions {\\n        success\\n        message\\n        sessionsTerminated\\n    }\\n}",
-								"variables": "{}"
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/graphql",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"graphql"
-							]
-						},
-						"description": "Logout from all sessions for the current user. This will invalidate all session tokens for the user."
-					},
-					"response": []
-				}
-			],
-			"id": "49009646-login-sessions-folder-001",
-			"description": "Login flow and session management endpoints - initiate login, complete with verification code, manage sessions"
-		},
-		{
-			"name": "👤 User Management (GraphQL)",
+			"name": "�👤 User Management (GraphQL)",
 			"item": [
 				{
 					"name": "Get All Users",
@@ -502,7 +216,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetUsers($limit: Float, $offset: Float){\n    users(limit: $limit, offset: $offset) {\n        id\n        name\n        email\n        handle\n        userType\n        emailVerified\n        lastLoginAt\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }\n}",
+								"query": "query GetUsers($limit: Float, $offset: Float){\n    users(limit: $limit, offset: $offset) {\n        id\n        name\n        email\n        handle\n        userType\n        emailVerified\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }\n}",
 								"variables": "{\n    \"limit\": 10,\n    \"offset\": 0\n}"
 							}
 						},
@@ -540,7 +254,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetUser($id: ID!) {\n    user(id: $id) {\n        id\n        name\n        email\n        handle\n        userType\n        emailVerified\n        lastLoginAt\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }\n }",
+								"query": "query GetUser($id: ID!) {\n    user(id: $id) {\n        id\n        name\n        email\n        handle\n        userType\n        emailVerified\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }\n }",
 								"variables": "{\n    \"id\": \"68e1a10a3360e5cd78e88071\"\n}"
 							}
 						},
@@ -578,7 +292,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation CreateUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n     id\n        name\n        email\n        handle\n        userType\n        emailVerified\n        lastLoginAt\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }  \n}",
+								"query": "mutation CreateUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n     id\n        name\n        email\n        handle\n        userType\n        emailVerified\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }  \n}",
 								"variables": "{\n    \"input\": {\n        \"name\": \"John Doe\",\n        \"email\": \"john.doe@example.com\",\n        \"userType\": \"admin\",\n        \"profileImageUrl\": \"https://test.com\",\n        \"bio\": \"This is a bio\",\n        \"shortBio\": \"this is a short bio\",\n        \"handle\": \"handle\",\n        \"backdropImageUrl\": \"https://handle.com\",\n        \"instagramHandle\": \"instagram\",\n        \"tikTokHandle\": \"tik\",\n        \"twitterHandle\": \"twit\",\n        \"websiteUrl\": \"https://test.com\",\n        \"facebookUrl\": \"fb\",\n        \"snapchatHandle\": \"snap\",\n        \"primaryColor\": \"red\",\n        \"sign\": \"leo\",\n        \"sex\": \"male\",\n        \"location\": \"New York, NY\",\n        \"birthDate\": \"1990-05-15\",\n        \"pronouns\": \"he/him\"\n    }\n  }"
 							}
 						},
@@ -1005,24 +719,6 @@
 			"key": "accessToken",
 			"value": "",
 			"type": "string"
-		},
-		{
-			"key": "sessionToken",
-			"value": "",
-			"type": "string",
-			"description": "User session token for session-based authentication"
-		},
-		{
-			"key": "refreshToken",
-			"value": "",
-			"type": "string",
-			"description": "Refresh token for long-term sessions (keepMeLoggedIn: true)"
-		},
-		{
-			"key": "userId",
-			"value": "",
-			"type": "string",
-			"description": "Current user ID from login/session"
 		}
 	]
 }
