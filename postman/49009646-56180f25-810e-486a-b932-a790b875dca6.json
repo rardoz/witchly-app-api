@@ -704,6 +704,7 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "c8bc4040-0862-4a7c-97bc-544f87d21013",
 								"exec": [
 									"if (pm.response.code === 200) {",
 									"    const response = pm.response.json();",
@@ -714,7 +715,8 @@
 									"}"
 								],
 								"type": "text/javascript",
-								"id": "c8bc4040-0862-4a7c-97bc-544f87d21013"
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -728,10 +730,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{accessToken}}"
 							}
 						],
 						"body": {
@@ -763,10 +761,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{accessToken}}"
 							}
 						],
 						"body": {
@@ -798,10 +792,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{accessToken}}"
 							}
 						],
 						"body": {
