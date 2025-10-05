@@ -328,10 +328,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{sessionToken}}"
 							}
 						],
 						"body": {
@@ -366,10 +362,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{sessionToken}}"
 							}
 						],
 						"body": {
