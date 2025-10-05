@@ -1,17 +1,13 @@
-import bcrypt from 'bcrypt';
 import { Arg, Ctx, Mutation, Resolver } from 'type-graphql';
-import validator from 'validator';
 import { emailService } from '../../config/email';
 import { GraphQLContext } from '../../middleware/auth.middleware';
-import { EmailVerification } from '../../models/EmailVerification';
 import { Signup } from '../../models/Signup';
 import { User } from '../../models/User';
+import { VerificationService } from '../../services/verification.service';
 import {
   ConflictError,
   NotFoundError,
-  TooManyRequestsError,
   UnauthorizedError,
-  ValidationError,
 } from '../../utils/errors';
 import {
   CompleteSignupInput,
@@ -35,72 +31,43 @@ export class SignupResolver {
     }
 
     const { email } = input;
-    const emailFormatted = email.toLowerCase();
 
     try {
       // Validate email format
-      if (!validator.isEmail(email)) {
-        throw new ValidationError('Please provide a valid email address');
-      }
+      VerificationService.validateEmailFormat(email);
 
       // Check if user already exists
-      const existingUser = await User.findOne({ email: emailFormatted });
+      const { emailFormatted, user: existingUser } =
+        await VerificationService.checkUserExists(email);
       if (existingUser) {
         throw new ConflictError(
           'An account with this email address already exists'
         );
       }
 
-      // Check for existing unverified code first
-      const existingVerification = await EmailVerification.findOne({
-        email: emailFormatted,
-        verified: false,
-      });
+      // Rate limiting check
+      await VerificationService.enforceRateLimit(emailFormatted);
 
-      // Rate limiting: if there's an existing code created less than 1 minute ago, reject
-      if (existingVerification) {
-        const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
-        if (existingVerification.createdAt > oneMinuteAgo) {
-          throw new TooManyRequestsError(
-            'Please wait at least 1 minute before requesting another verification code.'
-          );
-        }
-      }
+      // Clean up any existing verification codes and pending signups
+      await VerificationService.cleanupExistingVerifications(emailFormatted);
+      await Signup.deleteMany({ email: emailFormatted });
 
-      // Clean up any existing unverified codes for this email
-      await EmailVerification.deleteMany({
-        email: emailFormatted,
-        verified: false,
-      });
-
-      // Clean up any existing pending signup for this email
-      await Signup.deleteMany({
-        email: emailFormatted,
-      });
-
-      // Generate 6-digit verification code
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      const hashedCode = await bcrypt.hash(code, 10);
-
-      // Set expiration to 15 minutes from now
-      const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+      // Generate verification code
+      const { code, expiresAt } =
+        VerificationService.generateVerificationCode();
+      const hashedCode = await VerificationService.hashVerificationCode(code);
 
       // Create verification record
-      const verification = new EmailVerification({
-        email: emailFormatted,
-        code: hashedCode,
-        expiresAt,
-        attempts: 0,
-        verified: false,
-      });
-
-      await verification.save();
+      await VerificationService.createVerificationRecord(
+        emailFormatted,
+        hashedCode,
+        expiresAt
+      );
 
       // Store minimal pending signup (only email)
       const pendingSignup = new Signup({
         email: emailFormatted,
       });
-
       await pendingSignup.save();
 
       // Send verification email
@@ -119,10 +86,12 @@ export class SignupResolver {
         expiresAt,
       };
     } catch (error) {
+      // Re-throw specific errors from VerificationService
       if (
-        error instanceof ValidationError ||
         error instanceof ConflictError ||
-        error instanceof TooManyRequestsError
+        error instanceof UnauthorizedError ||
+        error?.constructor?.name === 'ValidationError' ||
+        error?.constructor?.name === 'TooManyRequestsError'
       ) {
         throw error;
       }
@@ -140,64 +109,30 @@ export class SignupResolver {
     if (!context.isAuthenticated || !context.hasScope('write')) {
       throw new UnauthorizedError('Write access required');
     }
+
     const { email, verificationCode } = input;
-    const emailFormatted = email.toLowerCase();
+
     try {
       // Validate email format
-      if (!validator.isEmail(email)) {
-        throw new ValidationError('Please provide a valid email address');
-      }
+      VerificationService.validateEmailFormat(email);
 
       // Validate verification code format
-      if (!/^\d{6}$/.test(verificationCode)) {
-        throw new ValidationError('Verification code must be exactly 6 digits');
-      }
-
-      // Find verification record
-      const verification = await EmailVerification.findOne({
-        email: emailFormatted,
-        verified: false,
-        expiresAt: { $gt: new Date() },
-      });
-
-      if (!verification) {
-        throw new NotFoundError('Invalid or expired verification code');
-      }
-
-      // Check attempts limit
-      if (verification.attempts >= 3) {
-        await EmailVerification.deleteOne({ _id: verification._id });
-        throw new TooManyRequestsError(
-          'Too many attempts. Please request a new verification code.'
-        );
-      }
-
-      // Verify the code
-      const isValidCode = await bcrypt.compare(
-        verificationCode,
-        verification.code
-      );
-
-      if (!isValidCode) {
-        // Increment attempts
-        verification.attempts += 1;
-        await verification.save();
-
-        const remainingAttempts = 3 - verification.attempts;
-        throw new ValidationError(
-          remainingAttempts > 0
-            ? `Invalid verification code. ${remainingAttempts} attempts remaining.`
-            : 'Invalid verification code. Please request a new code.'
-        );
-      }
+      VerificationService.validateVerificationCodeFormat(verificationCode);
 
       // Check if user already exists (double-check)
-      const existingUser = await User.findOne({ email: emailFormatted });
+      const { emailFormatted, user: existingUser } =
+        await VerificationService.checkUserExists(email);
       if (existingUser) {
         throw new ConflictError(
           'An account with this email address already exists'
         );
       }
+
+      // Find and validate verification code
+      await VerificationService.findAndValidateVerification(
+        emailFormatted,
+        verificationCode
+      );
 
       // Get the pending signup data
       const pendingSignup = await Signup.findOne({
@@ -225,7 +160,7 @@ export class SignupResolver {
       await user.save();
 
       // Clean up verification and pending signup
-      await EmailVerification.deleteOne({ email: emailFormatted });
+      await VerificationService.completeVerification(emailFormatted);
       await Signup.deleteOne({ email: emailFormatted });
 
       return {
@@ -234,11 +169,13 @@ export class SignupResolver {
         user: user as GraphQLUser,
       };
     } catch (error) {
+      // Re-throw specific errors from VerificationService
       if (
-        error instanceof ValidationError ||
         error instanceof ConflictError ||
         error instanceof NotFoundError ||
-        error instanceof TooManyRequestsError
+        error instanceof UnauthorizedError ||
+        error?.constructor?.name === 'ValidationError' ||
+        error?.constructor?.name === 'TooManyRequestsError'
       ) {
         throw error;
       }

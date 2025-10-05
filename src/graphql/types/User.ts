@@ -18,6 +18,9 @@ export class User extends BaseProfileObjectType {
   @Field()
   userType: string;
 
+  @Field(() => Date, { nullable: true })
+  lastLoginAt?: Date;
+
   @Field()
   createdAt: Date;
 

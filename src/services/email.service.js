@@ -1,40 +1,13 @@
 import * as nodemailer from 'nodemailer';
-import {
-  type EmailTemplateData,
-  emailTemplateService,
-} from './email-template.service';
-
-export interface EmailConfig {
-  host: string;
-  port: number;
-  secure: boolean;
-  requireTLS?: boolean;
-  auth: {
-    user: string;
-    pass: string;
-  };
-  from: string;
-  fromName?: string; // Optional display name
-}
-
-export interface EmailTemplate {
-  subject: string;
-  html: string;
-  text: string;
-}
-
+import { emailTemplateService } from './email-template.service';
 export class EmailService {
-  private transporter: nodemailer.Transporter;
-  private fromAddress: string;
-
-  constructor(config: EmailConfig) {
+  constructor(config) {
     // Format the from address with optional display name
     if (config.fromName) {
       this.fromAddress = `"${config.fromName}" <${config.from}>`;
     } else {
       this.fromAddress = config.from;
     }
-
     // AWS SES configuration with proper TLS settings
     this.transporter = nodemailer.createTransport({
       host: config.host,
@@ -48,8 +21,7 @@ export class EmailService {
       },
     });
   }
-
-  async sendEmail(to: string, template: EmailTemplate): Promise<void> {
+  async sendEmail(to, template) {
     try {
       await this.transporter.sendMail({
         from: this.fromAddress,
@@ -63,11 +35,10 @@ export class EmailService {
       throw new Error('Failed to send email');
     }
   }
-
   /**
    * Send verification code using template service
    */
-  async sendVerificationCode(email: string, code: string): Promise<void> {
+  async sendVerificationCode(email, code) {
     const template = await emailTemplateService.getTemplate(
       'signup-verification',
       {
@@ -77,15 +48,10 @@ export class EmailService {
     );
     await this.sendEmail(email, template);
   }
-
   /**
    * Send login verification code using template service
    */
-  async sendLoginVerificationCode(
-    email: string,
-    code: string,
-    userName: string = 'User'
-  ): Promise<void> {
+  async sendLoginVerificationCode(email, code, userName = 'there') {
     const template = await emailTemplateService.getTemplate(
       'login-verification',
       {
@@ -96,23 +62,17 @@ export class EmailService {
     );
     await this.sendEmail(email, template);
   }
-
   /**
    * Send email using a template name and data
    */
-  async sendTemplatedEmail(
-    to: string,
-    templateName: string,
-    data: EmailTemplateData
-  ): Promise<void> {
+  async sendTemplatedEmail(to, templateName, data) {
     const template = await emailTemplateService.getTemplate(templateName, data);
     await this.sendEmail(to, template);
   }
-
   /**
    * Debug method to list available methods
    */
-  listMethods(): string[] {
+  listMethods() {
     return Object.getOwnPropertyNames(Object.getPrototypeOf(this));
   }
 }

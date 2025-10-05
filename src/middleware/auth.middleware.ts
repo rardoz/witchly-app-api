@@ -5,12 +5,14 @@ import {
   type JWTPayload,
   verifyAccessToken,
 } from '../services/jwt.service';
+import { type SessionInfo, SessionService } from '../services/session.service';
 
-// Extend Express Request to include client info
+// Extend Express Request to include client info and session info
 declare global {
   namespace Express {
     interface Request {
       client?: JWTPayload;
+      sessionInfo?: SessionInfo;
     }
   }
 }
@@ -84,7 +86,7 @@ export function requireScope(requiredScope: string) {
 }
 
 /**
- * Optional authentication middleware - doesn't fail if no token
+ * Optional authentication middleware - supports both OAuth2 and user sessions
  */
 export function optionalAuth(
   req: Request,
@@ -95,30 +97,58 @@ export function optionalAuth(
   const token = extractTokenFromHeader(authHeader);
 
   if (token) {
-    const payload = verifyAccessToken(token);
-    if (payload) {
-      req.client = payload;
+    // First try OAuth2 client credentials
+    const clientPayload = verifyAccessToken(token);
+    if (clientPayload) {
+      req.client = clientPayload;
+      next();
+    } else {
+      // Try user session token
+      SessionService.validateSession(token)
+        .then((sessionInfo) => {
+          if (sessionInfo) {
+            req.sessionInfo = sessionInfo;
+          }
+          next();
+        })
+        .catch(() => {
+          next();
+        });
+      return;
     }
+  } else {
+    next();
   }
-
-  next();
 }
 
 /**
- * GraphQL Context builder that includes authentication
+ * Enhanced GraphQL Context that includes both OAuth2 and session authentication
  */
 export interface GraphQLContext {
+  // OAuth2 client credentials
   client?: JWTPayload | undefined;
   isAuthenticated: boolean;
   hasScope: (scope: string) => boolean;
+
+  // User session info
+  sessionInfo?: SessionInfo | undefined;
+  isUserAuthenticated: boolean;
+  userId?: string | undefined;
 }
 
 export function createGraphQLContext(req: Request): GraphQLContext {
   const client = req.client;
+  const sessionInfo = req.sessionInfo;
 
   return {
+    // OAuth2 context (existing)
     client: client || undefined,
     isAuthenticated: !!client,
     hasScope: (scope: string) => (client ? hasScope(client, scope) : false),
+
+    // Session context (new)
+    sessionInfo: sessionInfo || undefined,
+    isUserAuthenticated: !!sessionInfo,
+    userId: sessionInfo?.userId,
   };
 }
