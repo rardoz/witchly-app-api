@@ -817,6 +817,7 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "d48b5d0f-074c-419b-8950-d89b2004adac",
 								"exec": [
 									"if (pm.response.code === 200) {",
 									"    const response = pm.response.json();",
@@ -826,7 +827,8 @@
 									"}"
 								],
 								"type": "text/javascript",
-								"id": "d48b5d0f-074c-419b-8950-d89b2004adac"
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -840,10 +842,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{accessToken}}"
 							}
 						],
 						"body": {
