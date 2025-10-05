@@ -607,10 +607,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{accessToken}}"
 							}
 						],
 						"body": {
