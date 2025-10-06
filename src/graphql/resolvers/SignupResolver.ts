@@ -7,7 +7,9 @@ import { VerificationService } from '../../services/verification.service';
 import {
   ConflictError,
   NotFoundError,
+  TooManyRequestsError,
   UnauthorizedError,
+  ValidationError,
 } from '../../utils/errors';
 import {
   CompleteSignupInput,
@@ -89,9 +91,10 @@ export class SignupResolver {
       // Re-throw specific errors from VerificationService
       if (
         error instanceof ConflictError ||
+        error instanceof NotFoundError ||
         error instanceof UnauthorizedError ||
-        error?.constructor?.name === 'ValidationError' ||
-        error?.constructor?.name === 'TooManyRequestsError'
+        error instanceof ValidationError ||
+        error instanceof TooManyRequestsError
       ) {
         throw error;
       }
@@ -174,8 +177,8 @@ export class SignupResolver {
         error instanceof ConflictError ||
         error instanceof NotFoundError ||
         error instanceof UnauthorizedError ||
-        error?.constructor?.name === 'ValidationError' ||
-        error?.constructor?.name === 'TooManyRequestsError'
+        error instanceof ValidationError ||
+        error instanceof TooManyRequestsError
       ) {
         throw error;
       }
