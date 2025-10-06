@@ -269,6 +269,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "x-real-ip",
+								"value": "0.0.0.0",
+								"type": "text"
 							}
 						],
 						"body": {
