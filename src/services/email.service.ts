@@ -3,6 +3,7 @@ import {
   type EmailTemplateData,
   emailTemplateService,
 } from './email-template.service';
+import { VerificationService } from './verification.service';
 
 export interface EmailConfig {
   host: string;
@@ -70,7 +71,7 @@ export class EmailService {
       'signup-verification',
       {
         code,
-        expiryMinutes: 15,
+        expiryMinutes: VerificationService.CODE_EXPIRY_MINUTES_VALUE,
       }
     );
     await this.sendEmail(email, template);
@@ -88,7 +89,7 @@ export class EmailService {
       'login-verification',
       {
         code,
-        expiryMinutes: 15,
+        expiryMinutes: VerificationService.CODE_EXPIRY_MINUTES_VALUE,
         userName,
       }
     );
