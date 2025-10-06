@@ -11,6 +11,7 @@ import {
   UnauthorizedError,
   ValidationError,
 } from '../../utils/errors';
+import { getScopesForLevel } from '../../utils/user-scopes';
 import {
   CompleteSignupInput,
   InitiateSignupInput,
@@ -153,7 +154,7 @@ export class SignupResolver {
       // Create minimal user with just email and auto-generated handle
       const user = new User({
         email: emailFormatted,
-        userType: 'basic',
+        allowedScopes: getScopesForLevel('basic'), // Default to basic user scopes
         emailVerified: true,
         handle,
         // All profile fields will be undefined/empty initially

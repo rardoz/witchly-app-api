@@ -9,14 +9,14 @@ export class User extends BaseProfileObjectType {
   @Field()
   email: string;
 
+  @Field(() => [String])
+  allowedScopes: string[];
+
   @Field()
   emailVerified: boolean;
 
   @Field()
   handle: string;
-
-  @Field()
-  userType: string;
 
   @Field(() => Date, { nullable: true })
   lastLoginAt?: Date;

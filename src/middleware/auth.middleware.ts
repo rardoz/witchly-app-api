@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
+import { User } from '../models/User';
 import {
   extractTokenFromHeader,
   hasScope,
@@ -13,6 +14,7 @@ declare global {
     interface Request {
       client?: JWTPayload;
       sessionInfo?: SessionInfo;
+      userScopes?: string[];
     }
   }
 }
@@ -110,16 +112,25 @@ export function optionalAuth(
 
   if (sessionToken) {
     SessionService.validateSession(sessionToken, req, true)
-      .then((sessionInfo) => {
+      .then(async (sessionInfo) => {
         if (sessionInfo) {
           req.sessionInfo = sessionInfo;
+
+          // Fetch user scopes
+          try {
+            const user = await User.findById(sessionInfo.userId);
+            if (user?.allowedScopes) {
+              req.userScopes = user.allowedScopes;
+            }
+          } catch (_error) {
+            req.userScopes = [];
+          }
         }
         next();
       })
       .catch(() => {
         next();
       });
-    return;
   } else {
     next();
   }
@@ -138,6 +149,8 @@ export interface GraphQLContext {
   sessionInfo?: SessionInfo | undefined;
   isUserAuthenticated: boolean;
   userId?: string | undefined;
+  userScopes?: string[] | undefined;
+  hasUserScope: (scope: string) => boolean;
 
   // Request information
   request: Request;
@@ -146,6 +159,7 @@ export interface GraphQLContext {
 export function createGraphQLContext(req: Request): GraphQLContext {
   const client = req.client;
   const sessionInfo = req.sessionInfo;
+  const userScopes = req.userScopes;
 
   return {
     // OAuth2 context (existing)
@@ -157,6 +171,9 @@ export function createGraphQLContext(req: Request): GraphQLContext {
     sessionInfo: sessionInfo || undefined,
     isUserAuthenticated: !!sessionInfo,
     userId: sessionInfo?.userId,
+    userScopes: userScopes || undefined,
+    hasUserScope: (scope: string) =>
+      userScopes ? userScopes.includes(scope) : false,
 
     // Request information
     request: req,

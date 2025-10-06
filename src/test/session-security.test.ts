@@ -97,7 +97,7 @@ describe('Session Security', () => {
         email: 'security.test@example.com',
         emailVerified: true,
         handle: 'securitytest',
-        userType: 'basic',
+        scopes: ['read', 'write', 'basic'],
       }) as IUser;
       await testUser.save();
 
@@ -257,7 +257,7 @@ describe('Session Security', () => {
         email: 'overload.test@example.com',
         emailVerified: true,
         handle: 'overloadtest',
-        userType: 'basic',
+        scopes: ['read', 'write', 'basic'],
       }) as IUser;
       await testUser.save();
     });

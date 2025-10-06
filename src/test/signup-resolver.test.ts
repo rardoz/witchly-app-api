@@ -281,7 +281,7 @@ describe('SignupResolver GraphQL Endpoints', () => {
       await User.create({
         name: 'Existing User',
         email: validSignupData.email,
-        userType: 'basic',
+        allowedScopes: ['read', 'write', 'basic'],
         handle: 'existing_user',
         emailVerified: true,
       });
@@ -416,7 +416,7 @@ describe('SignupResolver GraphQL Endpoints', () => {
               name
               email
               handle
-              userType
+              allowedScopes
               emailVerified
             }
           }
@@ -441,7 +441,11 @@ describe('SignupResolver GraphQL Endpoints', () => {
       expect(response.body.data.completeSignup.user).toBeDefined();
       expect(response.body.data.completeSignup.user.email).toBe(testEmail);
       expect(response.body.data.completeSignup.user.emailVerified).toBe(true);
-      expect(response.body.data.completeSignup.user.userType).toBe('basic');
+      expect(response.body.data.completeSignup.user.allowedScopes).toEqual([
+        'read',
+        'write',
+        'basic',
+      ]);
       expect(response.body.data.completeSignup.user.handle).toMatch(
         /^[a-z]+_\d+$/
       );
@@ -671,7 +675,7 @@ describe('SignupResolver GraphQL Endpoints', () => {
               name
               email
               handle
-              userType
+              allowedScopes
               emailVerified
               bio
               shortBio
@@ -703,7 +707,7 @@ describe('SignupResolver GraphQL Endpoints', () => {
       const user = completeResponse.body.data.completeSignup.user;
       expect(user.email).toBe(fullFlowEmail);
       expect(user.emailVerified).toBe(true);
-      expect(user.userType).toBe('basic');
+      expect(user.allowedScopes).toEqual(['read', 'write', 'basic']);
       expect(user.handle).toMatch(/^[a-z]+_\d+$/);
 
       // Profile fields should be null since we no longer collect them during signup

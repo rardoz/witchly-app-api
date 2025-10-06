@@ -8,8 +8,8 @@ export class CreateUserInput {
   @Field()
   email: string;
 
-  @Field()
-  userType: string;
+  @Field(() => [String], { nullable: true })
+  allowedScopes?: string[];
 
   @Field({ nullable: true })
   profileImageUrl?: string;
@@ -62,8 +62,8 @@ export class UpdateUserInput {
   @Field({ nullable: true })
   email?: string;
 
-  @Field({ nullable: true })
-  userType?: string;
+  @Field(() => [String], { nullable: true })
+  allowedScopes?: string[];
 
   @Field({ nullable: true })
   profileImageUrl?: string;

@@ -8,11 +8,11 @@ describe('SessionService', () => {
 
   beforeAll(async () => {
     // Create a test user
-    const user = new User({
-      name: 'Session Test User',
-      email: 'session.test@example.com',
-      userType: 'user',
-      handle: 'session_test',
+    const user = await User.create({
+      name: 'John Doe',
+      email: 'john.doe@example.com',
+      allowedScopes: ['read', 'write', 'basic'],
+      handle: 'johndoe123',
       emailVerified: true,
     });
     await user.save();
@@ -195,7 +195,7 @@ describe('SessionService', () => {
       const anotherUser = new User({
         name: 'Another Test User',
         email: 'another.test@example.com',
-        userType: 'user',
+        scopes: ['read', 'write', 'basic'],
         handle: 'another_test',
         emailVerified: true,
       });
