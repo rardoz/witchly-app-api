@@ -45,8 +45,18 @@ export class SessionResolver {
     if (!context.isAuthenticated || !context.hasScope('write')) {
       throw new UnauthorizedError('Write access required');
     }
+
+    // Require user session for refresh token validation (security requirement)
+    if (!context.isUserAuthenticated || !context.sessionInfo) {
+      throw new UnauthorizedError('User session required to refresh tokens');
+    }
+
+    // Get current user ID from session context for validation
+    const currentUserId = context.sessionInfo.userId;
+
     const sessionResponse = await SessionService.refreshSession(
-      input.refreshToken
+      input.refreshToken,
+      currentUserId // Pass current user ID for security validation
     );
 
     return {

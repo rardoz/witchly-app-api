@@ -160,8 +160,10 @@ describe('SessionService', () => {
         );
       }
 
-      const refreshedResponse =
-        await SessionService.refreshSession(refreshToken);
+      const refreshedResponse = await SessionService.refreshSession(
+        refreshToken,
+        testUserId
+      );
 
       expect(refreshedResponse).toHaveProperty('sessionToken');
       expect(refreshedResponse).toHaveProperty('refreshToken');
@@ -180,6 +182,45 @@ describe('SessionService', () => {
       await expect(
         SessionService.refreshSession('invalid-refresh-token')
       ).rejects.toThrow(UnauthorizedError);
+    });
+
+    it('should throw error for empty refresh token', async () => {
+      await expect(SessionService.refreshSession('')).rejects.toThrow(
+        'Refresh token is required'
+      );
+    });
+
+    it('should throw error when refresh token belongs to different user', async () => {
+      // Create another test user
+      const anotherUser = new User({
+        name: 'Another Test User',
+        email: 'another.test@example.com',
+        userType: 'user',
+        handle: 'another_test',
+        emailVerified: true,
+      });
+      await anotherUser.save();
+      const anotherUserId = String(anotherUser._id);
+
+      // Create session for the other user
+      const sessionResponse = await SessionService.createSession(
+        anotherUserId,
+        true
+      );
+
+      const refreshToken = sessionResponse.refreshToken;
+      if (!refreshToken) {
+        throw new Error('Refresh token should be present');
+      }
+
+      // Try to refresh with wrong user ID
+      await expect(
+        SessionService.refreshSession(refreshToken, testUserId)
+      ).rejects.toThrow('Refresh token does not belong to the current user');
+
+      // Clean up
+      await User.deleteOne({ _id: anotherUserId });
+      await UserSession.deleteMany({ userId: anotherUserId });
     });
 
     it('should throw error for refresh token on short session', async () => {

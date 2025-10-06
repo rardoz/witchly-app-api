@@ -232,8 +232,15 @@ export namespace SessionService {
    * Refresh a session using refresh token with optional security validation
    */
   export async function refreshSession(
-    refreshToken: string
+    refreshToken: string,
+    currentUserId?: string
   ): Promise<SessionTokenResponse> {
+    // Validate that a refresh token was provided
+    if (!refreshToken || refreshToken.trim() === '') {
+      throw new UnauthorizedError('Refresh token is required');
+    }
+
+    // Find the session with the exact refresh token
     const session = await UserSession.findOne({
       refreshToken,
       isActive: true,
@@ -243,6 +250,30 @@ export namespace SessionService {
 
     if (!session) {
       throw new UnauthorizedError('Invalid or expired refresh token');
+    }
+
+    // Additional validation: ensure the session actually has a refresh token
+    if (!session.refreshToken) {
+      throw new UnauthorizedError(
+        'Session does not support refresh functionality'
+      );
+    }
+
+    // Validate that the provided refresh token exactly matches the session's refresh token
+    if (session.refreshToken !== refreshToken) {
+      throw new UnauthorizedError('Refresh token does not match session');
+    }
+
+    // Critical security check: ensure the refresh token belongs to the current user
+    if (currentUserId && session.userId !== currentUserId) {
+      throw new UnauthorizedError(
+        'Refresh token does not belong to the current user'
+      );
+    }
+
+    // Ensure this is a long-term session (keepMeLoggedIn must be true for refresh)
+    if (!session.keepMeLoggedIn) {
+      throw new UnauthorizedError('Only long-term sessions can be refreshed');
     }
 
     // Generate new session token (but keep same refresh token)

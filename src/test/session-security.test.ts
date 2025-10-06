@@ -215,7 +215,10 @@ describe('Session Security', () => {
       // Note: refreshSession no longer validates IP/UserAgent changes
       // Security validation is now only done in validateSession
       if (refreshToken) {
-        const refreshResult = await SessionService.refreshSession(refreshToken);
+        const refreshResult = await SessionService.refreshSession(
+          refreshToken,
+          String(testUser._id)
+        );
         expect(refreshResult.sessionToken).toBeDefined();
         expect(refreshResult.refreshToken).toBeDefined();
       }
@@ -235,7 +238,10 @@ describe('Session Security', () => {
 
       // Test successful refresh
       if (refreshToken) {
-        const refreshResult = await SessionService.refreshSession(refreshToken);
+        const refreshResult = await SessionService.refreshSession(
+          refreshToken,
+          String(testUser._id)
+        );
 
         expect(refreshResult.sessionToken).toBeDefined();
         expect(refreshResult.refreshToken).toBeDefined();

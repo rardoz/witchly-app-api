@@ -290,6 +290,7 @@ describe('SessionResolver GraphQL Endpoints', () => {
       const response = await global.testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('X-Session-Token', freshSessionResponse.sessionToken) // Need session token for user validation
         .set('User-Agent', 'Mozilla/5.0 (Test Browser)') // Match session creation
         .send({
           query: refreshSessionMutation(
@@ -318,10 +319,100 @@ describe('SessionResolver GraphQL Endpoints', () => {
       ).toBeGreaterThan(freshSessionResponse.expiresAt.getTime());
     });
 
-    it('should reject invalid refresh token', async () => {
+    it('should require user session for refresh token validation', async () => {
+      // Create two different users
+      const anotherUser = new User({
+        name: 'Another User',
+        email: 'another.refresh@example.com',
+        userType: 'user',
+        handle: 'another_refresh',
+        emailVerified: true,
+      });
+      await anotherUser.save();
+
+      // Create sessions for both users
+      const user1Session = await SessionService.createSession(
+        createdTestUser._id as string,
+        true,
+        'Mozilla/5.0 (Test Browser)',
+        '::ffff:127.0.0.1'
+      );
+
+      const user2Session = await SessionService.createSession(
+        anotherUser._id as string,
+        true,
+        'Mozilla/5.0 (Test Browser)',
+        '::ffff:127.0.0.1'
+      );
+
+      // Try to refresh user1's token while authenticated as user2
       const response = await global.testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('X-Session-Token', user2Session.sessionToken) // User2's session
+        .set('User-Agent', 'Mozilla/5.0 (Test Browser)')
+        .send({
+          query: refreshSessionMutation(
+            user1Session.refreshToken || '' // User1's refresh token
+          ),
+        });
+
+      // GraphQL returns 401 for UNAUTHORIZED errors
+      expect(response.status).toBe(401);
+      expect(response.body.errors).toBeDefined();
+      expect(response.body.errors[0].extensions.code).toBe('UNAUTHORIZED');
+      expect(response.body.errors[0].message).toBe(
+        'Refresh token does not belong to the current user'
+      );
+
+      // Cleanup
+      await User.deleteOne({ _id: anotherUser._id });
+      await UserSession.deleteMany({ userId: anotherUser._id });
+    });
+
+    it('should require user session token to be provided', async () => {
+      // Create a session
+      const freshSessionResponse = await SessionService.createSession(
+        createdTestUser._id as string,
+        true,
+        'Mozilla/5.0 (Test Browser)',
+        '::ffff:127.0.0.1'
+      );
+
+      // Make request without session token
+      const response = await global.testRequest
+        .post('/graphql')
+        .set('Authorization', `Bearer ${accessToken}`)
+        // Intentionally NOT setting X-Session-Token
+        .send({
+          query: refreshSessionMutation(
+            freshSessionResponse.refreshToken || ''
+          ),
+        });
+
+      // GraphQL returns 401 for UNAUTHORIZED errors
+      expect(response.status).toBe(401);
+      expect(response.body.errors).toBeDefined();
+      expect(response.body.errors[0].extensions.code).toBe('UNAUTHORIZED');
+      expect(response.body.errors[0].message).toBe(
+        'User session required to refresh tokens'
+      );
+    });
+
+    it('should reject invalid refresh token', async () => {
+      // Create a valid session to provide the required session token
+      const validSession = await SessionService.createSession(
+        createdTestUser._id as string,
+        true,
+        'Mozilla/5.0 (Test Browser)',
+        '::ffff:127.0.0.1'
+      );
+
+      const response = await global.testRequest
+        .post('/graphql')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .set('X-Session-Token', validSession.sessionToken) // Provide valid session
+        .set('User-Agent', 'Mozilla/5.0 (Test Browser)')
         .send({ query: refreshSessionMutation('invalid-refresh-token') });
 
       expect(response.body.errors).toBeDefined();
