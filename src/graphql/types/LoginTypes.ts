@@ -1,5 +1,4 @@
-import { Field, ObjectType } from 'type-graphql';
-import { User } from './User';
+import { Field, InputType, ObjectType } from 'type-graphql';
 
 @ObjectType()
 export class InitiateLoginResponse {
@@ -13,14 +12,38 @@ export class InitiateLoginResponse {
   expiresAt?: Date;
 }
 
+@InputType()
+export class CompleteLoginInput {
+  @Field()
+  email!: string;
+
+  @Field()
+  verificationCode!: string;
+
+  @Field({ nullable: true, defaultValue: false })
+  keepMeLoggedIn?: boolean;
+}
+
 @ObjectType()
 export class CompleteLoginResponse {
   @Field()
-  success: boolean;
+  success!: boolean;
 
   @Field()
-  message: string;
+  message!: string;
 
-  @Field(() => User, { nullable: true })
-  user?: User;
+  @Field()
+  sessionToken!: string;
+
+  @Field(() => String, { nullable: true })
+  refreshToken?: string | undefined;
+
+  @Field()
+  expiresIn!: number;
+
+  @Field()
+  expiresAt!: Date;
+
+  @Field()
+  userId!: string;
 }

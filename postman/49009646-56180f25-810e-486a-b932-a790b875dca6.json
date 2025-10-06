@@ -274,7 +274,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation CompleteLogin($input: LoginWithSessionInput!) {   \n        completeLogin(input: $input) {\n            success\n            message\n            sessionToken\n            refreshToken\n            expiresIn\n            expiresAt\n            userId\n        }\n    }",
+								"query": "mutation CompleteLogin($input: CompleteLoginInput!) {   \n        completeLogin(input: $input) {\n            success\n            message\n            sessionToken\n            refreshToken\n            expiresIn\n            expiresAt\n            userId\n        }\n    }",
 								"variables": "{\n    \"input\": {\n        \"email\": \"witchlyapp@gmail.com\",     \n        \"verificationCode\": \"941982\",       \n        \"keepMeLoggedIn\": true   \n    }\n}"
 							}
 						},

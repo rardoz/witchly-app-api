@@ -1,41 +1,5 @@
 import { Field, InputType, ObjectType } from 'type-graphql';
 
-@InputType()
-export class LoginWithSessionInput {
-  @Field()
-  email!: string;
-
-  @Field()
-  verificationCode!: string;
-
-  @Field({ nullable: true, defaultValue: false })
-  keepMeLoggedIn?: boolean;
-}
-
-@ObjectType()
-export class LoginWithSessionResponse {
-  @Field()
-  success!: boolean;
-
-  @Field()
-  message!: string;
-
-  @Field()
-  sessionToken!: string;
-
-  @Field(() => String, { nullable: true })
-  refreshToken?: string | undefined;
-
-  @Field()
-  expiresIn!: number;
-
-  @Field()
-  expiresAt!: Date;
-
-  @Field()
-  userId!: string;
-}
-
 @ObjectType()
 export class SessionInfoType {
   @Field()

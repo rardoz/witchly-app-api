@@ -9,11 +9,11 @@ import {
   ValidationError,
 } from '../../utils/errors';
 import { InitiateLoginInput } from '../inputs/LoginInput';
-import { InitiateLoginResponse } from '../types/LoginTypes';
 import {
-  LoginWithSessionInput,
-  LoginWithSessionResponse,
-} from '../types/SessionTypes';
+  CompleteLoginInput,
+  CompleteLoginResponse,
+  InitiateLoginResponse,
+} from '../types/LoginTypes';
 
 @Resolver()
 export class LoginResolver {
@@ -81,11 +81,11 @@ export class LoginResolver {
     };
   }
 
-  @Mutation(() => LoginWithSessionResponse)
+  @Mutation(() => CompleteLoginResponse)
   async completeLogin(
     @Ctx() context: GraphQLContext,
-    @Arg('input') input: LoginWithSessionInput
-  ): Promise<LoginWithSessionResponse> {
+    @Arg('input') input: CompleteLoginInput
+  ): Promise<CompleteLoginResponse> {
     if (!context.isAuthenticated || !context.hasScope('write')) {
       throw new UnauthorizedError('Write access required');
     }
