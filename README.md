@@ -1950,6 +1950,259 @@ For existing applications:
 
 The session management system provides a robust foundation for user authentication while maintaining full compatibility with the existing OAuth2 infrastructure.
 
+## 🛡️ Advanced Session Security Features
+
+### Session Hijacking Prevention System
+
+**Recent Enhancement (October 2025)**: The session management system now includes advanced security features that provide robust protection against session hijacking attacks through comprehensive IP address and User-Agent validation.
+
+#### Security Architecture
+
+The security system operates with multiple layers of protection:
+
+1. **Request Context Capture**: IP addresses and User-Agent strings are captured during session creation
+2. **Real-time Validation**: Every session validation automatically checks current request context against stored values
+3. **Automatic Termination**: Sessions are immediately terminated when security violations are detected
+4. **Centralized Security Logic**: All security validation is handled in the SessionService for consistency
+
+#### IP Address & User-Agent Validation
+
+##### Strict Security Enforcement
+```typescript
+// SessionService now enforces security checks by default
+validateSession(sessionToken, request, true) // enforceSecurityChecks = true
+```
+
+**What triggers security violations:**
+- **IP Address Changes**: Session automatically terminated if request comes from different IP
+- **User-Agent Changes**: Session automatically terminated if browser/device fingerprint changes
+- **Simultaneous Detection**: Both IP and User-Agent are validated in real-time
+
+##### Request Context Extraction
+```typescript
+// Advanced request parsing with proxy support
+export function extractRequestInfo(request: Request): RequestInfo {
+  const userAgent = request.headers['user-agent'] || undefined;
+  
+  // Priority-based IP extraction for production environments
+  let ipAddress: string | undefined;
+  
+  // Check X-Forwarded-For first (CDN/proxy environments)
+  if (request.headers['x-forwarded-for']) {
+    const forwardedIps = request.headers['x-forwarded-for'] as string;
+    ipAddress = forwardedIps.split(',')[0]?.trim();
+  } else if (request.headers['x-real-ip']) {
+    ipAddress = request.headers['x-real-ip'] as string;
+  } else if (request.ip) {
+    ipAddress = request.ip;
+  }
+  
+  return { userAgent, ipAddress };
+}
+```
+
+**Production-Ready Features:**
+- **X-Forwarded-For Support**: Properly handles requests through CDNs, load balancers, and reverse proxies
+- **X-Real-IP Fallback**: Secondary header support for different proxy configurations
+- **Express IP Extraction**: Final fallback to Express's built-in IP detection
+- **IPv6 Compatibility**: Handles both IPv4 and IPv6 addresses correctly
+
+#### Security Validation Flow
+
+```mermaid
+flowchart TD
+    A[Session Request] --> B[Extract Current Context]
+    B --> C{IP Address Match?}
+    C -->|No| D[Terminate Session]
+    C -->|Yes| E{User-Agent Match?}
+    E -->|No| F[Terminate Session]
+    E -->|Yes| G[Update Last Used]
+    D --> H[Throw Security Error]
+    F --> H
+    G --> I[Allow Request]
+    H --> J[Session Invalidated]
+```
+
+#### Enhanced Authentication Middleware
+
+The `optionalAuth` middleware now automatically enforces security validation:
+
+```typescript
+// Automatic security enforcement in middleware
+SessionService.validateSession(sessionToken, req, true)
+  .then((sessionInfo) => {
+    if (sessionInfo) {
+      req.sessionInfo = sessionInfo;
+    }
+    next();
+  })
+  .catch(() => {
+    // Security violations automatically handled
+    next();
+  });
+```
+
+**Benefits:**
+- **Transparent Security**: Security validation happens automatically for all session-based requests
+- **No Code Changes Required**: Existing session endpoints automatically benefit from enhanced security
+- **Consistent Protection**: All session operations use the same security validation logic
+
+#### Session Creation with Security Context
+
+Enhanced session creation captures security context automatically:
+
+```typescript
+// Unified session creation with automatic context capture
+const sessionResponse = await SessionService.createSession(
+  userId,
+  keepMeLoggedIn,
+  request  // Request object automatically extracts IP/User-Agent
+);
+
+// Alternative: Direct parameter passing still supported
+const sessionResponse = await SessionService.createSession(
+  userId,
+  keepMeLoggedIn,
+  userAgent,
+  ipAddress
+);
+```
+
+#### Error Handling & Security Responses
+
+**Security Violation Responses:**
+```json
+// IP Address Change Detection
+{
+  "errors": [
+    {
+      "message": "Session terminated due to security policy violation: IP address changed",
+      "extensions": {
+        "code": "UNAUTHORIZED"
+      }
+    }
+  ]
+}
+
+// User-Agent Change Detection  
+{
+  "errors": [
+    {
+      "message": "Session terminated due to security policy violation: User-Agent changed",
+      "extensions": {
+        "code": "UNAUTHORIZED"
+      }
+    }
+  ]
+}
+```
+
+**Security Event Logging:**
+```typescript
+// Comprehensive security violation logging
+console.warn(`Session security violation: IP changed from ${storedIP} to ${currentIP} for user ${userId}`);
+console.warn(`Session security violation: User-Agent changed from "${storedUA}" to "${currentUA}" for user ${userId}`);
+```
+
+#### Refresh Token Security
+
+Enhanced refresh token validation includes the same security measures:
+
+```typescript
+// Refresh tokens also validate security context
+export async function refreshSession(
+  refreshToken: string
+): Promise<SessionTokenResponse> {
+  // Session context security is validated before token refresh
+  // IP/User-Agent changes prevent refresh token usage
+}
+```
+
+**Security Features:**
+- **Refresh Protection**: Refresh tokens cannot be used if session security has been compromised
+- **Automatic Termination**: Compromised sessions are terminated during refresh attempts
+- **Audit Trail**: All refresh attempts with security violations are logged
+
+#### Production Security Configuration
+
+**Express Proxy Trust Configuration:**
+```typescript
+// Enable proper IP detection behind proxies
+app.set('trust proxy', true);
+```
+
+**Environment-Specific Security:**
+- **Development**: Relaxed validation for local testing
+- **Test**: Controlled environment with predictable request contexts
+- **Production**: Full security enforcement with proxy support
+
+#### Security Testing & Validation
+
+Comprehensive test suite validates all security features:
+
+```typescript
+// Security validation test examples
+describe('Session Security Validation', () => {
+  it('should reject when IP changes with security checks enforced', async () => {
+    // Creates session with original IP
+    const sessionToken = await createSessionWithIP('192.168.1.100');
+    
+    // Attempts access from different IP
+    await expect(
+      SessionService.validateSession(sessionToken, differentIPRequest, true)
+    ).rejects.toThrow('Session terminated due to security policy violation: IP address changed');
+  });
+
+  it('should reject when UserAgent changes with security checks enforced', async () => {
+    // Creates session with original User-Agent
+    const sessionToken = await createSessionWithUserAgent('Original Browser');
+    
+    // Attempts access with different User-Agent
+    await expect(
+      SessionService.validateSession(sessionToken, differentUARequest, true)
+    ).rejects.toThrow('Session terminated due to security policy violation: User-Agent changed');
+  });
+});
+```
+
+**Test Coverage:**
+- **IP Change Detection**: Validates automatic session termination on IP changes
+- **User-Agent Validation**: Confirms User-Agent mismatches trigger security responses
+- **Proxy Header Handling**: Tests X-Forwarded-For and X-Real-IP header processing
+- **Refresh Token Security**: Validates refresh tokens respect security constraints
+- **Request Context Extraction**: Comprehensive testing of IP/User-Agent extraction logic
+
+#### Security Benefits
+
+**Attack Prevention:**
+- **Session Hijacking**: Prevents stolen session tokens from being used on different devices/networks
+- **Cross-Device Attacks**: Blocks usage of session tokens on unauthorized devices
+- **Network-Level Protection**: Detects session usage from different network locations
+- **Browser Fingerprinting**: User-Agent validation adds device-level security
+
+**Audit & Monitoring:**
+- **Security Event Logging**: All security violations are logged for monitoring and analysis
+- **Session Termination Tracking**: Comprehensive audit trail of terminated sessions
+- **Attack Pattern Detection**: Logs enable identification of systematic attack attempts
+
+**Production Readiness:**
+- **CDN/Proxy Support**: Works correctly behind Cloudflare, AWS CloudFront, nginx, etc.
+- **Load Balancer Compatibility**: Handles X-Forwarded-For headers from load balancers
+- **IPv6 Support**: Compatible with modern IPv6 network infrastructures
+- **Graceful Degradation**: Falls back to Express IP detection when proxy headers unavailable
+
+#### Migration & Compatibility
+
+**Backward Compatibility:**
+- **Existing Sessions**: All existing session functionality preserved
+- **Optional Enforcement**: Security validation can be disabled for specific use cases
+- **Gradual Rollout**: Security features can be enabled incrementally
+
+**Implementation Notes:**
+- **Zero Breaking Changes**: All existing session endpoints continue to work
+- **Automatic Activation**: Security features activate automatically for new sessions
+- **Testing Support**: Test environment provides controlled request contexts for reliable testing
+
 ## 📋 Postman Collection & API Documentation
 
 ### Complete Postman Collection

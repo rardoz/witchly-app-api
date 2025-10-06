@@ -199,8 +199,7 @@ export namespace SessionService {
 
         // Check for User-Agent changes (moderate security - log but allow)
         if (session.userAgent !== currentRequestInfo?.userAgent) {
-          // For now, just log the warning. In stricter security, you could terminate here too
-          // await terminateSession(session._id as string, session.userId);
+          await terminateSession(session._id as string, session.userId);
           throw new UnauthorizedError(
             'Session terminated due to security policy violation: User-Agent changed'
           );
