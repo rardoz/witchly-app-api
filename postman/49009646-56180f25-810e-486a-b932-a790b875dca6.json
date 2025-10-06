@@ -213,7 +213,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation InitiateLogin($input: InitiateLoginInput!) {    initiateLogin(input: $input) {        \n        success\n        message\n        expiresAt\n    }\n}",
-								"variables": "{\n    \"input\": {\n        \"email\": \"user@example.com\"\n    }\n}"
+								"variables": "{\n    \"input\": {\n        \"email\": \"witchlyapp@gmail.com\"\n    }\n}"
 							}
 						},
 						"url": {
