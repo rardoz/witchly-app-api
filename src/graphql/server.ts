@@ -8,6 +8,8 @@ import { type GraphQLFormattedError } from 'graphql';
 import { buildSchema } from 'type-graphql';
 import { AuthResolver } from './resolvers/AuthResolver';
 import { ClientResolver } from './resolvers/ClientResolver';
+import { LoginResolver } from './resolvers/LoginResolver';
+import { SessionResolver } from './resolvers/SessionResolver';
 import { SignupResolver } from './resolvers/SignupResolver';
 import { UserResolver } from './resolvers/UserResolver';
 
@@ -87,7 +89,14 @@ const responseProcessingPlugin: ApolloServerPlugin<BaseContext> = {
 
 export const createApolloServer = async (): Promise<ApolloServer> => {
   const schema = await buildSchema({
-    resolvers: [UserResolver, ClientResolver, AuthResolver, SignupResolver],
+    resolvers: [
+      UserResolver,
+      ClientResolver,
+      AuthResolver,
+      SignupResolver,
+      LoginResolver,
+      SessionResolver,
+    ],
     validate: false,
   });
 

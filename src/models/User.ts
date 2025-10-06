@@ -9,6 +9,7 @@ export interface IUser extends Document, IProfileFields {
   userType: string;
   emailVerified: boolean;
   handle: string; // Made required for signup flow
+  lastLoginAt?: Date; // Track last login time
   createdAt: Date;
   updatedAt: Date;
 }
@@ -43,6 +44,9 @@ const userSchema = new Schema<IUser>(
       required: true, // Made required for signup flow
       unique: true,
       trim: true,
+    },
+    lastLoginAt: {
+      type: Date,
     },
   },
   {

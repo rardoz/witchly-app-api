@@ -5,8 +5,18 @@
 jest.mock('../config/email', () => ({
   emailService: {
     sendVerificationCode: jest.fn().mockResolvedValue(undefined),
+    sendLoginVerificationCode: jest.fn().mockResolvedValue(undefined),
     sendEmail: jest.fn().mockResolvedValue(undefined),
+    sendTemplatedEmail: jest.fn().mockResolvedValue(undefined),
     testConnection: jest.fn().mockResolvedValue(true),
+    listMethods: jest
+      .fn()
+      .mockReturnValue([
+        'sendVerificationCode',
+        'sendLoginVerificationCode',
+        'sendEmail',
+        'sendTemplatedEmail',
+      ]),
   },
 }));
 

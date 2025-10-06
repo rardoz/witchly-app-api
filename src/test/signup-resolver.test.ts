@@ -7,6 +7,7 @@ import {
   generateClientSecret,
   hashClientSecret,
 } from '../services/jwt.service';
+import { VerificationService } from '../services/verification.service';
 
 describe('SignupResolver GraphQL Endpoints', () => {
   let accessToken: string;
@@ -388,8 +389,10 @@ describe('SignupResolver GraphQL Endpoints', () => {
       // Create verification record
       const verification = new EmailVerification({
         email: testEmail,
-        code: await require('bcrypt').hash(verificationCode, 10),
-        expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+        code: await VerificationService.hashVerificationCode(verificationCode),
+        expiresAt: new Date(
+          Date.now() + VerificationService.CODE_EXPIRY_MINUTES_VALUE * 60 * 1000
+        ),
         attempts: 0,
         verified: false,
       });
@@ -547,6 +550,30 @@ describe('SignupResolver GraphQL Endpoints', () => {
     });
 
     it('should enforce attempt limits', async () => {
+      // Use a separate email for this test to avoid conflicts with other tests
+      const attemptTestEmail = 'attempt-limits.test@example.com';
+      const attemptVerificationCode = '654321';
+
+      // Create a fresh verification record for this test
+      const verification = new EmailVerification({
+        email: attemptTestEmail,
+        code: await VerificationService.hashVerificationCode(
+          attemptVerificationCode
+        ),
+        expiresAt: new Date(
+          Date.now() + VerificationService.CODE_EXPIRY_MINUTES_VALUE * 60 * 1000
+        ),
+        attempts: 0,
+        verified: false,
+      });
+      await verification.save();
+
+      // Create pending signup for this test
+      const pendingSignup = new Signup({
+        email: attemptTestEmail,
+      });
+      await pendingSignup.save();
+
       const mutation = `
         mutation CompleteSignup($input: CompleteSignupInput!) {
           completeSignup(input: $input) {
@@ -565,7 +592,7 @@ describe('SignupResolver GraphQL Endpoints', () => {
             query: mutation,
             variables: {
               input: {
-                email: testEmail,
+                email: attemptTestEmail,
                 verificationCode: '999999',
               },
             },
@@ -580,8 +607,8 @@ describe('SignupResolver GraphQL Endpoints', () => {
           query: mutation,
           variables: {
             input: {
-              email: testEmail,
-              verificationCode: verificationCode,
+              email: attemptTestEmail,
+              verificationCode: attemptVerificationCode,
             },
           },
         });

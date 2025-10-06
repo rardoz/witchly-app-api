@@ -53,6 +53,9 @@ function processApolloResponse(response: HTTPGraphQLResponse): {
 // Initialize Express application with TypeScript support
 const app = express();
 
+// Trust proxy for IP address forwarding (for reverse proxies like nginx, cloudflare, etc.)
+app.set('trust proxy', true);
+
 // Middleware
 app.use(cors());
 app.use(express.json());
