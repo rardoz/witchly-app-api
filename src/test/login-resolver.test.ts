@@ -1,6 +1,7 @@
 import { Client } from '../models/Client';
 import { EmailVerification } from '../models/EmailVerification';
 import { type IUser, User } from '../models/User';
+import { UserSession } from '../models/UserSession';
 import {
   generateClientId,
   generateClientSecret,
@@ -316,6 +317,8 @@ describe('LoginResolver GraphQL Endpoints', () => {
       const response = await global.testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('User-Agent', 'Mozilla/5.0 (Test Login Browser)')
+        .set('X-Forwarded-For', '192.168.1.100')
         .send({ query: completeLoginMutation(testUser.email, code) });
 
       expect(response.status).toBe(200);
@@ -335,6 +338,56 @@ describe('LoginResolver GraphQL Endpoints', () => {
         email: testUser.email.toLowerCase(),
       });
       expect(deletedVerification).toBeNull();
+    });
+
+    it('should capture userAgent and ipAddress during login', async () => {
+      // First initiate login to get verification code
+      const code = '789012';
+      const hashedCode = await VerificationService.hashVerificationCode(code);
+
+      const verification = new EmailVerification({
+        email: testUser.email.toLowerCase(),
+        code: hashedCode,
+        expiresAt: new Date(
+          Date.now() + VerificationService.CODE_EXPIRY_MINUTES_VALUE * 60 * 1000
+        ),
+        attempts: 0,
+        verified: false,
+      });
+      await verification.save();
+
+      // Complete login with specific headers
+      const loginResponse = await global.testRequest
+        .post('/graphql')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .set('User-Agent', 'Test-Agent/1.0 (Testing UserAgent Capture)')
+        .set('X-Forwarded-For', '203.0.113.42, 198.51.100.1')
+        .send({ query: completeLoginMutation(testUser.email, code, true) });
+
+      expect(loginResponse.status).toBe(200);
+      expect(loginResponse.body.data.completeLogin.success).toBe(true);
+
+      const sessionToken = loginResponse.body.data.completeLogin.sessionToken;
+      expect(sessionToken).toBeDefined();
+
+      // Now verify the session was created with the correct userAgent and ipAddress
+      // We need to get the session data to verify the userAgent and ipAddress were captured
+      const sessions = await UserSession.find({
+        userId: createdTestUser._id,
+        isActive: true,
+      })
+        .sort({ createdAt: -1 })
+        .limit(1);
+
+      expect(sessions.length).toBeGreaterThan(0);
+      const latestSession = sessions[0];
+      expect(latestSession).toBeDefined();
+      if (latestSession) {
+        expect(latestSession.userAgent).toBe(
+          'Test-Agent/1.0 (Testing UserAgent Capture)'
+        );
+        expect(latestSession.ipAddress).toBe('203.0.113.42'); // First IP from X-Forwarded-For
+      }
     });
 
     it('should reject invalid verification code', async () => {

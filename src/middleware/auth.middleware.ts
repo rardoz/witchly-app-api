@@ -109,7 +109,7 @@ export function optionalAuth(
   const sessionToken = sessionHeader || (token && !req.client ? token : null);
 
   if (sessionToken) {
-    SessionService.validateSession(sessionToken)
+    SessionService.validateSession(sessionToken, req, true)
       .then((sessionInfo) => {
         if (sessionInfo) {
           req.sessionInfo = sessionInfo;
@@ -138,6 +138,9 @@ export interface GraphQLContext {
   sessionInfo?: SessionInfo | undefined;
   isUserAuthenticated: boolean;
   userId?: string | undefined;
+
+  // Request information
+  request: Request;
 }
 
 export function createGraphQLContext(req: Request): GraphQLContext {
@@ -154,5 +157,8 @@ export function createGraphQLContext(req: Request): GraphQLContext {
     sessionInfo: sessionInfo || undefined,
     isUserAuthenticated: !!sessionInfo,
     userId: sessionInfo?.userId,
+
+    // Request information
+    request: req,
   };
 }

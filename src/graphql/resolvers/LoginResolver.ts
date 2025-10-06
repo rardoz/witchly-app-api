@@ -125,10 +125,11 @@ export class LoginResolver {
     // Update user's last login time
     await VerificationService.updateLastLogin(user._id as string);
 
-    // Create user session
+    // Create user session with automatic request info extraction
     const sessionResponse = await SessionService.createSession(
       user._id as string,
-      keepMeLoggedIn
+      keepMeLoggedIn,
+      context.request
     );
 
     return {

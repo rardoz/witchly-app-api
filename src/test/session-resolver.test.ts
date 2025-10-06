@@ -76,15 +76,16 @@ describe('SessionResolver GraphQL Endpoints', () => {
     createdTestUser = await user.save();
 
     // Create user session for session-based authentication tests
+    // Express in test environment typically provides IPv6-mapped IPv4 addresses
     const sessionResponse = await SessionService.createSession(
       createdTestUser._id as string,
       true, // keepMeLoggedIn = true to get refresh token
       'Mozilla/5.0 (Test Browser)',
-      '127.0.0.1'
+      '::ffff:127.0.0.1' // Express format for localhost in test
     );
 
     userSessionToken = sessionResponse.sessionToken;
-    userRefreshToken = sessionResponse.refreshToken!;
+    userRefreshToken = sessionResponse.refreshToken || '';
   }, 30000);
 
   afterAll(async () => {
@@ -183,6 +184,7 @@ describe('SessionResolver GraphQL Endpoints', () => {
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
         .set('X-Session-Token', userSessionToken)
+        .set('User-Agent', 'Mozilla/5.0 (Test Browser)') // Match session creation
         .send({ query: mySessionsQuery });
 
       expect(response.status).toBe(200);
@@ -196,7 +198,7 @@ describe('SessionResolver GraphQL Endpoints', () => {
       expect(session.lastUsedAt).toBeDefined();
       expect(session.expiresAt).toBeDefined();
       expect(session.userAgent).toBe('Mozilla/5.0 (Test Browser)');
-      expect(session.ipAddress).toBe('127.0.0.1');
+      expect(session.ipAddress).toBe('::ffff:127.0.0.1'); // Express format for localhost
       expect(session.isActive).toBe(true);
       expect(session.createdAt).toBeDefined();
     });
@@ -272,6 +274,7 @@ describe('SessionResolver GraphQL Endpoints', () => {
       const response = await global.testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('User-Agent', 'Mozilla/5.0 (Test Browser)') // Match session creation
         .send({ query: refreshSessionMutation(userRefreshToken) });
 
       expect(response.status).toBe(200);
@@ -321,7 +324,7 @@ describe('SessionResolver GraphQL Endpoints', () => {
         createdTestUser._id as string,
         false,
         'Mozilla/5.0 (Logout Test)',
-        '127.0.0.1'
+        '::ffff:127.0.0.1' // Express format for localhost
       );
       userSessionToken = sessionResponse.sessionToken;
     });
@@ -399,6 +402,7 @@ describe('SessionResolver GraphQL Endpoints', () => {
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
         .set('X-Session-Token', userSessionToken)
+        .set('User-Agent', 'Mozilla/5.0 (Logout Test)') // Match session creation
         .send({ query: logoutMutation });
 
       expect(response.status).toBe(200);
@@ -429,14 +433,14 @@ describe('SessionResolver GraphQL Endpoints', () => {
       const session1 = await SessionService.createSession(
         createdTestUser._id as string,
         false,
-        'Mozilla/5.0 (Session 1)',
-        '127.0.0.1'
+        'Mozilla/5.0 (Test Browser)', // Match the main session User-Agent
+        '::ffff:127.0.0.1' // Express format for localhost
       );
       await SessionService.createSession(
         createdTestUser._id as string,
         true,
         'Mozilla/5.0 (Session 2)',
-        '127.0.0.2'
+        '::ffff:127.0.0.2'
       );
       userSessionToken = session1.sessionToken;
     });
@@ -515,6 +519,7 @@ describe('SessionResolver GraphQL Endpoints', () => {
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
         .set('X-Session-Token', userSessionToken)
+        .set('User-Agent', 'Mozilla/5.0 (Test Browser)') // Match session creation
         .send({
           query: `
             query {
@@ -534,6 +539,7 @@ describe('SessionResolver GraphQL Endpoints', () => {
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
         .set('X-Session-Token', userSessionToken)
+        .set('User-Agent', 'Mozilla/5.0 (Test Browser)') // Match session creation
         .send({ query: logoutAllSessionsMutation });
 
       expect(response.status).toBe(200);

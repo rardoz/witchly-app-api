@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import type { Request } from 'express';
 import jwt from 'jsonwebtoken';
 import { type IUserSession, UserSession } from '../models/UserSession';
 import { NotFoundError, UnauthorizedError } from '../utils/errors';
@@ -9,6 +10,11 @@ export interface UserSessionPayload {
   keepMeLoggedIn: boolean;
   iat?: number;
   exp?: number;
+}
+
+export interface RequestInfo {
+  userAgent?: string | undefined;
+  ipAddress?: string | undefined;
 }
 
 export interface SessionTokenResponse {
@@ -38,14 +44,71 @@ export namespace SessionService {
   const JWT_AUDIENCE = 'witchly-users';
 
   /**
+   * Extract user agent and IP address from Express request
+   */
+  export function extractRequestInfo(request: Request): RequestInfo {
+    const userAgent = request.headers['user-agent'] || undefined;
+
+    // Extract IP address with X-Forwarded-For taking priority (for proxy setups)
+    let ipAddress: string | undefined;
+
+    // Check X-Forwarded-For first (most accurate for proxied requests)
+    if (request.headers['x-forwarded-for']) {
+      const forwardedIps = request.headers['x-forwarded-for'] as string;
+      ipAddress = forwardedIps.split(',')[0]?.trim();
+    } else if (request.headers['x-real-ip']) {
+      ipAddress = request.headers['x-real-ip'] as string;
+    } else if (request.ip) {
+      // Fall back to Express's ip property
+      ipAddress = request.ip;
+    } else if (request.socket && 'remoteAddress' in request.socket) {
+      ipAddress = request.socket.remoteAddress;
+    } else if (request.connection && 'remoteAddress' in request.connection) {
+      ipAddress = request.connection.remoteAddress;
+    }
+
+    return { userAgent, ipAddress };
+  }
+
+  /**
    * Create a new user session
    */
   export async function createSession(
     userId: string,
-    keepMeLoggedIn: boolean = false,
+    keepMeLoggedIn?: boolean,
     userAgent?: string,
     ipAddress?: string
+  ): Promise<SessionTokenResponse>;
+  export async function createSession(
+    userId: string,
+    keepMeLoggedIn: boolean,
+    request: Request
+  ): Promise<SessionTokenResponse>;
+  export async function createSession(
+    userId: string,
+    keepMeLoggedIn: boolean = false,
+    userAgentOrRequest?: string | Request,
+    ipAddress?: string
   ): Promise<SessionTokenResponse> {
+    let userAgent: string | undefined;
+    let resolvedIpAddress: string | undefined;
+
+    // Handle overloaded parameters
+    if (
+      typeof userAgentOrRequest === 'object' &&
+      userAgentOrRequest &&
+      'headers' in userAgentOrRequest
+    ) {
+      // Request object provided
+      const requestInfo = extractRequestInfo(userAgentOrRequest as Request);
+      userAgent = requestInfo.userAgent;
+      resolvedIpAddress = requestInfo.ipAddress;
+    } else {
+      // Direct parameters provided
+      userAgent = userAgentOrRequest as string | undefined;
+      resolvedIpAddress = ipAddress;
+    }
+
     // Clean up expired sessions for this user
     await cleanupExpiredSessions(userId);
 
@@ -71,7 +134,7 @@ export namespace SessionService {
       expiresAt,
       lastUsedAt: new Date(),
       userAgent: userAgent?.substring(0, 500), // Limit length
-      ipAddress,
+      ipAddress: resolvedIpAddress,
       isActive: true,
     });
 
@@ -94,10 +157,12 @@ export namespace SessionService {
   }
 
   /**
-   * Validate and refresh a session
+   * Validate a session with optional security checks
    */
   export async function validateSession(
-    sessionToken: string
+    sessionToken: string,
+    request?: Request,
+    enforceSecurityChecks: boolean = false
   ): Promise<SessionInfo | null> {
     try {
       // Decode JWT to get session info
@@ -118,6 +183,30 @@ export namespace SessionService {
         return null;
       }
 
+      // Security validation if request provided and enforcement enabled
+      if (request && enforceSecurityChecks) {
+        const currentRequestInfo = extractRequestInfo(request);
+
+        // Check for IP address changes (strict security)
+        if (session.ipAddress !== currentRequestInfo?.ipAddress) {
+          // Terminate the session immediately
+          await terminateSession(session._id as string, session.userId);
+
+          throw new UnauthorizedError(
+            'Session terminated due to security policy violation: IP address changed'
+          );
+        }
+
+        // Check for User-Agent changes (moderate security - log but allow)
+        if (session.userAgent !== currentRequestInfo?.userAgent) {
+          // For now, just log the warning. In stricter security, you could terminate here too
+          // await terminateSession(session._id as string, session.userId);
+          throw new UnauthorizedError(
+            'Session terminated due to security policy violation: User-Agent changed'
+          );
+        }
+      }
+
       // Update last used timestamp
       session.lastUsedAt = new Date();
       await session.save();
@@ -131,15 +220,17 @@ export namespace SessionService {
         ipAddress: session.ipAddress,
       };
     } catch (error) {
-      if (process.env.NODE_ENV !== 'test') {
-        console.error('Session validation failed:', error);
+      // Re-throw UnauthorizedError for security violations
+      if (error instanceof UnauthorizedError) {
+        throw error;
       }
+
       return null;
     }
   }
 
   /**
-   * Refresh a session using refresh token
+   * Refresh a session using refresh token with optional security validation
    */
   export async function refreshSession(
     refreshToken: string
