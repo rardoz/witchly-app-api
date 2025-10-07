@@ -13,4 +13,7 @@ export class AuthenticateResponse {
 
   @Field()
   scope!: string;
+
+  @Field({ nullable: true })
+  refresh_token?: string;
 }

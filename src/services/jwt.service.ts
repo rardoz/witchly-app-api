@@ -14,6 +14,15 @@ export interface TokenResponse {
   token_type: 'Bearer';
   expires_in: number;
   scope: string;
+  refresh_token?: string;
+}
+
+export interface RefreshTokenPayload {
+  clientId: string;
+  scopes: string[];
+  tokenType: 'refresh';
+  iat?: number;
+  exp?: number;
 }
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-key';
@@ -51,12 +60,13 @@ export async function verifyClientSecret(
 }
 
 /**
- * Generate a JWT access token
+ * Generate a JWT access token with optional refresh token
  */
 export function generateAccessToken(
   clientId: string,
   scopes: string[] = ['read'],
-  expiresIn: number = 3600
+  expiresIn: number = 3600,
+  refreshTokenExpiresIn?: number
 ): TokenResponse {
   const payload: JWTPayload = {
     clientId,
@@ -69,12 +79,31 @@ export function generateAccessToken(
     audience: 'witchly-clients',
   });
 
-  return {
+  const response: TokenResponse = {
     access_token: token,
     token_type: 'Bearer',
     expires_in: expiresIn,
     scope: scopes.join(' '),
   };
+
+  // Generate refresh token if expiration time is provided
+  if (refreshTokenExpiresIn) {
+    const refreshPayload: RefreshTokenPayload = {
+      clientId,
+      scopes,
+      tokenType: 'refresh',
+    };
+
+    const refreshToken = jwt.sign(refreshPayload, JWT_SECRET, {
+      expiresIn: refreshTokenExpiresIn,
+      issuer: 'witchly-api',
+      audience: 'witchly-clients',
+    });
+
+    response.refresh_token = refreshToken;
+  }
+
+  return response;
 }
 
 /**
@@ -104,6 +133,30 @@ export function extractTokenFromHeader(authHeader?: string): string | null {
     return null;
   }
   return authHeader.substring(7); // Remove 'Bearer ' prefix
+}
+
+/**
+ * Verify and decode a refresh token
+ */
+export function verifyRefreshToken(token: string): RefreshTokenPayload | null {
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET, {
+      issuer: 'witchly-api',
+      audience: 'witchly-clients',
+    }) as RefreshTokenPayload;
+
+    // Ensure it's actually a refresh token
+    if (decoded.tokenType !== 'refresh') {
+      return null;
+    }
+
+    return decoded;
+  } catch (error) {
+    if (process.env.NODE_ENV !== 'test') {
+      console.error('Refresh token verification failed:', error);
+    }
+    return null;
+  }
 }
 
 /**

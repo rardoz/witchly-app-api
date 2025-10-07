@@ -8,6 +8,8 @@ export interface IClient extends Document {
   isActive: boolean;
   allowedScopes: string[];
   tokenExpiresIn: number; // in seconds
+  refreshTokenExpiresIn: number; // in seconds
+  supportsRefreshToken: boolean;
   lastUsed?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -43,6 +45,14 @@ const clientSchema = new Schema<IClient>(
     tokenExpiresIn: {
       type: Number,
       default: 3600, // 1 hour
+    },
+    refreshTokenExpiresIn: {
+      type: Number,
+      default: 86400 * 7, // 7 days
+    },
+    supportsRefreshToken: {
+      type: Boolean,
+      default: true,
     },
     lastUsed: {
       type: Date,
