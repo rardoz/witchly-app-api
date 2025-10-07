@@ -577,7 +577,7 @@
 					"response": []
 				},
 				{
-					"name": "Create User Copy",
+					"name": "Create Admin User",
 					"id": "49009646-0ffaa053-fd0a-4d98-a448-efdb34d2fd8a",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
