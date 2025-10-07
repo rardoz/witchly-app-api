@@ -411,14 +411,11 @@ describe('SignupResolver GraphQL Endpoints', () => {
           completeSignup(input: $input) {
             success
             message
-            user {
-              id
-              name
-              email
-              handle
-              allowedScopes
-              emailVerified
-            }
+            sessionToken
+            refreshToken
+            expiresIn
+            expiresAt
+            userId
           }
         }
       `;
@@ -438,22 +435,20 @@ describe('SignupResolver GraphQL Endpoints', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.data.completeSignup.success).toBe(true);
-      expect(response.body.data.completeSignup.user).toBeDefined();
-      expect(response.body.data.completeSignup.user.email).toBe(testEmail);
-      expect(response.body.data.completeSignup.user.emailVerified).toBe(true);
-      expect(response.body.data.completeSignup.user.allowedScopes).toEqual([
-        'read',
-        'write',
-        'basic',
-      ]);
-      expect(response.body.data.completeSignup.user.handle).toMatch(
-        /^[a-z]+_\d+$/
-      );
+      expect(response.body.data.completeSignup.sessionToken).toBeDefined();
+      expect(response.body.data.completeSignup.expiresIn).toBeGreaterThan(0);
+      expect(response.body.data.completeSignup.expiresAt).toBeDefined();
+      expect(response.body.data.completeSignup.userId).toBeDefined();
 
-      // Verify user was created
+      // Verify user was created with correct properties
       const user = await User.findOne({ email: testEmail });
       expect(user).toBeDefined();
       expect(user?.emailVerified).toBe(true);
+      expect(user?.allowedScopes).toEqual(['read', 'write', 'basic']);
+      expect(user?.handle).toMatch(/^[a-z]+_\d+$/);
+      expect((user?._id as string).toString()).toBe(
+        response.body.data.completeSignup.userId
+      );
 
       // Verify cleanup happened
       const verification = await EmailVerification.findOne({
@@ -670,20 +665,11 @@ describe('SignupResolver GraphQL Endpoints', () => {
           completeSignup(input: $input) {
             success
             message
-            user {
-              id
-              name
-              email
-              handle
-              allowedScopes
-              emailVerified
-              bio
-              shortBio
-              location
-              birthDate
-              pronouns
-              sex
-            }
+            sessionToken
+            refreshToken
+            expiresIn
+            expiresAt
+            userId
           }
         }
       `;
@@ -703,18 +689,30 @@ describe('SignupResolver GraphQL Endpoints', () => {
 
       expect(completeResponse.status).toBe(200);
       expect(completeResponse.body.data.completeSignup.success).toBe(true);
+      expect(
+        completeResponse.body.data.completeSignup.sessionToken
+      ).toBeDefined();
+      expect(
+        completeResponse.body.data.completeSignup.expiresIn
+      ).toBeGreaterThan(0);
+      expect(completeResponse.body.data.completeSignup.expiresAt).toBeDefined();
+      expect(completeResponse.body.data.completeSignup.userId).toBeDefined();
 
-      const user = completeResponse.body.data.completeSignup.user;
-      expect(user.email).toBe(fullFlowEmail);
-      expect(user.emailVerified).toBe(true);
-      expect(user.allowedScopes).toEqual(['read', 'write', 'basic']);
-      expect(user.handle).toMatch(/^[a-z]+_\d+$/);
+      // Verify user was created in database with correct properties
+      const dbUser = await User.findById(
+        completeResponse.body.data.completeSignup.userId
+      );
+      expect(dbUser).toBeDefined();
+      expect(dbUser?.email).toBe(fullFlowEmail);
+      expect(dbUser?.emailVerified).toBe(true);
+      expect(dbUser?.allowedScopes).toEqual(['read', 'write', 'basic']);
+      expect(dbUser?.handle).toMatch(/^[a-z]+_\d+$/);
 
-      // Profile fields should be null since we no longer collect them during signup
-      expect(user.name).toBeNull();
-      expect(user.bio).toBeNull();
-      expect(user.shortBio).toBeNull();
-      expect(user.location).toBeNull();
+      // Profile fields should be undefined since we no longer collect them during signup
+      expect(dbUser?.name).toBeUndefined();
+      expect(dbUser?.bio).toBeUndefined();
+      expect(dbUser?.shortBio).toBeUndefined();
+      expect(dbUser?.location).toBeUndefined();
 
       // Step 4: Verify cleanup
       const remainingVerification = await EmailVerification.findOne({
@@ -727,10 +725,7 @@ describe('SignupResolver GraphQL Endpoints', () => {
       expect(remainingVerification).toBeNull();
       expect(remainingPending).toBeNull();
 
-      // Step 5: Verify user exists in database
-      const dbUser = await User.findOne({ email: fullFlowEmail });
-      expect(dbUser).toBeDefined();
-      expect(dbUser?.emailVerified).toBe(true);
+      // User database verification already done above
     });
   });
 });

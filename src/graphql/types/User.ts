@@ -9,9 +9,6 @@ export class User extends BaseProfileObjectType {
   @Field()
   email: string;
 
-  @Field(() => [String])
-  allowedScopes: string[];
-
   @Field()
   emailVerified: boolean;
 

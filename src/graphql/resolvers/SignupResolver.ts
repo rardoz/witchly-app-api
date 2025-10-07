@@ -3,6 +3,7 @@ import { emailService } from '../../config/email';
 import { GraphQLContext } from '../../middleware/auth.middleware';
 import { Signup } from '../../models/Signup';
 import { User } from '../../models/User';
+import { SessionService } from '../../services/session.service';
 import { VerificationService } from '../../services/verification.service';
 import {
   ConflictError,
@@ -16,11 +17,8 @@ import {
   CompleteSignupInput,
   InitiateSignupInput,
 } from '../inputs/SignupInput';
-import {
-  CompleteSignupResponse,
-  InitiateSignupResponse,
-} from '../types/SignupTypes';
-import { User as GraphQLUser } from '../types/User';
+import { CompleteLoginResponse } from '../types/LoginTypes';
+import { InitiateSignupResponse } from '../types/SignupTypes';
 
 @Resolver()
 export class SignupResolver {
@@ -105,11 +103,11 @@ export class SignupResolver {
     }
   }
 
-  @Mutation(() => CompleteSignupResponse)
+  @Mutation(() => CompleteLoginResponse)
   async completeSignup(
     @Ctx() context: GraphQLContext,
     @Arg('input') input: CompleteSignupInput
-  ): Promise<CompleteSignupResponse> {
+  ): Promise<CompleteLoginResponse> {
     if (!context.isAuthenticated || !context.hasScope('write')) {
       throw new UnauthorizedError('Write access required');
     }
@@ -167,10 +165,21 @@ export class SignupResolver {
       await VerificationService.completeVerification(emailFormatted);
       await Signup.deleteOne({ email: emailFormatted });
 
+      // Create user session with automatic request info extraction
+      const sessionResponse = await SessionService.createSession(
+        user._id as string,
+        false,
+        context.request
+      );
+
       return {
         success: true,
         message: 'Account created successfully! Welcome to Witchly!',
-        user: user as GraphQLUser,
+        sessionToken: sessionResponse.sessionToken,
+        refreshToken: sessionResponse.refreshToken,
+        expiresIn: sessionResponse.expiresIn,
+        expiresAt: sessionResponse.expiresAt,
+        userId: user._id as string,
       };
     } catch (error) {
       // Re-throw specific errors from VerificationService
