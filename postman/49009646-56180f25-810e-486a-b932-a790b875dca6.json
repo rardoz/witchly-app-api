@@ -526,7 +526,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "query GetUser($id: ID!) {\n    user(id: $id) {\n        id\n        name\n        email\n        handle\n        allowedScopes\n        emailVerified\n        lastLoginAt\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }\n }",
-								"variables": "{\n    \"id\": \"68e1a10a3360e5cd78e88071\"\n}"
+								"variables": "{\n    \"id\": \"68e3236ad1117de1047a9ffc\"\n}"
 							}
 						},
 						"url": {
