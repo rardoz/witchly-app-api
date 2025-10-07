@@ -156,6 +156,34 @@
 				},
 				{
 					"name": "Complete Signup",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e340721d-3a91-4ea1-8352-612fac7db4c1",
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.completeLogin) {",
+									"        pm.collectionVariables.set('sessionToken', response.data.completeLogin.sessionToken);",
+									"        pm.collectionVariables.set('userId', response.data.completeLogin.userId);",
+									"        if (response.data.completeLogin.refreshToken) {",
+									"            pm.collectionVariables.set('refreshToken', response.data.completeLogin.refreshToken);",
+									"            console.log('Long session with refresh token saved');",
+									"        } else {",
+									"            console.log('Short session token saved');",
+									"        }",
+									"    }",
+									"} else {",
+									"    console.log('Failed to complete login');",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"id": "49009646-signup-complete-001",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
