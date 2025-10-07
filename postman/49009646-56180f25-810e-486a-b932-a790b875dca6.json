@@ -175,7 +175,7 @@
 									"        }",
 									"    }",
 									"} else {",
-									"    console.log('Failed to complete login');",
+									"    console.log('Failed to complete signup');",
 									"}"
 								],
 								"type": "text/javascript",
