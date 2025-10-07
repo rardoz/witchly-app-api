@@ -171,7 +171,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation CompleteSignup($input: CompleteSignupInput!) {\n    completeSignup(input: $input) {\n        success\n        message\n        user {\n            id\n            email\n            handle\n            allowedScopes\n            emailVerified\n            createdAt\n            updatedAt\n            name\n            bio\n            shortBio\n            profileImageUrl\n            backdropImageUrl\n            instagramHandle\n            tikTokHandle\n            twitterHandle\n            websiteUrl\n            facebookUrl\n            snapchatHandle\n            primaryColor\n            sign\n            sex\n            location\n            birthDate\n            pronouns\n        }\n    }\n}",
+								"query": "mutation CompleteSignup($input: CompleteSignupInput!) {\n    completeSignup(input: $input) {\n        success\n        message\n        sessionToken\n        refreshToken\n        expiresIn\n        expiresAt\n        userId\n    }\n}",
 								"variables": "{\n    \"input\": {\n        \"email\": \"witchlyapp@gmail.com\",\n        \"verificationCode\": \"777711\"\n    }\n}"
 							}
 						},
