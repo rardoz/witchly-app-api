@@ -15,9 +15,6 @@ export class User extends BaseProfileObjectType {
   @Field()
   handle: string;
 
-  @Field()
-  userType: string;
-
   @Field(() => Date, { nullable: true })
   lastLoginAt?: Date;
 

@@ -6,7 +6,7 @@ import {
 
 export interface IUser extends Document, IProfileFields {
   email: string;
-  userType: string;
+  allowedScopes: string[]; // Changed from userType to allowedScopes array
   emailVerified: boolean;
   handle: string; // Made required for signup flow
   lastLoginAt?: Date; // Track last login time
@@ -27,12 +27,23 @@ const userSchema = new Schema<IUser>(
       lowercase: true,
       trim: true,
     },
-    userType: {
-      type: String,
+    allowedScopes: {
+      type: [String],
       required: true,
-      lowercase: true,
-      trim: true,
-      default: 'basic', // Default for signup flow
+      default: ['read', 'write', 'basic'], // Default scopes for basic users
+      validate: {
+        validator: (scopes: string[]) => {
+          // Import here to avoid circular dependency
+          const { validateUserScopes } = require('../utils/user-scopes');
+          try {
+            validateUserScopes(scopes);
+            return true;
+          } catch {
+            return false;
+          }
+        },
+        message: 'Invalid user scopes provided',
+      },
     },
     emailVerified: {
       type: Boolean,
@@ -55,7 +66,7 @@ const userSchema = new Schema<IUser>(
 );
 
 // Indexes for performance (email and handle already indexed via unique: true)
-userSchema.index({ userType: 1 });
+userSchema.index({ allowedScopes: 1 });
 userSchema.index({ emailVerified: 1 });
 
 export const User = model<IUser>('User', userSchema);

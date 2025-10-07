@@ -22,7 +22,7 @@ describe('LoginResolver GraphQL Endpoints', () => {
   const testUser = {
     name: 'John Doe',
     email: 'john.login@example.com',
-    userType: 'user',
+    allowedScopes: ['read', 'write', 'basic'],
     bio: 'Test user for login',
     handle: 'johnlogin123',
     emailVerified: true,
@@ -198,7 +198,7 @@ describe('LoginResolver GraphQL Endpoints', () => {
       const unverifiedUser = new User({
         name: 'Unverified User',
         email: 'unverified.login@example.com',
-        userType: 'user',
+        allowedScopes: ['read', 'write', 'basic'],
         handle: 'unverified123',
         emailVerified: false,
       });

@@ -4,9 +4,16 @@ A modern TypeScript Express.js API with GraphQL and MongoDB integration, featuri
 
 ## 🆕 Recent Updates (October 2025)
 
-### Code Consolidation & Improvements
+### Code Consolidation & User Model Improvements
 
-Recent enhancements focused on eliminating code duplication and streamlining the authentication system:
+Recent enhancements focused on eliminating code duplication, streamlining the authentication system, and improving the user data model:
+
+#### ✅ **User Model Enhancement: `allowedScopes` Field**
+- **Renamed Field**: Changed user `scopes` field to `allowedScopes` for better clarity and consistency
+- **Clear Semantics**: The new name better represents that this field defines what scopes a user is permitted to have
+- **GraphQL Schema Updated**: All GraphQL types, inputs, and queries now use `allowedScopes`
+- **Test Suite Updated**: All 149 tests updated and passing with the new field name
+- **API Consistency**: Aligns user scopes with similar naming patterns used for OAuth2 client `allowedScopes`
 
 #### ✅ **Unified Login System**
 - **Consolidated Login Methods**: Combined separate `completeLogin` and `loginWithSession` methods into a single `completeLogin` endpoint

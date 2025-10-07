@@ -60,6 +60,7 @@ export interface IProfileFields {
   location?: string;
   birthDate?: Date;
   pronouns?: string;
+  allowedScopes?: string[];
 }
 
 // Base class for profile fields with GraphQL decorators and validation
@@ -203,6 +204,9 @@ export class BaseProfileFields implements IProfileFields {
     message: `Pronouns must be between ${PROFILE_VALIDATION.PRONOUNS.min} and ${PROFILE_VALIDATION.PRONOUNS.max} characters`,
   })
   pronouns?: string;
+
+  @Field(() => [String], { nullable: true })
+  allowedScopes?: string[];
 }
 
 // Base class for profile fields in GraphQL ObjectTypes
@@ -258,6 +262,9 @@ export class BaseProfileObjectType implements IProfileFields {
 
   @Field({ nullable: true })
   pronouns?: string;
+
+  @Field(() => [String], { nullable: true })
+  allowedScopes?: string[];
 }
 
 // Shared Mongoose schema definition for profile fields

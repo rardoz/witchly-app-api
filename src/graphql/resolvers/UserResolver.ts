@@ -68,6 +68,9 @@ export class UserResolver {
     if (!context.isAuthenticated || !context.hasScope('write')) {
       throw new UnauthorizedError('Write access required');
     }
+    if (!context.hasUserScope('admin') && input.allowedScopes) {
+      throw new UnauthorizedError('Admin access required to set scopes');
+    }
 
     try {
       const user = await UserModel.create(input);
@@ -93,6 +96,14 @@ export class UserResolver {
       throw new UnauthorizedError('Write access required');
     }
 
+    if (!context.hasUserScope('admin') && input.allowedScopes) {
+      throw new UnauthorizedError('Admin access required to set scopes');
+    }
+
+    if (context.userId !== id.toString() && !context.hasUserScope('admin')) {
+      throw new UnauthorizedError('Users can only update their own accounts');
+    }
+
     const user = await UserModel.findByIdAndUpdate(id, input, { new: true });
     if (!user) {
       throw new NotFoundError('User not found');
@@ -108,6 +119,10 @@ export class UserResolver {
   ): Promise<boolean> {
     if (!context.isAuthenticated || !context.hasScope('write')) {
       throw new UnauthorizedError('Write access required');
+    }
+
+    if (context.userId !== id && !context.hasUserScope('admin')) {
+      throw new UnauthorizedError('Users can only delete their own accounts');
     }
 
     const user = await UserModel.findByIdAndDelete(id);

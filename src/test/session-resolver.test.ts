@@ -23,7 +23,7 @@ describe('SessionResolver GraphQL Endpoints', () => {
   const testUser = {
     name: 'Jane Session',
     email: 'jane.session@example.com',
-    userType: 'user',
+    allowedScopes: ['read', 'write', 'basic'],
     bio: 'Test user for session management',
     handle: 'janesession123',
     emailVerified: true,
@@ -324,7 +324,7 @@ describe('SessionResolver GraphQL Endpoints', () => {
       const anotherUser = new User({
         name: 'Another User',
         email: 'another.refresh@example.com',
-        userType: 'user',
+        allowedScopes: ['read', 'write', 'basic'],
         handle: 'another_refresh',
         emailVerified: true,
       });
