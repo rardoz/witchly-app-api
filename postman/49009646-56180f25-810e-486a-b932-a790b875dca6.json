@@ -1182,7 +1182,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation UpdateTarotDeck($id: ID!, $input: UpdateTarotDeckInput!) {\n    updateTarotDeck(id: $id, input: $input) {\n        success\n        message\n        id\n        name\n        primaryImageUrl\n        cardBackgroundUrl\n        primaryColor\n        description\n        author\n        meta\n        layoutType\n        layoutCount\n        status\n        createdAt\n        updatedAt\n    }\n}",
-								"variables": "{\n    \"id\": \"DECK_ID_HERE\",\n    \"input\": {\n        \"name\": \"Updated Deck Name\",\n        \"description\": \"Updated description with new insights and expanded guidance.\",\n        \"primaryColor\": \"#8B5CF6\",\n        \"status\": \"active\"\n    }\n}"
+								"variables": "{\n    \"id\": \"68e9a8a738af61fcb45f7a33\",\n    \"input\": {\n        \"name\": \"Updated Deck Name\",\n        \"description\": \"Updated description with new insights and expanded guidance.\",\n        \"primaryColor\": \"#8B5CF6\",\n        \"status\": \"active\"\n    }\n}"
 							}
 						},
 						"url": {
