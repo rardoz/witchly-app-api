@@ -11,6 +11,7 @@ import { ClientResolver } from './resolvers/ClientResolver';
 import { LoginResolver } from './resolvers/LoginResolver';
 import { SessionResolver } from './resolvers/SessionResolver';
 import { SignupResolver } from './resolvers/SignupResolver';
+import { TarotDeckResolver } from './resolvers/TarotDeckResolver';
 import { UserResolver } from './resolvers/UserResolver';
 
 // Comprehensive plugin to handle Apollo Server v5 response processing and HTTP status codes
@@ -96,6 +97,7 @@ export const createApolloServer = async (): Promise<ApolloServer> => {
       SignupResolver,
       LoginResolver,
       SessionResolver,
+      TarotDeckResolver,
     ],
     validate: false,
   });
