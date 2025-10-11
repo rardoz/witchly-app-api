@@ -1,4 +1,4 @@
-import { Arg, Ctx, ID, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, Ctx, ID, Int, Mutation, Query, Resolver } from 'type-graphql';
 import { GraphQLContext } from '../../middleware/auth.middleware';
 import { TarotDeck } from '../../models/TarotDeck';
 import {
@@ -23,11 +23,11 @@ export class TarotDeckResolver {
   @Query(() => [TarotDeckType])
   async tarotDecks(
     @Ctx() context: GraphQLContext,
-    @Arg('limit', () => Number, { nullable: true, defaultValue: 10 })
+    @Arg('limit', () => Int, { nullable: true, defaultValue: 10 })
     limit: number,
-    @Arg('offset', () => Number, { nullable: true, defaultValue: 0 })
+    @Arg('offset', () => Int, { nullable: true, defaultValue: 0 })
     offset: number,
-    @Arg('status', { nullable: true, defaultValue: 'active' })
+    @Arg('status', () => String, { nullable: true, defaultValue: 'active' })
     status: 'active' | 'paused'
   ): Promise<TarotDeckType[]> {
     if (!context.isAuthenticated || !context.hasScope('read')) {
@@ -68,21 +68,6 @@ export class TarotDeckResolver {
     }
 
     return deck as TarotDeckType;
-  }
-
-  @Query(() => [TarotDeckType])
-  async tarotDecksByStatus(
-    @Ctx() context: GraphQLContext,
-    @Arg('status') status: 'active' | 'paused'
-  ): Promise<TarotDeckType[]> {
-    if (!context.isAuthenticated || !context.hasScope('read')) {
-      throw new UnauthorizedError('Read access required');
-    }
-
-    const filter = { status };
-
-    const decks = await TarotDeck.find(filter).sort({ createdAt: -1 });
-    return decks as TarotDeckType[];
   }
 
   @Mutation(() => CreateTarotDeckResponse)
