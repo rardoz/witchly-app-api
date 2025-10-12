@@ -1700,11 +1700,6 @@
 											"mode": "file",
 											"file": {
 												"src": ""
-											},
-											"options": {
-												"raw": {
-													"language": "text"
-												}
 											}
 										},
 										"url": {
@@ -2427,6 +2422,10 @@
 			"key": "currentChunkIndex",
 			"value": "0",
 			"description": "Current chunk index for multi-chunk uploads"
+		},
+		{
+			"key": "chunkCalculatorScript",
+			"value": ""
 		}
 	]
 }
