@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "49009646-56180f25-810e-486a-b932-a790b875dca6",
 		"name": "Witchly App API",
-		"description": "Comprehensive API collection for Witchly App - includes OAuth2 authentication, user login/session management with dual authentication support, GraphQL queries and mutations for user and client management with complete profile support. Session operations require both OAuth2 access tokens AND user session tokens for enhanced security.",
+		"description": "Comprehensive API collection for Witchly App - includes OAuth2 authentication, user login/session management with dual authentication support, GraphQL queries and mutations for user and client management with complete profile support, and advanced asset management with both simple and chunked uploads. Session operations require both OAuth2 access tokens AND user session tokens for enhanced security. Asset management supports images and videos with S3 storage, streaming uploads, progress tracking, and signed URLs for secure access.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -1064,7 +1064,498 @@
 			"description": "GraphQL schema exploration and introspection"
 		},
 		{
-			"name": "🔮 Tarot Decks (GraphQL)",
+			"name": "� Asset Management",
+			"item": [
+				{
+					"name": "🔍 Asset Queries (GraphQL)",
+					"item": [
+						{
+							"name": "Get All Assets",
+							"id": "49009646-assets-get-all",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"description": "OAuth2 access token with read scope"
+									},
+									{
+										"key": "X-Session-Token",
+										"value": "{{sessionToken}}",
+										"description": "User session token (required)"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query GetAssets($limit: Int, $offset: Int) {\n    assets(limit: $limit, offset: $offset) {\n        id\n        fileName\n        hashedFileName\n        mimeType\n        fileSize\n        s3Key\n        s3Url\n        assetType\n        uploadedBy\n        createdAt\n        updatedAt\n    }\n}",
+										"variables": "{\n    \"limit\": 10,\n    \"offset\": 0\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Get paginated list of all assets. Requires OAuth2 read scope and user session."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Asset by ID",
+							"id": "49009646-assets-get-by-id",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"description": "OAuth2 access token with read scope"
+									},
+									{
+										"key": "X-Session-Token",
+										"value": "{{sessionToken}}",
+										"description": "User session token (required)"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query GetAsset($id: ID!) {\n    asset(id: $id) {\n        id\n        fileName\n        hashedFileName\n        mimeType\n        fileSize\n        s3Key\n        s3Url\n        assetType\n        uploadedBy\n        createdAt\n        updatedAt\n        signedUrl\n    }\n}",
+										"variables": "{\n    \"id\": \"67037f3b123456789abcdef0\"\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Get a specific asset by ID with signed URL for secure access. Requires OAuth2 read scope and user session."
+							},
+							"response": []
+						},
+						{
+							"name": "Get My Assets",
+							"id": "49009646-assets-get-my-assets",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"description": "OAuth2 access token with read scope"
+									},
+									{
+										"key": "X-Session-Token",
+										"value": "{{sessionToken}}",
+										"description": "User session token (required)"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query GetMyAssets($assetType: String, $limit: Int, $offset: Int) {\n    myAssets(assetType: $assetType, limit: $limit, offset: $offset) {\n        id\n        fileName\n        hashedFileName\n        mimeType\n        fileSize\n        s3Key\n        s3Url\n        assetType\n        uploadedBy\n        createdAt\n        updatedAt\n        signedUrl\n    }\n}",
+										"variables": "{\n    \"assetType\": \"image\",\n    \"limit\": 20,\n    \"offset\": 0\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Get assets uploaded by the current user. Optional filtering by assetType ('image' or 'video'). Requires OAuth2 read scope and user session."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Upload Info",
+							"id": "49009646-assets-upload-info",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"description": "OAuth2 access token with read scope"
+									},
+									{
+										"key": "X-Session-Token",
+										"value": "{{sessionToken}}",
+										"description": "User session token (required)"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query GetUploadInfo {\n    uploadInfo {\n        endpoint\n        maxSizes {\n            image\n            video\n        }\n        supportedTypes {\n            images\n            videos\n        }\n        authentication {\n            required\n        }\n        chunkedUpload {\n            endpoint\n            chunkSize\n            minChunkSize\n            maxChunkSize\n        }\n    }\n}",
+										"variables": "{}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Get information about upload endpoints, supported file types, size limits, and authentication requirements."
+							},
+							"response": []
+						}
+					],
+					"id": "49009646-assets-graphql-folder",
+					"description": "GraphQL queries for asset retrieval and information"
+				},
+				{
+					"name": "📤 Simple Upload (HTTP)",
+					"item": [
+						{
+							"name": "Upload Asset (Simple)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "asset-upload-test",
+										"exec": [
+											"if (pm.response.code === 201) {",
+											"    const response = pm.response.json();",
+											"    if (response.success && response.asset) {",
+											"        pm.collectionVariables.set('lastUploadedAssetId', response.asset.id);",
+											"        console.log('Asset uploaded successfully:', response.asset.fileName);",
+											"        console.log('Asset ID:', response.asset.id);",
+											"        console.log('Signed URL:', response.asset.signedUrl);",
+											"    }",
+											"} else {",
+											"    console.log('Upload failed:', pm.response.text());",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"id": "49009646-assets-upload-simple",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"description": "OAuth2 access token with write scope (required)"
+									},
+									{
+										"key": "X-Session-Token",
+										"value": "{{sessionToken}}",
+										"description": "User session token (required)"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"description": "Select an image or video file to upload (max 50MB for images, 500MB for videos)",
+											"type": "file",
+											"src": []
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/assets/upload",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"assets",
+										"upload"
+									]
+								},
+								"description": "Upload a file using multipart/form-data. Supports images (JPEG, PNG, GIF, WebP, max 50MB) and videos (MP4, MPEG, QuickTime, AVI, WebM, max 500MB). Files are streamed directly to S3 for efficiency. Requires OAuth2 write scope and user session token."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Upload Info (HTTP)",
+							"id": "49009646-assets-upload-info-http",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/assets/upload-info",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"assets",
+										"upload-info"
+									]
+								},
+								"description": "Get detailed information about upload endpoints, supported file types, size limits, authentication requirements, and chunked upload options. No authentication required."
+							},
+							"response": []
+						}
+					],
+					"id": "49009646-assets-simple-upload-folder",
+					"description": "Simple file uploads using HTTP multipart/form-data (recommended for files under 50MB)"
+				},
+				{
+					"name": "🔄 Chunked Upload (HTTP)",
+					"item": [
+						{
+							"name": "1. Initialize Chunked Upload",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "chunked-upload-init-test",
+										"exec": [
+											"if (pm.response.code === 201) {",
+											"    const response = pm.response.json();",
+											"    if (response.success && response.uploadId) {",
+											"        pm.collectionVariables.set('uploadId', response.uploadId);",
+											"        pm.collectionVariables.set('chunkSize', response.chunkSize);",
+											"        console.log('Chunked upload initialized:');",
+											"        console.log('Upload ID:', response.uploadId);",
+											"        console.log('Chunk Size:', response.chunkSize);",
+											"    }",
+											"} else {",
+											"    console.log('Failed to initialize chunked upload:', pm.response.text());",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"id": "49009646-chunked-upload-init",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"description": "OAuth2 access token with write scope (required)"
+									},
+									{
+										"key": "X-Session-Token",
+										"value": "{{sessionToken}}",
+										"description": "User session token (required)"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"fileName\": \"large-video.mp4\",\n    \"mimeType\": \"video/mp4\",\n    \"totalSize\": 524288000,\n    \"chunkSize\": 5242880,\n    \"totalChunks\": 100\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/assets/chunked/init",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"assets",
+										"chunked",
+										"init"
+									]
+								},
+								"description": "Initialize a chunked upload session for large files. Returns uploadId and recommended chunkSize. Requires OAuth2 write scope and user session token."
+							},
+							"response": []
+						},
+						{
+							"name": "2. Upload Chunk",
+							"id": "49009646-chunked-upload-chunk",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"description": "OAuth2 access token with write scope (required)"
+									},
+									{
+										"key": "X-Session-Token",
+										"value": "{{sessionToken}}",
+										"description": "User session token (required)"
+									},
+									{
+										"key": "X-Chunk-Hash",
+										"value": "sha256hashofchunkdata",
+										"description": "SHA-256 hash of the chunk data for integrity verification (required)"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/octet-stream"
+									}
+								],
+								"body": {
+									"mode": "file",
+									"file": {
+										"src": ""
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/assets/chunked/upload/{{uploadId}}/0",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"assets",
+										"chunked",
+										"upload",
+										"{{uploadId}}",
+										"0"
+									]
+								},
+								"description": "Upload a single chunk of file data. Replace '0' with the actual chunk index (0-based). Include X-Chunk-Hash header with SHA-256 hash of chunk data. Body should contain raw binary chunk data. Returns progress information after each successful chunk upload."
+							},
+							"response": []
+						},
+						{
+							"name": "3. Get Upload Progress",
+							"id": "49009646-chunked-upload-progress",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"description": "OAuth2 access token with read scope (required)"
+									},
+									{
+										"key": "X-Session-Token",
+										"value": "{{sessionToken}}",
+										"description": "User session token (required)"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/assets/chunked/progress/{{uploadId}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"assets",
+										"chunked",
+										"progress",
+										"{{uploadId}}"
+									]
+								},
+								"description": "Get real-time progress of a chunked upload session. Returns percentage complete, chunks uploaded, file size information, and upload status. Useful for progress bars and monitoring upload status."
+							},
+							"response": []
+						},
+						{
+							"name": "4. Cancel Upload",
+							"id": "49009646-chunked-upload-cancel",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"description": "OAuth2 access token with write scope (required)"
+									},
+									{
+										"key": "X-Session-Token",
+										"value": "{{sessionToken}}",
+										"description": "User session token (required)"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/assets/chunked/{{uploadId}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"assets",
+										"chunked",
+										"{{uploadId}}"
+									]
+								},
+								"description": "Cancel a chunked upload session and clean up any partial data. This will abort the S3 multipart upload and remove the session. Use when user cancels upload or on error recovery."
+							},
+							"response": []
+						}
+					],
+					"id": "49009646-assets-chunked-upload-folder",
+					"description": "Chunked upload system for large files with progress tracking and resumable uploads. Recommended for files over 50MB or when progress tracking is needed."
+				}
+			],
+			"id": "49009646-assets-management-section",
+			"description": "Complete asset management system with GraphQL queries, simple HTTP uploads, and chunked uploads with progress tracking. Supports images and videos with S3 storage and signed URLs for secure access."
+		},
+		{
+			"name": "�🔮 Tarot Decks (GraphQL)",
 			"item": [
 				{
 					"name": "Get All Tarot Decks",
@@ -1361,6 +1852,21 @@
 			"key": "userId",
 			"value": "",
 			"description": "Current user ID from login/session"
+		},
+		{
+			"key": "uploadId",
+			"value": "",
+			"description": "Upload session ID for chunked uploads"
+		},
+		{
+			"key": "chunkSize",
+			"value": "",
+			"description": "Recommended chunk size for chunked uploads"
+		},
+		{
+			"key": "lastUploadedAssetId",
+			"value": "",
+			"description": "ID of the most recently uploaded asset"
 		}
 	]
 }
