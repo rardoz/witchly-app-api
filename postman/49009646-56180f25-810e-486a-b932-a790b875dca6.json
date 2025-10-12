@@ -768,8 +768,11 @@
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"query\": \"query GetClients {\\n    clients {\\n      id\\n      clientId\\n      name\\n      description\\n      isActive\\n      allowedScopes\\n      tokenExpiresIn\\n      lastUsed\\n      createdAt\\n      updatedAt\\n    }\\n  }\"\n}"
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetClients {    \n    clients {      \n        id      \n        clientId      \n        name      \n        description      \n        isActive      \n        allowedScopes     \n        tokenExpiresIn      \n        lastUsed      \n        createdAt      \n        updatedAt\n    }\n}",
+								"variables": "{}"
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/graphql",
