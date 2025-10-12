@@ -881,8 +881,11 @@
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"query\": \"mutation UpdateClient($clientId: String!, $input: UpdateClientInput!) {\\n    updateClient(clientId: $clientId, input: $input) {\\n      id\\n      clientId\\n      name\\n      description\\n      isActive\\n      allowedScopes\\n      tokenExpiresIn\\n      updatedAt\\n    }\\n  }\",\n  \"variables\": {\n    \"clientId\": \"CLIENT_ID_HERE\",\n    \"input\": {\n      \"name\": \"Updated Client Name\",\n      \"description\": \"Updated description\",\n      \"isActive\": true,\n      \"allowedScopes\": [\"read\", \"write\", \"admin\"]\n    }\n  }\n}"
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation UpdateClient($clientId: String!, $input: UpdateClientInput!) {    updateClient(clientId: $clientId, input: $input) {      \n        id\n        clientId\n        name\n        description\n        isActive\n        allowedScopes\n        tokenExpiresIn\n        updatedAt\n    }\n}",
+								"variables": " {\n    \"clientId\": \"client_372a2eef32e1b60cb1517bccf40e6004\",\n    \"input\": {\n      \"name\": \"DELETE THIS!\",\n      \"description\": \"NEED TO DELETE\",\n      \"isActive\": false,\n      \"allowedScopes\": [\"read\"]\n    }\n  }"
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/graphql",
