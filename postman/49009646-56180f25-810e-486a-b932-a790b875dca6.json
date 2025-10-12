@@ -1242,7 +1242,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation DeleteTarotDeck($id: ID!, $hardDelete: Boolean) {\n    deleteTarotDeck(id: $id, hardDelete: $hardDelete) {\n        success\n        message\n    }\n}",
-								"variables": "{\n    \"id\": \"68eb31111a80560b29339d3d\",\n    \"hardDelete\": true\n}"
+								"variables": "{\n    \"id\": \"68e9a8a738af61fcb45f7a33\",\n    \"hardDelete\": true\n}"
 							}
 						},
 						"url": {
