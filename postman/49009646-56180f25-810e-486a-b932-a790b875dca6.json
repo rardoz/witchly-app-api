@@ -1157,11 +1157,6 @@
 								"value": "application/json"
 							},
 							{
-								"key": "Authorization",
-								"value": "Bearer {{accessToken}}",
-								"description": "OAuth2 access token (required)"
-							},
-							{
 								"key": "X-Session-Token",
 								"value": "{{sessionToken}}",
 								"description": "User session token with admin scope (required)"
