@@ -1038,8 +1038,7 @@
 							},
 							{
 								"key": "X-Session-Token",
-								"value": "{{sessionToken}}",
-								"description": "OAuth2 access token (required)"
+								"value": "{{sessionToken}}"
 							}
 						],
 						"body": {
