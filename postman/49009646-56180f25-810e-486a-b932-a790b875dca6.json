@@ -869,7 +869,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation CreateClient($input: CreateClientInput!) {\n        createClient(input: $input) {\n            clientId\n            clientSecret\n    }\n}",
-								"variables": "{\n    \"input\": {\n      \"name\": \"Mobile App Client v2\",\n      \"description\": \"A Mobile App OAuth2 client with basic read write permissions\",\n      \"allowedScopes\": [\"read\", \"write\", \"basic\"]\n    }\n  }"
+								"variables": "{\n    \"input\": {\n      \"name\": \"DELete me too\",\n      \"description\": \"A Mobile App OAuth2 client with basic read write permissions\",\n      \"allowedScopes\": [\"read\", \"write\", \"basic\"]\n    }\n  }"
 							}
 						},
 						"url": {
