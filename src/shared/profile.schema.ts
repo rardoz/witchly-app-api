@@ -61,6 +61,7 @@ export interface IProfileFields {
   birthDate?: Date;
   pronouns?: string;
   allowedScopes?: string[];
+  emailVerified?: boolean;
 }
 
 // Base class for profile fields with GraphQL decorators and validation
@@ -207,6 +208,9 @@ export class BaseProfileFields implements IProfileFields {
 
   @Field(() => [String], { nullable: true })
   allowedScopes?: string[];
+
+  @Field(() => Boolean, { nullable: false, defaultValue: false })
+  emailVerified: boolean;
 }
 
 // Base class for profile fields in GraphQL ObjectTypes
@@ -265,6 +269,9 @@ export class BaseProfileObjectType implements IProfileFields {
 
   @Field(() => [String], { nullable: true })
   allowedScopes?: string[];
+
+  @Field(() => Boolean)
+  emailVerified: boolean;
 }
 
 // Shared Mongoose schema definition for profile fields
@@ -347,5 +354,10 @@ export const createProfileFieldsSchema = () => ({
     type: String,
     trim: true,
     maxlength: PROFILE_VALIDATION.PRONOUNS.max,
+  },
+  emailVerified: {
+    type: Boolean,
+    default: false,
+    required: true,
   },
 });

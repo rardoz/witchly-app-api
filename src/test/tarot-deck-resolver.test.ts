@@ -1,148 +1,52 @@
-import { Client } from '../models/Client';
 import { TarotDeck } from '../models/TarotDeck';
-import { User } from '../models/User';
-import {
-  generateClientId,
-  generateClientSecret,
-  hashClientSecret,
-} from '../services/jwt.service';
-import { SessionService } from '../services/session.service';
 
 describe('TarotDeckResolver GraphQL Endpoints', () => {
-  let accessToken: string;
-  let userSessionToken: string;
-  let basicSessionToken: string;
-  const testClient = {
-    clientId: '',
-    clientSecret: '',
-    hashedSecret: '',
-  };
-
   beforeEach(() => {
     // Reset all mocks before each test
     jest.clearAllMocks();
   });
 
   beforeAll(async () => {
-    // Generate test client credentials
-    testClient.clientId = generateClientId();
-    testClient.clientSecret = generateClientSecret();
-    testClient.hashedSecret = await hashClientSecret(testClient.clientSecret);
-
-    // Create test client in database
-    const client = new Client({
-      clientId: testClient.clientId,
-      clientSecret: testClient.hashedSecret,
-      name: 'Test Client for Tarot Decks',
-      description: 'Test client for tarot deck resolver tests',
-      allowedScopes: ['read', 'write', 'admin'],
-      tokenExpiresIn: 3600,
-    });
-    await client.save();
-
-    // Get access token using GraphQL mutation
-    const authMutation = `
-      mutation {
-        authenticate(
-          grant_type: "client_credentials"
-          client_id: "${testClient.clientId}"
-          client_secret: "${testClient.clientSecret}"
-          scope: "read write admin"
-        ) {
-          access_token
-        }
-      }
-    `;
-
-    const tokenResponse = await testRequest
-      .post('/graphql')
-      .send({ query: authMutation });
-    accessToken = tokenResponse.body.data.authenticate.access_token;
-
-    const user = await User.create({
-      name: 'Test User',
-      email: 'test.users@example.com',
-      allowedScopes: ['read', 'write', 'admin'],
-      bio: 'Test biography',
-      handle: 'test_user',
-    });
-    const session = await SessionService.createSession(
-      user.id,
-      true, // keepMeLoggedIn
-      'node-superagent/3.8.3', // Match supertest/superagent User-Agent
-      '::ffff:127.0.0.1'
-    );
-    userSessionToken = session.sessionToken;
-
-    const basicUser = await User.create({
-      name: 'Test User',
-      email: 'basic.users@example.com',
-      allowedScopes: ['read', 'write', 'basic'],
-      bio: 'Basic biography',
-      handle: 'basic_user',
-    });
-    const basicSession = await SessionService.createSession(
-      basicUser.id,
-      true, // keepMeLoggedIn
-      'node-superagent/3.8.3', // Match supertest/superagent User-Agent
-      '::ffff:127.0.0.1'
-    );
-    basicSessionToken = basicSession.sessionToken;
-  }, 30000);
-
-  afterAll(async () => {
-    // Clean up test data
-    await TarotDeck.deleteMany({ name: { $regex: /test/i } });
-    await Client.deleteOne({ clientId: testClient.clientId });
-    await User.deleteMany({ email: /@example\.com$/i });
-  });
-
-  afterEach(async () => {
-    // Clean up any data created during tests
-    await TarotDeck.deleteMany({ name: { $regex: /test/i } });
+    // Create some test decks
+    await TarotDeck.create([
+      {
+        name: 'Test Deck 1',
+        primaryImageUrl: 'https://example.com/deck1.jpg',
+        cardBackgroundUrl: 'https://example.com/card-bg1.jpg',
+        primaryColor: '#FF5733',
+        description: 'A test tarot deck',
+        author: 'Test Author',
+        meta: ['mystical', 'beginner'],
+        layoutType: 'default',
+        layoutCount: 1,
+        status: 'active',
+      },
+      {
+        name: 'Test Deck 2',
+        primaryImageUrl: 'https://example.com/deck2.jpg',
+        primaryColor: '#33FF57',
+        description: 'Another test tarot deck',
+        author: 'Another Author',
+        meta: ['advanced', 'spiritual'],
+        layoutType: 'custom',
+        layoutCount: 3,
+        status: 'paused',
+      },
+      {
+        name: 'Test Deck 3 Inactive',
+        primaryImageUrl: 'https://example.com/deck3.jpg',
+        primaryColor: '#3357FF',
+        description: 'An inactive test deck',
+        author: 'Test Author',
+        meta: [],
+        layoutType: 'default',
+        layoutCount: 1,
+        status: 'paused',
+      },
+    ]);
   });
 
   describe('Query: tarotDecks', () => {
-    beforeEach(async () => {
-      // Create some test decks
-      await TarotDeck.create([
-        {
-          name: 'Test Deck 1',
-          primaryImageUrl: 'https://example.com/deck1.jpg',
-          cardBackgroundUrl: 'https://example.com/card-bg1.jpg',
-          primaryColor: '#FF5733',
-          description: 'A test tarot deck',
-          author: 'Test Author',
-          meta: ['mystical', 'beginner'],
-          layoutType: 'default',
-          layoutCount: 1,
-          status: 'active',
-        },
-        {
-          name: 'Test Deck 2',
-          primaryImageUrl: 'https://example.com/deck2.jpg',
-          primaryColor: '#33FF57',
-          description: 'Another test tarot deck',
-          author: 'Another Author',
-          meta: ['advanced', 'spiritual'],
-          layoutType: 'custom',
-          layoutCount: 3,
-          status: 'paused',
-        },
-        {
-          name: 'Test Deck 3 Inactive',
-          primaryImageUrl: 'https://example.com/deck3.jpg',
-          primaryColor: '#3357FF',
-          description: 'An inactive test deck',
-          author: 'Test Author',
-          meta: [],
-          layoutType: 'default',
-          layoutCount: 1,
-          status: 'paused',
-        },
-      ]);
-    });
-
     it('should return active tarot decks by default', async () => {
       const query = `
         query {
@@ -162,11 +66,8 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${accessToken}`)
-        .set('X-Session-Token', userSessionToken)
-        .set('User-Agent', 'node-superagent/3.8.3')
+      const response = await global
+        .adminUserAdminAppTestRequest()
         .send({ query });
 
       expect(response.status).toBe(200);
@@ -192,12 +93,8 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
           }
         }
       `;
-
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${accessToken}`)
-        .set('X-Session-Token', userSessionToken)
-        .set('User-Agent', 'node-superagent/3.8.3')
+      const response = await global
+        .adminUserAdminAppTestRequest()
         .send({ query });
 
       expect(response.status).toBe(200);
@@ -215,11 +112,8 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${accessToken}`)
-        .set('X-Session-Token', userSessionToken)
-        .set('User-Agent', 'node-superagent/3.8.3')
+      const response = await global
+        .adminUserAdminAppTestRequest()
         .send({ query });
 
       expect(response.status).toBe(200);
@@ -282,11 +176,8 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${accessToken}`)
-        .set('X-Session-Token', userSessionToken)
-        .set('User-Agent', 'node-superagent/3.8.3')
+      const response = await global
+        .adminUserAdminAppTestRequest()
         .send({ query });
 
       expect(response.status).toBe(200);
@@ -308,11 +199,8 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${accessToken}`)
-        .set('X-Session-Token', userSessionToken)
-        .set('User-Agent', 'node-superagent/3.8.3')
+      const response = await global
+        .adminUserAdminAppTestRequest()
         .send({ query });
 
       expect(response.status).toBe(404);
@@ -355,17 +243,12 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${accessToken}`)
-        .set('X-Session-Token', basicSessionToken)
-        .set('User-Agent', 'node-superagent/3.8.3')
-        .send({
-          query: mutation,
-          variables: {
-            input: validDeckData,
-          },
-        });
+      const response = await global.basicUserBasicAppTestRequest().send({
+        query: mutation,
+        variables: {
+          input: validDeckData,
+        },
+      });
 
       expect(response.status).toBe(401);
       expect(response.body.errors[0].extensions.code).toBe('UNAUTHORIZED');
@@ -397,17 +280,12 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${accessToken}`)
-        .set('X-Session-Token', basicSessionToken)
-        .set('User-Agent', 'node-superagent/3.8.3')
-        .send({
-          query: mutation,
-          variables: {
-            input: minimalDeckData,
-          },
-        });
+      const response = await global.basicUserBasicAppTestRequest().send({
+        query: mutation,
+        variables: {
+          input: minimalDeckData,
+        },
+      });
 
       expect(response.status).toBe(401);
       expect(response.body.errors[0].extensions.code).toBe('UNAUTHORIZED');
@@ -432,17 +310,12 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${accessToken}`)
-        .set('X-Session-Token', basicSessionToken)
-        .set('User-Agent', 'node-superagent/3.8.3')
-        .send({
-          query: mutation,
-          variables: {
-            input: invalidDeckData,
-          },
-        });
+      const response = await global.basicUserBasicAppTestRequest().send({
+        query: mutation,
+        variables: {
+          input: invalidDeckData,
+        },
+      });
 
       expect(response.status).toBe(401);
       expect(response.body.errors[0].extensions.code).toBe('UNAUTHORIZED');
@@ -467,17 +340,12 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${accessToken}`)
-        .set('X-Session-Token', basicSessionToken)
-        .set('User-Agent', 'node-superagent/3.8.3')
-        .send({
-          query: mutation,
-          variables: {
-            input: invalidDeckData,
-          },
-        });
+      const response = await global.basicUserBasicAppTestRequest().send({
+        query: mutation,
+        variables: {
+          input: invalidDeckData,
+        },
+      });
 
       expect(response.status).toBe(401);
       expect(response.body.errors[0].extensions.code).toBe('UNAUTHORIZED');
@@ -499,17 +367,12 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${accessToken}`)
-        .set('X-Session-Token', userSessionToken)
-        .set('User-Agent', 'node-superagent/3.8.3')
-        .send({
-          query: mutation,
-          variables: {
-            input: validDeckData,
-          },
-        });
+      const response = await global.adminUserAdminAppTestRequest().send({
+        query: mutation,
+        variables: {
+          input: validDeckData,
+        },
+      });
 
       expect(response.status).toBe(409);
       expect(response.body.errors[0].extensions.code).toBe('CONFLICT');
@@ -528,7 +391,7 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest.post('/graphql').send({
+      const response = await global.basicUserBasicAppTestRequest().send({
         query: mutation,
         variables: {
           input: validDeckData,

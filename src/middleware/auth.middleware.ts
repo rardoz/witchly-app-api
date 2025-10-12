@@ -224,9 +224,7 @@ export function createGraphQLContext(req: Request): GraphQLContext {
 
       // Check for admin session scope
       if (!context.isUserAuthenticated || !context.hasUserScope('admin')) {
-        throw new UnauthorizedError(
-          'Admin session access required to update tarot decks'
-        );
+        throw new UnauthorizedError('Admin session access required');
       }
     },
   };

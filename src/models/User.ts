@@ -7,7 +7,6 @@ import {
 export interface IUser extends Document, IProfileFields {
   email: string;
   allowedScopes: string[]; // Changed from userType to allowedScopes array
-  emailVerified: boolean;
   handle: string; // Made required for signup flow
   lastLoginAt?: Date; // Track last login time
   createdAt: Date;
@@ -44,11 +43,6 @@ const userSchema = new Schema<IUser>(
         },
         message: 'Invalid user scopes provided',
       },
-    },
-    emailVerified: {
-      type: Boolean,
-      required: true,
-      default: false,
     },
     handle: {
       type: String,

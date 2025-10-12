@@ -61,10 +61,8 @@ export class UserResolver {
     @Ctx() context: GraphQLContext,
     @Arg('input', () => CreateUserInput) input: CreateUserInput
   ): Promise<UserType> {
-    context.hasAppWriteScope(context);
-    if (!context.hasUserScope('admin') && input.allowedScopes) {
-      throw new UnauthorizedError('Admin access required to set scopes');
-    }
+    // typical users will do this through the signup journey
+    context.hasUserAdminWriteAppWriteScope(context);
 
     try {
       const user = await UserModel.create(input);
@@ -89,7 +87,7 @@ export class UserResolver {
     context.hasAppWriteScope(context);
 
     if (!context.hasUserScope('admin') && input.allowedScopes) {
-      throw new UnauthorizedError('Admin access required to set scopes');
+      throw new UnauthorizedError('Admin session access required');
     }
 
     if (context.userId !== id.toString() && !context.hasUserScope('admin')) {
