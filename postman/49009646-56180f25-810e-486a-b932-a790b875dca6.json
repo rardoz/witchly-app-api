@@ -1038,7 +1038,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Bearer {{accessToken}}",
+								"value": "Bearer {{sessionToken}}",
 								"description": "OAuth2 access token (required)"
 							}
 						],
