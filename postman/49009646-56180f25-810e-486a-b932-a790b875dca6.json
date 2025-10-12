@@ -1037,7 +1037,7 @@
 								"value": "application/json"
 							},
 							{
-								"key": "Authorization",
+								"key": "X-Session-Token",
 								"value": "Bearer {{sessionToken}}",
 								"description": "OAuth2 access token (required)"
 							}
