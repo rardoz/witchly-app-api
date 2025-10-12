@@ -1353,6 +1353,540 @@
 					"name": "🔄 Chunked Upload (HTTP)",
 					"item": [
 						{
+							"name": "🧪 Complete File Upload Test",
+							"item": [
+								{
+									"name": "Step 1: Prepare File for Chunked Upload",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "file-preparation-script",
+												"exec": [
+													"// This script helps prepare file metadata for chunked upload testing",
+													"",
+													"if (pm.response.code === 200) {",
+													"    console.log('✅ File preparation step completed');",
+													"    console.log('');",
+													"    console.log('📋 CHUNKED UPLOAD TESTING INSTRUCTIONS:');",
+													"    console.log('1. Select a test file (image/video) in the next requests');",
+													"    console.log('2. File will be automatically chunked based on CHUNK_SIZE');",
+													"    console.log('3. Progress will be tracked automatically');",
+													"    console.log('');",
+													"    console.log('📊 Current Configuration:');",
+													"    console.log('- Default Chunk Size: 5MB (5242880 bytes)');",
+													"    console.log('- Max Image Size: 50MB');",
+													"    console.log('- Max Video Size: 500MB');",
+													"    console.log('');",
+													"    console.log('🔧 To test with different chunk size:');",
+													"    console.log('1. Set collection variable: CHUNK_SIZE (in bytes)');",
+													"    console.log('2. Example: 1048576 for 1MB chunks');",
+													"    console.log('');",
+													"    ",
+													"    // Set default chunk size if not already set",
+													"    if (!pm.collectionVariables.get('CHUNK_SIZE')) {",
+													"        pm.collectionVariables.set('CHUNK_SIZE', 5242880); // 5MB default",
+													"    }",
+													"    ",
+													"    // Helper function to calculate file chunks (stored for use in other requests)",
+													"    pm.collectionVariables.set('chunkCalculatorScript', `",
+													"        function calculateFileChunks(fileSize, chunkSize) {",
+													"            const totalChunks = Math.ceil(fileSize / chunkSize);",
+													"            const chunks = [];",
+													"            for (let i = 0; i < totalChunks; i++) {",
+													"                const start = i * chunkSize;",
+													"                const end = Math.min(start + chunkSize, fileSize);",
+													"                chunks.push({",
+													"                    index: i,",
+													"                    start: start,",
+													"                    end: end,",
+													"                    size: end - start",
+													"                });",
+													"            }",
+													"            return { chunks, totalChunks };",
+													"        }",
+													"    `);",
+													"}",
+													"",
+													"console.log('🚀 Ready for chunked upload testing!');"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"id": "49009646-chunked-file-prep",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/assets/upload-info",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"assets",
+												"upload-info"
+											]
+										},
+										"description": "Preparation step for chunked upload testing. This request sets up the environment and provides instructions for testing chunked uploads with real files."
+									},
+									"response": []
+								},
+								{
+									"name": "Step 2: Initialize Upload with Selected File",
+									"event": [
+										{
+											"listen": "pre-request",
+											"script": {
+												"id": "dynamic-file-init-script",
+												"exec": [
+													"// Dynamic file initialization script",
+													"// NOTE: You need to manually set these variables based on your test file:",
+													"",
+													"// MANUAL SETUP REQUIRED:",
+													"// 1. Set collection variable 'TEST_FILE_NAME' (e.g., 'test-video.mp4')",
+													"// 2. Set collection variable 'TEST_FILE_MIME_TYPE' (e.g., 'video/mp4')",
+													"// 3. Set collection variable 'TEST_FILE_SIZE' (in bytes, e.g., 10485760 for 10MB)",
+													"",
+													"const fileName = pm.collectionVariables.get('TEST_FILE_NAME') || 'test-file.jpg';",
+													"const mimeType = pm.collectionVariables.get('TEST_FILE_MIME_TYPE') || 'image/jpeg';",
+													"const fileSize = parseInt(pm.collectionVariables.get('TEST_FILE_SIZE') || '5242880'); // 5MB default",
+													"const chunkSize = parseInt(pm.collectionVariables.get('CHUNK_SIZE') || '5242880'); // 5MB default",
+													"",
+													"// Calculate total chunks",
+													"const totalChunks = Math.ceil(fileSize / chunkSize);",
+													"",
+													"console.log('📁 File Upload Initialization:');",
+													"console.log('- File Name:', fileName);",
+													"console.log('- MIME Type:', mimeType);",
+													"console.log('- File Size:', fileSize, 'bytes (' + Math.round(fileSize / 1024 / 1024 * 100) / 100 + ' MB)');",
+													"console.log('- Chunk Size:', chunkSize, 'bytes (' + Math.round(chunkSize / 1024 / 1024 * 100) / 100 + ' MB)');",
+													"console.log('- Total Chunks:', totalChunks);",
+													"",
+													"// Store for use in request body",
+													"pm.collectionVariables.set('CALCULATED_TOTAL_CHUNKS', totalChunks);",
+													"",
+													"// Update request body dynamically",
+													"const requestBody = {",
+													"    fileName: fileName,",
+													"    mimeType: mimeType,",
+													"    totalSize: fileSize,",
+													"    chunkSize: chunkSize,",
+													"    totalChunks: totalChunks",
+													"};",
+													"",
+													"pm.request.body.raw = JSON.stringify(requestBody, null, 2);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "init-upload-test",
+												"exec": [
+													"if (pm.response.code === 201) {",
+													"    const response = pm.response.json();",
+													"    if (response.success && response.uploadId) {",
+													"        pm.collectionVariables.set('uploadId', response.uploadId);",
+													"        pm.collectionVariables.set('chunkSize', response.chunkSize);",
+													"        ",
+													"        console.log('✅ Chunked upload initialized successfully!');",
+													"        console.log('📋 Upload Session Details:');",
+													"        console.log('- Upload ID:', response.uploadId);",
+													"        console.log('- Server Chunk Size:', response.chunkSize, 'bytes');",
+													"        ",
+													"        const totalChunks = pm.collectionVariables.get('CALCULATED_TOTAL_CHUNKS');",
+													"        console.log('- Total Chunks to Upload:', totalChunks);",
+													"        ",
+													"        console.log('');",
+													"        console.log('🔄 NEXT STEPS:');",
+													"        console.log('1. Use \"Step 3: Upload File Chunks\" to upload your file');",
+													"        console.log('2. Select your actual file in the request body');",
+													"        console.log('3. The request will automatically handle chunking');",
+													"        console.log('4. Monitor progress with \"Step 4: Check Progress\"');",
+													"    }",
+													"} else {",
+													"    console.log('❌ Failed to initialize chunked upload');",
+													"    console.log('Response:', pm.response.text());",
+													"    ",
+													"    console.log('');",
+													"    console.log('🔧 TROUBLESHOOTING:');",
+													"    console.log('1. Check if you have valid OAuth2 token and session token');",
+													"    console.log('2. Verify file size and MIME type are valid');",
+													"    console.log('3. Ensure file size does not exceed limits (50MB images, 500MB videos)');",
+													"}"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"id": "49009646-chunked-init-dynamic",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer {{accessToken}}",
+												"description": "OAuth2 access token with write scope (required)"
+											},
+											{
+												"key": "X-Session-Token",
+												"value": "{{sessionToken}}",
+												"description": "User session token (required)"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"fileName\": \"test-file.jpg\",\n    \"mimeType\": \"image/jpeg\",\n    \"totalSize\": 5242880,\n    \"chunkSize\": 5242880,\n    \"totalChunks\": 1\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/assets/chunked/init",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"assets",
+												"chunked",
+												"init"
+											]
+										},
+										"description": "🔧 SETUP REQUIRED: Set these collection variables before running:\n- TEST_FILE_NAME (e.g., 'my-video.mp4')\n- TEST_FILE_MIME_TYPE (e.g., 'video/mp4')\n- TEST_FILE_SIZE (file size in bytes)\n- CHUNK_SIZE (optional, defaults to 5MB)\n\nThis request will automatically calculate chunks and initialize the upload session."
+									},
+									"response": []
+								},
+								{
+									"name": "Step 3: Upload File Chunks (Select Your File)",
+									"event": [
+										{
+											"listen": "pre-request",
+											"script": {
+												"id": "chunk-upload-prep",
+												"exec": [
+													"// This script helps with chunk upload preparation",
+													"",
+													"const uploadId = pm.collectionVariables.get('uploadId');",
+													"const chunkIndex = pm.collectionVariables.get('currentChunkIndex') || 0;",
+													"",
+													"if (!uploadId) {",
+													"    console.log('❌ No upload session found. Please run Step 2 first.');",
+													"    return;",
+													"}",
+													"",
+													"console.log('📤 Preparing chunk upload:');",
+													"console.log('- Upload ID:', uploadId);",
+													"console.log('- Chunk Index:', chunkIndex);",
+													"",
+													"console.log('');",
+													"console.log('📋 INSTRUCTIONS FOR THIS REQUEST:');",
+													"console.log('1. In the Body tab, select \"binary\" mode');",
+													"console.log('2. Click \"Select File\" and choose your test file');",
+													"console.log('3. Set X-Chunk-Hash header (use any SHA-256 hash for testing)');",
+													"console.log('4. Send the request');",
+													"console.log('');",
+													"console.log('💡 TIP: For real implementation, you would:');",
+													"console.log('- Split file into chunks client-side');",
+													"console.log('- Calculate actual SHA-256 hash for each chunk');",
+													"console.log('- Upload each chunk with correct index');",
+													"",
+													"// Update URL with current chunk index",
+													"const url = pm.request.url;",
+													"url.path = ['api', 'assets', 'chunked', 'upload', uploadId, chunkIndex.toString()];"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "chunk-upload-test",
+												"exec": [
+													"if (pm.response.code === 200) {",
+													"    const response = pm.response.json();",
+													"    ",
+													"    if (response.success && response.progress) {",
+													"        const progress = response.progress;",
+													"        ",
+													"        console.log('✅ Chunk uploaded successfully!');",
+													"        console.log('📊 Upload Progress:');",
+													"        console.log('- Progress:', progress.progress + '%');",
+													"        console.log('- Chunks Uploaded:', progress.chunksUploaded, '/', progress.totalChunks);",
+													"        console.log('- Uploaded Size:', Math.round(progress.uploadedSize / 1024 / 1024 * 100) / 100, 'MB');",
+													"        console.log('- Total Size:', Math.round(progress.totalSize / 1024 / 1024 * 100) / 100, 'MB');",
+													"        console.log('- Status:', progress.status);",
+													"        ",
+													"        // Update chunk index for next upload",
+													"        const nextChunk = (pm.collectionVariables.get('currentChunkIndex') || 0) + 1;",
+													"        pm.collectionVariables.set('currentChunkIndex', nextChunk);",
+													"        ",
+													"        if (progress.status === 'completed') {",
+													"            console.log('');",
+													"            console.log('🎉 UPLOAD COMPLETED!');",
+													"            console.log('File has been successfully uploaded and processed.');",
+													"        } else if (nextChunk < progress.totalChunks) {",
+													"            console.log('');",
+													"            console.log('🔄 NEXT CHUNK:');",
+													"            console.log('- Run this request again to upload chunk', nextChunk);",
+													"            console.log('- Or use \"Step 4\" to check current progress');",
+													"        }",
+													"    }",
+													"} else {",
+													"    console.log('❌ Chunk upload failed');",
+													"    console.log('Response:', pm.response.text());",
+													"    ",
+													"    console.log('');",
+													"    console.log('🔧 COMMON ISSUES:');",
+													"    console.log('1. Make sure you selected a file in Body > binary');",
+													"    console.log('2. Check X-Chunk-Hash header is set');",
+													"    console.log('3. Verify upload session is still valid');",
+													"    console.log('4. Ensure chunk index is correct');",
+													"}"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"id": "49009646-chunked-upload-file",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{accessToken}}",
+												"description": "OAuth2 access token with write scope (required)"
+											},
+											{
+												"key": "X-Session-Token",
+												"value": "{{sessionToken}}",
+												"description": "User session token (required)"
+											},
+											{
+												"key": "X-Chunk-Hash",
+												"value": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+												"description": "SHA-256 hash of chunk data (use empty string hash for testing, calculate real hash in production)"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/octet-stream"
+											}
+										],
+										"body": {
+											"mode": "file",
+											"file": {
+												"src": ""
+											},
+											"options": {
+												"raw": {
+													"language": "text"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/assets/chunked/upload/{{uploadId}}/0",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"assets",
+												"chunked",
+												"upload",
+												"{{uploadId}}",
+												"0"
+											]
+										},
+										"description": "📁 SELECT YOUR FILE: In Body tab, choose 'file' mode and select your test file. The request will automatically handle the upload and track progress. For multi-chunk files, run this request multiple times with different chunk indices."
+									},
+									"response": []
+								},
+								{
+									"name": "Step 4: Check Upload Progress",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "progress-check-test",
+												"exec": [
+													"if (pm.response.code === 200) {",
+													"    const response = pm.response.json();",
+													"    ",
+													"    if (response.success && response.progress) {",
+													"        const progress = response.progress;",
+													"        ",
+													"        console.log('📊 Current Upload Progress:');",
+													"        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');",
+													"        console.log('📁 File:', progress.fileName);",
+													"        console.log('🎯 Progress:', progress.progress + '%');",
+													"        console.log('📦 Chunks:', progress.chunksUploaded, '/', progress.totalChunks);",
+													"        console.log('💾 Size:', Math.round(progress.uploadedSize / 1024 / 1024 * 100) / 100, 'MB /', Math.round(progress.totalSize / 1024 / 1024 * 100) / 100, 'MB');",
+													"        console.log('⏱️ Status:', progress.status.toUpperCase());",
+													"        console.log('🕐 Created:', new Date(progress.createdAt).toLocaleTimeString());",
+													"        console.log('🕑 Updated:', new Date(progress.lastUpdated).toLocaleTimeString());",
+													"        ",
+													"        // Create visual progress bar",
+													"        const progressBar = '█'.repeat(Math.floor(progress.progress / 5)) + '░'.repeat(20 - Math.floor(progress.progress / 5));",
+													"        console.log('📊 [' + progressBar + '] ' + progress.progress + '%');",
+													"        ",
+													"        if (progress.status === 'completed') {",
+													"            console.log('');",
+													"            console.log('🎉 UPLOAD COMPLETED SUCCESSFULLY!');",
+													"            console.log('Your file has been uploaded and is ready to use.');",
+													"            console.log('You can now query it using the GraphQL Asset queries.');",
+													"        } else if (progress.status === 'uploading') {",
+													"            console.log('');",
+													"            console.log('🔄 Upload in progress...');",
+													"            console.log('Continue uploading remaining chunks or wait for completion.');",
+													"        } else if (progress.status === 'failed') {",
+													"            console.log('');",
+													"            console.log('❌ Upload failed. You may need to restart the upload process.');",
+													"        }",
+													"        ",
+													"        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');",
+													"    }",
+													"} else {",
+													"    console.log('❌ Failed to get progress');",
+													"    console.log('Response:', pm.response.text());",
+													"}"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"id": "49009646-chunked-progress-check",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{accessToken}}",
+												"description": "OAuth2 access token with read scope (required)"
+											},
+											{
+												"key": "X-Session-Token",
+												"value": "{{sessionToken}}",
+												"description": "User session token (required)"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/assets/chunked/progress/{{uploadId}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"assets",
+												"chunked",
+												"progress",
+												"{{uploadId}}"
+											]
+										},
+										"description": "Monitor the real-time progress of your chunked upload. Shows completion percentage, chunks uploaded, file size progress, and current status with a visual progress bar."
+									},
+									"response": []
+								},
+								{
+									"name": "Step 5: Cancel Upload (If Needed)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "cancel-upload-test",
+												"exec": [
+													"if (pm.response.code === 200) {",
+													"    const response = pm.response.json();",
+													"    ",
+													"    if (response.success) {",
+													"        console.log('✅ Upload cancelled successfully');",
+													"        console.log('🧹 All partial data has been cleaned up');",
+													"        ",
+													"        // Clear upload-related variables",
+													"        pm.collectionVariables.unset('uploadId');",
+													"        pm.collectionVariables.unset('currentChunkIndex');",
+													"        ",
+													"        console.log('');",
+													"        console.log('🔄 To start a new upload:');",
+													"        console.log('1. Run Step 1 again to prepare');",
+													"        console.log('2. Set up your file variables');",
+													"        console.log('3. Initialize a new upload session');",
+													"    }",
+													"} else {",
+													"    console.log('❌ Failed to cancel upload');",
+													"    console.log('Response:', pm.response.text());",
+													"}"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"id": "49009646-chunked-cancel-test",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{accessToken}}",
+												"description": "OAuth2 access token with write scope (required)"
+											},
+											{
+												"key": "X-Session-Token",
+												"value": "{{sessionToken}}",
+												"description": "User session token (required)"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/assets/chunked/{{uploadId}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"assets",
+												"chunked",
+												"{{uploadId}}"
+											]
+										},
+										"description": "Cancel the current upload session and clean up any partial data. Use this when you want to abort an upload or start over."
+									},
+									"response": []
+								}
+							],
+							"id": "49009646-complete-chunked-test",
+							"description": "🧪 Complete workflow for testing chunked uploads with real files. Follow the steps in order for a guided testing experience."
+						},
+						{
 							"name": "1. Initialize Chunked Upload",
 							"event": [
 								{
@@ -1867,6 +2401,31 @@
 			"key": "lastUploadedAssetId",
 			"value": "",
 			"description": "ID of the most recently uploaded asset"
+		},
+		{
+			"key": "TEST_FILE_NAME",
+			"value": "",
+			"description": "Name of the test file for chunked upload (e.g., 'my-video.mp4')"
+		},
+		{
+			"key": "TEST_FILE_MIME_TYPE",
+			"value": "",
+			"description": "MIME type of the test file (e.g., 'video/mp4', 'image/jpeg')"
+		},
+		{
+			"key": "TEST_FILE_SIZE",
+			"value": "",
+			"description": "Size of the test file in bytes (e.g., 10485760 for 10MB)"
+		},
+		{
+			"key": "CHUNK_SIZE",
+			"value": "5242880",
+			"description": "Chunk size for uploads in bytes (default: 5MB)"
+		},
+		{
+			"key": "currentChunkIndex",
+			"value": "0",
+			"description": "Current chunk index for multi-chunk uploads"
 		}
 	]
 }
