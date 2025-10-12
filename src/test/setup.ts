@@ -63,6 +63,8 @@ declare global {
   var adminSessionToken: string;
   var basicUserId: string;
   var adminUserId: string;
+  var adminClientId: string;
+  var basicClientId: string;
 }
 
 // Initialize server once and create global test request instance
@@ -74,10 +76,12 @@ beforeAll(async () => {
   global.testRequest = request(app);
 
   basicClient.clientId = generateClientId();
+  global.basicClientId = basicClient.clientId;
   basicClient.clientSecret = generateClientSecret();
   basicClient.hashedSecret = await hashClientSecret(basicClient.clientSecret);
 
   adminClient.clientId = generateClientId();
+  global.adminClientId = adminClient.clientId;
   adminClient.clientSecret = generateClientSecret();
   adminClient.hashedSecret = await hashClientSecret(adminClient.clientSecret);
 

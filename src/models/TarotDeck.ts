@@ -10,7 +10,7 @@ export interface ITarotDeck extends Document {
   meta?: string[];
   layoutType?: string;
   layoutCount?: number;
-  status: 'active' | 'paused';
+  status: 'active' | 'paused' | 'deleted';
   createdAt: Date;
   updatedAt: Date;
 }
@@ -102,8 +102,8 @@ const tarotDeckSchema = new Schema<ITarotDeck>(
       type: String,
       required: true,
       enum: {
-        values: ['active', 'paused'],
-        message: 'Status must be either "active" or "paused"',
+        values: ['active', 'paused', 'deleted'],
+        message: 'Status must be either "active", "paused", or "deleted"',
       },
       default: 'active',
     },

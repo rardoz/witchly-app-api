@@ -113,9 +113,8 @@ describe('JWT Client Credentials Authentication', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${accessToken}`)
+      const response = await global
+        .adminUserAdminAppTestRequest()
         .send({ query: mutation });
 
       expect(response.status).toBe(200);

@@ -79,10 +79,10 @@ export class CreateTarotDeckInput {
   @Field({ nullable: true, defaultValue: 'active' })
   @IsOptional()
   @IsString()
-  @IsIn(['active', 'paused'], {
-    message: 'Status must be either "active" or "paused"',
+  @IsIn(['active', 'paused', 'deleted'], {
+    message: 'Status must be either "active", "paused", or "deleted"',
   })
-  status?: 'active' | 'paused';
+  status?: 'active' | 'paused' | 'deleted';
 }
 
 @InputType()
@@ -151,8 +151,8 @@ export class UpdateTarotDeckInput {
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
-  @IsIn(['active', 'paused'], {
-    message: 'Status must be either "active" or "paused"',
+  @IsIn(['active', 'paused', 'deleted'], {
+    message: 'Status must be either "active", "paused", or "deleted"',
   })
-  status?: 'active' | 'paused';
+  status?: 'active' | 'paused' | 'deleted';
 }

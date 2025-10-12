@@ -1,7 +1,6 @@
 // Global teardown file
 // This runs after all test suites have completed
 
-import 'dotenv/config'; // Load environment variables
 import mongoose from 'mongoose';
 import { disconnectDB, forceCloseDB } from '../config/database';
 
@@ -12,7 +11,9 @@ export default async (): Promise<void> => {
     if (mongoose.connection.readyState === 0) {
       const mongoUri = process.env.MONGODB_URI;
       if (mongoUri) {
-        await mongoose.connect(mongoUri);
+        await mongoose.connect(mongoUri, {
+          dbName: process.env.DB_NAME || 'test',
+        });
       }
     }
 

@@ -1,144 +1,11 @@
 import { Client } from '../models/Client';
 import {
-  generateClientId,
   generateClientSecret,
   hashClientSecret,
 } from '../services/jwt.service';
 
 describe('ClientResolver GraphQL Endpoints', () => {
-  let adminAccessToken: string;
-  let userAccessToken: string;
-
-  const adminTestClient = {
-    clientId: '',
-    clientSecret: '',
-    hashedSecret: '',
-  };
-
-  const userTestClient = {
-    clientId: '',
-    clientSecret: '',
-    hashedSecret: '',
-  };
-
-  beforeAll(async () => {
-    // Generate admin test client credentials
-    adminTestClient.clientId = generateClientId();
-    adminTestClient.clientSecret = generateClientSecret();
-    adminTestClient.hashedSecret = await hashClientSecret(
-      adminTestClient.clientSecret
-    );
-
-    // Create admin client in database
-    const adminClient = new Client({
-      clientId: adminTestClient.clientId,
-      clientSecret: adminTestClient.hashedSecret,
-      name: 'Admin Test Client',
-      description: 'Admin client for client resolver tests',
-      allowedScopes: ['read', 'write', 'admin'],
-      tokenExpiresIn: 3600,
-    });
-    await adminClient.save();
-
-    // Generate user test client credentials
-    userTestClient.clientId = generateClientId();
-    userTestClient.clientSecret = generateClientSecret();
-    userTestClient.hashedSecret = await hashClientSecret(
-      userTestClient.clientSecret
-    );
-
-    // Create user client in database
-    const userClient = new Client({
-      clientId: userTestClient.clientId,
-      clientSecret: userTestClient.hashedSecret,
-      name: 'User Test Client',
-      description: 'User client for client resolver tests',
-      allowedScopes: ['read', 'write'],
-      tokenExpiresIn: 3600,
-    });
-    await userClient.save();
-
-    // Get admin access token using GraphQL mutation
-    const adminMutation = `
-      mutation {
-        authenticate(
-          grant_type: "client_credentials"
-          client_id: "${adminTestClient.clientId}"
-          client_secret: "${adminTestClient.clientSecret}"
-          scope: "admin"
-        ) {
-          access_token
-        }
-      }
-    `;
-
-    const adminTokenResponse = await testRequest
-      .post('/graphql')
-      .send({ query: adminMutation });
-    adminAccessToken = adminTokenResponse.body.data.authenticate.access_token;
-
-    // Get user access token using GraphQL mutation
-    const userMutation = `
-      mutation {
-        authenticate(
-          grant_type: "client_credentials"
-          client_id: "${userTestClient.clientId}"
-          client_secret: "${userTestClient.clientSecret}"
-          scope: "read write"
-        ) {
-          access_token
-        }
-      }
-    `;
-
-    const userTokenResponse = await testRequest
-      .post('/graphql')
-      .send({ query: userMutation });
-    userAccessToken = userTokenResponse.body.data.authenticate.access_token;
-  }, 30000);
-
-  afterAll(async () => {
-    // Clean up test data
-    await Client.deleteMany({
-      $or: [
-        { clientId: adminTestClient.clientId },
-        { clientId: userTestClient.clientId },
-        { name: { $regex: /test|example/i } },
-      ],
-    });
-  });
-
-  afterEach(async () => {
-    // Clean up any clients created during tests (except the main test clients)
-    await Client.deleteMany({
-      clientId: {
-        $nin: [adminTestClient.clientId, userTestClient.clientId],
-      },
-      name: { $regex: /test|example/i },
-    });
-  });
-
   describe('Query: clients', () => {
-    beforeEach(async () => {
-      // Create some test clients for listing
-      await Client.create([
-        {
-          clientId: 'test-client-1',
-          clientSecret: await hashClientSecret('secret1'),
-          name: 'Test Client 1',
-          allowedScopes: ['read'],
-          tokenExpiresIn: 3600,
-        },
-        {
-          clientId: 'test-client-2',
-          clientSecret: await hashClientSecret('secret2'),
-          name: 'Test Client 2',
-          allowedScopes: ['read', 'write'],
-          tokenExpiresIn: 7200,
-        },
-      ]);
-    });
-
     it('should return list of clients with admin authentication', async () => {
       const query = `
         query {
@@ -156,9 +23,8 @@ describe('ClientResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${adminAccessToken}`)
+      const response = await global
+        .adminUserAdminAppTestRequest()
         .send({ query });
 
       expect(response.status).toBe(200);
@@ -180,9 +46,8 @@ describe('ClientResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${userAccessToken}`)
+      const response = await global
+        .basicUserBasicAppTestRequest()
         .send({ query });
 
       expect(response.status).toBe(401);
@@ -223,22 +88,15 @@ describe('ClientResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${adminAccessToken}`)
-        .send({
-          query,
-          variables: { clientId: userTestClient.clientId },
-        });
+      const response = await global.adminUserAdminAppTestRequest().send({
+        query,
+        variables: { clientId: global.basicClientId },
+      });
 
       expect(response.status).toBe(200);
       expect(response.body.data.client).toHaveProperty(
         'clientId',
-        userTestClient.clientId
-      );
-      expect(response.body.data.client).toHaveProperty(
-        'name',
-        'User Test Client'
+        global.basicClientId
       );
     });
 
@@ -254,22 +112,15 @@ describe('ClientResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${userAccessToken}`)
-        .send({
-          query,
-          variables: { clientId: userTestClient.clientId },
-        });
+      const response = await global.basicUserBasicAppTestRequest().send({
+        query,
+        variables: { clientId: global.basicClientId },
+      });
 
       expect(response.status).toBe(200);
       expect(response.body.data.client).toHaveProperty(
         'clientId',
-        userTestClient.clientId
-      );
-      expect(response.body.data.client).toHaveProperty(
-        'name',
-        'User Test Client'
+        global.basicClientId
       );
     });
 
@@ -284,13 +135,10 @@ describe('ClientResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${userAccessToken}`)
-        .send({
-          query,
-          variables: { clientId: adminTestClient.clientId },
-        });
+      const response = await global.basicUserBasicAppTestRequest().send({
+        query,
+        variables: { clientId: global.adminClientId },
+      });
 
       expect(response.status).toBe(403);
       expect(response.body.errors[0].extensions.code).toBe('FORBIDDEN');
@@ -307,13 +155,10 @@ describe('ClientResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${adminAccessToken}`)
-        .send({
-          query,
-          variables: { clientId: 'non-existent-client' },
-        });
+      const response = await global.adminUserAdminAppTestRequest().send({
+        query,
+        variables: { clientId: 'non-existent-client' },
+      });
 
       expect(response.status).toBe(200);
       expect(response.body.data.client).toBeNull();
@@ -338,13 +183,10 @@ describe('ClientResolver GraphQL Endpoints', () => {
         tokenExpiresIn: 7200,
       };
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${adminAccessToken}`)
-        .send({
-          query: mutation,
-          variables: { input },
-        });
+      const response = await global.adminUserAdminAppTestRequest().send({
+        query: mutation,
+        variables: { input },
+      });
 
       expect(response.status).toBe(200);
       expect(response.body.data.createClient).toHaveProperty('clientId');
@@ -379,13 +221,10 @@ describe('ClientResolver GraphQL Endpoints', () => {
         name: 'Minimal Test Client',
       };
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${adminAccessToken}`)
-        .send({
-          query: mutation,
-          variables: { input },
-        });
+      const response = await global.adminUserAdminAppTestRequest().send({
+        query: mutation,
+        variables: { input },
+      });
 
       expect(response.status).toBe(200);
       expect(response.body.data.createClient).toHaveProperty('clientId');
@@ -413,17 +252,14 @@ describe('ClientResolver GraphQL Endpoints', () => {
         name: 'Unauthorized Client',
       };
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${userAccessToken}`)
-        .send({
-          query: mutation,
-          variables: { input },
-        });
+      const response = await global.basicUserBasicAppTestRequest().send({
+        query: mutation,
+        variables: { input },
+      });
 
       expect(response.status).toBe(401);
       expect(response.body.errors[0].message).toContain(
-        'Admin access required'
+        'Admin session access required'
       );
     });
   });
@@ -473,13 +309,10 @@ describe('ClientResolver GraphQL Endpoints', () => {
         isActive: false,
       };
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${adminAccessToken}`)
-        .send({
-          query: mutation,
-          variables: { clientId: updateTestClientId, input },
-        });
+      const response = await global.adminUserAdminAppTestRequest().send({
+        query: mutation,
+        variables: { clientId: updateTestClientId, input },
+      });
 
       expect(response.status).toBe(200);
       expect(response.body.data.updateClient).toHaveProperty(
@@ -511,16 +344,13 @@ describe('ClientResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${adminAccessToken}`)
-        .send({
-          query: mutation,
-          variables: {
-            clientId: 'non-existent-client',
-            input: { name: 'Updated Name' },
-          },
-        });
+      const response = await global.adminUserAdminAppTestRequest().send({
+        query: mutation,
+        variables: {
+          clientId: 'non-existent-client',
+          input: { name: 'Updated Name' },
+        },
+      });
 
       expect(response.status).toBe(404);
       expect(response.body.errors[0].extensions.code).toBe('NOT_FOUND');
@@ -536,20 +366,17 @@ describe('ClientResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${userAccessToken}`)
-        .send({
-          query: mutation,
-          variables: {
-            clientId: updateTestClientId,
-            input: { name: 'Updated Name' },
-          },
-        });
+      const response = await global.basicUserBasicAppTestRequest().send({
+        query: mutation,
+        variables: {
+          clientId: global.basicClientId,
+          input: { name: 'Updated Name' },
+        },
+      });
 
       expect(response.status).toBe(401);
       expect(response.body.errors[0].message).toContain(
-        'Admin access required'
+        'Admin session access required'
       );
     });
   });
@@ -582,13 +409,10 @@ describe('ClientResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${adminAccessToken}`)
-        .send({
-          query: mutation,
-          variables: { clientId: deleteTestClientId },
-        });
+      const response = await global.adminUserAdminAppTestRequest().send({
+        query: mutation,
+        variables: { clientId: deleteTestClientId },
+      });
 
       expect(response.status).toBe(200);
       expect(response.body.data.deleteClient).toBe(true);
@@ -607,13 +431,10 @@ describe('ClientResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${adminAccessToken}`)
-        .send({
-          query: mutation,
-          variables: { clientId: 'non-existent-client' },
-        });
+      const response = await global.adminUserAdminAppTestRequest().send({
+        query: mutation,
+        variables: { clientId: 'non-existent-client' },
+      });
 
       expect(response.status).toBe(200);
       expect(response.body.data.deleteClient).toBe(false);
@@ -626,13 +447,10 @@ describe('ClientResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${userAccessToken}`)
-        .send({
-          query: mutation,
-          variables: { clientId: deleteTestClientId },
-        });
+      const response = await global.basicUserBasicAppTestRequest().send({
+        query: mutation,
+        variables: { clientId: deleteTestClientId },
+      });
 
       expect(response.status).toBe(401);
       expect(response.body.errors[0].message).toContain(
@@ -671,13 +489,10 @@ describe('ClientResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${adminAccessToken}`)
-        .send({
-          query: mutation,
-          variables: { clientId: regenTestClientId },
-        });
+      const response = await global.adminUserAdminAppTestRequest().send({
+        query: mutation,
+        variables: { clientId: regenTestClientId },
+      });
 
       expect(response.status).toBe(200);
       expect(response.body.data.regenerateClientSecret).toMatch(
@@ -703,14 +518,10 @@ describe('ClientResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${adminAccessToken}`)
-        .send({
-          query: mutation,
-          variables: { clientId: 'non-existent-client' },
-        });
-
+      const response = await global.adminUserAdminAppTestRequest().send({
+        query: mutation,
+        variables: { clientId: 'non-existent-client' },
+      });
       expect(response.status).toBe(404);
       expect(response.body.errors[0].extensions.code).toBe('NOT_FOUND');
     });
@@ -722,17 +533,13 @@ describe('ClientResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const response = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${userAccessToken}`)
-        .send({
-          query: mutation,
-          variables: { clientId: regenTestClientId },
-        });
-
+      const response = await global.basicUserBasicAppTestRequest().send({
+        query: mutation,
+        variables: { clientId: global.basicClientId },
+      });
       expect(response.status).toBe(401);
       expect(response.body.errors[0].message).toContain(
-        'Admin access required'
+        'Admin session access required'
       );
     });
   });
@@ -749,20 +556,17 @@ describe('ClientResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const createResponse = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${adminAccessToken}`)
-        .send({
-          query: createMutation,
-          variables: {
-            input: {
-              name: 'Lifecycle Test Client',
-              description: 'Full lifecycle test',
-              allowedScopes: ['read'],
-              tokenExpiresIn: 3600,
-            },
+      const createResponse = await global.adminUserAdminAppTestRequest().send({
+        query: createMutation,
+        variables: {
+          input: {
+            name: 'Lifecycle Test Client',
+            description: 'Full lifecycle test',
+            allowedScopes: ['read'],
+            tokenExpiresIn: 3600,
           },
-        });
+        },
+      });
 
       expect(createResponse.status).toBe(200);
       const clientId = createResponse.body.data.createClient.clientId;
@@ -781,13 +585,10 @@ describe('ClientResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const readResponse = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${adminAccessToken}`)
-        .send({
-          query: readQuery,
-          variables: { clientId },
-        });
+      const readResponse = await global.adminUserAdminAppTestRequest().send({
+        query: readQuery,
+        variables: { clientId },
+      });
 
       expect(readResponse.status).toBe(200);
       expect(readResponse.body.data.client.name).toBe('Lifecycle Test Client');
@@ -803,20 +604,17 @@ describe('ClientResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const updateResponse = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${adminAccessToken}`)
-        .send({
-          query: updateMutation,
-          variables: {
-            clientId,
-            input: {
-              name: 'Updated Lifecycle Client',
-              description: 'Updated description',
-              allowedScopes: ['read', 'write'],
-            },
+      const updateResponse = await global.adminUserAdminAppTestRequest().send({
+        query: updateMutation,
+        variables: {
+          clientId,
+          input: {
+            name: 'Updated Lifecycle Client',
+            description: 'Updated description',
+            allowedScopes: ['read', 'write'],
           },
-        });
+        },
+      });
 
       expect(updateResponse.status).toBe(200);
       expect(updateResponse.body.data.updateClient.name).toBe(
@@ -834,13 +632,10 @@ describe('ClientResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const regenResponse = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${adminAccessToken}`)
-        .send({
-          query: regenMutation,
-          variables: { clientId },
-        });
+      const regenResponse = await global.adminUserAdminAppTestRequest().send({
+        query: regenMutation,
+        variables: { clientId },
+      });
 
       expect(regenResponse.status).toBe(200);
       expect(regenResponse.body.data.regenerateClientSecret).not.toBe(
@@ -854,13 +649,10 @@ describe('ClientResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const deleteResponse = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${adminAccessToken}`)
-        .send({
-          query: deleteMutation,
-          variables: { clientId },
-        });
+      const deleteResponse = await global.adminUserAdminAppTestRequest().send({
+        query: deleteMutation,
+        variables: { clientId },
+      });
 
       expect(deleteResponse.status).toBe(200);
       expect(deleteResponse.body.data.deleteClient).toBe(true);
@@ -875,13 +667,10 @@ describe('ClientResolver GraphQL Endpoints', () => {
         }
       `;
 
-      const verifyResponse = await testRequest
-        .post('/graphql')
-        .set('Authorization', `Bearer ${adminAccessToken}`)
-        .send({
-          query: verifyQuery,
-          variables: { clientId },
-        });
+      const verifyResponse = await global.adminUserAdminAppTestRequest().send({
+        query: verifyQuery,
+        variables: { clientId },
+      });
 
       expect(verifyResponse.status).toBe(200);
       expect(verifyResponse.body.data.client).toBeNull();

@@ -27,7 +27,7 @@ export class TarotDeckResolver {
     @Arg('offset', () => Int, { nullable: true, defaultValue: 0 })
     offset: number,
     @Arg('status', () => String, { nullable: true, defaultValue: 'active' })
-    status: 'active' | 'paused'
+    status: 'active' | 'paused' | 'deleted'
   ): Promise<TarotDeckType[]> {
     context.hasUserReadAppReadScope(context);
 
@@ -87,8 +87,13 @@ export class TarotDeckResolver {
     }
 
     // Validate status if provided
-    if (input.status && !['active', 'paused'].includes(input.status)) {
-      throw new ValidationError('Status must be either "active" or "paused"');
+    if (
+      input.status &&
+      !['active', 'paused', 'deleted'].includes(input.status)
+    ) {
+      throw new ValidationError(
+        'Status must be either "active", "paused", or "deleted"'
+      );
     }
 
     try {
@@ -165,8 +170,13 @@ export class TarotDeckResolver {
     }
 
     // Validate status if provided
-    if (input.status && !['active', 'paused'].includes(input.status)) {
-      throw new ValidationError('Status must be either "active" or "paused"');
+    if (
+      input.status &&
+      !['active', 'paused', 'deleted'].includes(input.status)
+    ) {
+      throw new ValidationError(
+        'Status must be either "active", "paused", or "deleted"'
+      );
     }
 
     try {
@@ -233,8 +243,8 @@ export class TarotDeckResolver {
           message: 'Tarot deck permanently deleted',
         };
       } else {
-        // Soft delete by setting status to paused
-        deck.status = 'paused';
+        // Soft delete by setting status to deleted
+        deck.status = 'deleted';
         await deck.save();
         return {
           success: true,
