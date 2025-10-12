@@ -1525,7 +1525,8 @@
 													"}"
 												],
 												"type": "text/javascript",
-												"packages": {}
+												"packages": {},
+												"requests": {}
 											}
 										}
 									],
@@ -1553,7 +1554,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"fileName\": \"test-file.jpg\",\n    \"mimeType\": \"image/jpeg\",\n    \"totalSize\": 5242880,\n    \"chunkSize\": 5242880,\n    \"totalChunks\": 1\n}",
+											"raw": "{\n    \"fileName\": \"test-file.jpg\",\n    \"mimeType\": \"test-upload.png\",\n    \"totalSize\": 2237072,\n    \"chunkSize\": 100,\n    \"totalChunks\": 1\n}",
 											"options": {
 												"raw": {
 													"language": "json"
