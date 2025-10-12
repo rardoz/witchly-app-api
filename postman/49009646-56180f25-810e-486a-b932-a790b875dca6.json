@@ -913,7 +913,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"query\": \"mutation DeleteClient($clientId: String!) {\\n    deleteClient(clientId: $clientId)\\n  }\",\n  \"variables\": {\n    \"clientId\": \"CLIENT_ID_HERE\"\n  }\n}"
+							"raw": ""
 						},
 						"url": {
 							"raw": "{{baseUrl}}/graphql",
