@@ -2,52 +2,30 @@
 
 A modern TypeScript Express.js API with GraphQL and MongoDB integration, featuring comprehensive tooling for development, testing, and code quality.
 
-## 🆕 Recent Updates (October 2025)
+## 📚 Table of Contents
 
-### Code Consolidation & User Model Improvements
-
-Recent enhancements focused on eliminating code duplication, streamlining the authentication system, and improving the user data model:
-
-#### ✅ **User Model Enhancement: `allowedScopes` Field**
-- **Renamed Field**: Changed user `scopes` field to `allowedScopes` for better clarity and consistency
-- **Clear Semantics**: The new name better represents that this field defines what scopes a user is permitted to have
-- **GraphQL Schema Updated**: All GraphQL types, inputs, and queries now use `allowedScopes`
-- **Test Suite Updated**: All 149 tests updated and passing with the new field name
-- **API Consistency**: Aligns user scopes with similar naming patterns used for OAuth2 client `allowedScopes`
-
-#### ✅ **Unified Login System**
-- **Consolidated Login Methods**: Combined separate `completeLogin` and `loginWithSession` methods into a single `completeLogin` endpoint
-- **Enhanced API**: New login method supports both session and non-session authentication with optional `keepMeLoggedIn` parameter
-- **Backward Compatibility**: Maintains all existing functionality while simplifying the API surface
-- **Session Integration**: Seamless integration with the comprehensive session management system
-
-#### ✅ **Merged Authentication Middleware**
-- **Unified Middleware**: Combined `auth.middleware.ts` and `enhanced-auth.middleware.ts` into a single, powerful authentication layer
-- **Dual Support**: Single middleware now handles both OAuth2 client credentials and user session authentication
-- **Enhanced Context**: Improved GraphQL context with comprehensive authentication information
-- **Simplified Architecture**: Reduced codebase complexity while maintaining full functionality
-
-#### ✅ **Updated Test Suite**
-- **Test Compatibility**: Updated all login resolver tests to use the new unified API structure
-- **Enhanced Coverage**: Maintained 100% test coverage while adapting to consolidated code
-- **Type Safety**: Improved TypeScript integration in test files
-- **Comprehensive Validation**: All 117+ tests passing with updated authentication flow
-
-#### 🎯 **Benefits Achieved**
-- **Reduced Code Duplication**: Eliminated redundant authentication patterns across the codebase
-- **Improved Maintainability**: Single source of truth for authentication logic
-- **Enhanced Developer Experience**: Simplified API with fewer endpoints to manage
-- **Preserved Functionality**: Zero breaking changes to existing session management capabilities
-- **Better Performance**: Reduced middleware overhead with unified authentication handling
-
-#### 📁 **Files Modified in This Update**
-- `src/graphql/resolvers/LoginResolver.ts` - Consolidated login methods into unified `completeLogin`
-- `src/middleware/auth.middleware.ts` - Enhanced to support both OAuth2 and session authentication
-- `src/test/login-resolver.test.ts` - Updated tests for new API structure
-- `src/graphql/server.ts` - Updated to include consolidated resolvers
-- ~~`src/middleware/enhanced-auth.middleware.ts`~~ - Removed (functionality merged into auth.middleware.ts)
-
-These improvements make the API more maintainable while preserving all the sophisticated authentication and session management features that make Witchly App API production-ready.
+- [🚀 Tech Stack](#-tech-stack)
+- [📋 Prerequisites](#-prerequisites)
+- [🛠️ Setup](#️-setup)
+- [🏗️ Project Structure](#️-project-structure)
+- [📊 Database (MongoDB + Mongoose)](#-database-mongodb--mongoose)
+- [🔗 GraphQL API (Apollo Server + type-graphql)](#-graphql-api-apollo-server--type-graphql)
+- [⚠️ Error Handling with HTTP Status Codes](#️-error-handling-with-http-status-codes)
+- [📧 Email Service & Two-Phase Signup System](#-email-service--two-phase-signup-system)
+- [👤 User Profile System](#-user-profile-system)
+- [🔐 JWT Authentication (Client Credentials)](#-jwt-authentication-client-credentials)
+- [🔒 Comprehensive Scope Validation System](#-comprehensive-scope-validation-system)
+- [📱 Session Management System](#-session-management-system)
+- [🛡️ Advanced Session Security Features](#️-advanced-session-security-features)
+- [🔮 Tarot Deck Management System](#-tarot-deck-management-system)
+- [🧪 Comprehensive Testing Suite](#-comprehensive-testing-suite)
+- [📋 Postman Collection](#-postman-collection)
+- [🚀 DevOps & Development Tools](#-devops--development-tools)
+- [🌐 Production Deployment](#-production-deployment)
+- [🔧 Development Workflow](#-development-workflow)
+- [📝 Environment Variables](#-environment-variables)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
 
 ## 🚀 Tech Stack
 
@@ -56,6 +34,7 @@ These improvements make the API more maintainable while preserving all the sophi
 - **Database**: MongoDB with Mongoose ODM
 - **API**: GraphQL with Apollo Server v5 and type-graphql
 - **Authentication**: JWT with OAuth2 Client Credentials flow and comprehensive scope validation
+- **Session Management**: User sessions with JWT tokens and refresh token support
 - **Testing**: Jest with Supertest for HTTP testing
 - **Code Quality**: Biome for linting and formatting
 - **Git Hooks**: Husky with lint-staged for pre-commit checks
@@ -846,9 +825,16 @@ npm run test:email
 
 ## 👤 User Profile System
 
-The API supports comprehensive user profiles with 24 fields covering personal information, social media handles, and preferences.
+The API supports comprehensive user profiles with 24 fields covering personal information, social media handles, preferences, and permission management.
 
 ### Core Profile Fields
+
+#### User Management & Permissions
+- `allowedScopes` - Array of permitted scopes for the user (`read`, `write`, `admin`, `basic`)
+- `handle` - Unique user identifier/username
+- `email` - Email address (unique, verified through signup process)
+- `emailVerified` - Boolean flag indicating email verification status
+- `userType` - User classification (defaults to 'basic')
 
 #### Personal Information
 - `name` - Full name (1-100 characters)
@@ -2601,7 +2587,7 @@ The session management system provides a robust foundation for user authenticati
 
 ### Session Hijacking Prevention System
 
-**Recent Enhancement (October 2025)**: The session management system now includes advanced security features that provide robust protection against session hijacking attacks through comprehensive IP address and User-Agent validation.
+The session management system includes advanced security features that provide robust protection against session hijacking attacks through comprehensive IP address and User-Agent validation.
 
 #### Security Architecture
 
