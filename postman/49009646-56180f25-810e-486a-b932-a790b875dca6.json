@@ -1880,7 +1880,7 @@
 								}
 							],
 							"id": "49009646-complete-chunked-test",
-							"description": "🧪 Complete workflow for testing chunked uploads with real files. Follow the steps in order for a guided testing experience."
+							"description": "🧪 Complete workflow for testing chunked uploads with real files. Follow the steps in order for a guided testing experience.\n\nYou need to get the file meta data and you can do that by running this command against the file you are uploading:  \n  \nls -l your-test-file.mp4"
 						},
 						{
 							"name": "1. Initialize Chunked Upload",
