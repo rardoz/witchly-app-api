@@ -851,7 +851,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"query\": \"mutation CreateClient($input: CreateClientInput!) {\\n    createClient(input: $input) {\\n      clientId\\n      clientSecret\\n    }\\n  }\",\n  \"variables\": {\n    \"input\": {\n      \"name\": \"Test Client\",\n      \"description\": \"A test OAuth2 client\",\n      \"allowedScopes\": [\"read\", \"write\"]\n    }\n  }\n}"
+							"raw": ""
 						},
 						"url": {
 							"raw": "{{baseUrl}}/graphql",
