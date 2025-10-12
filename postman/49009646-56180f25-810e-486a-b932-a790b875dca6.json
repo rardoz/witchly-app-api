@@ -1273,7 +1273,8 @@
 											"}"
 										],
 										"type": "text/javascript",
-										"packages": {}
+										"packages": {},
+										"requests": {}
 									}
 								}
 							],
@@ -1302,7 +1303,7 @@
 											"key": "file",
 											"description": "Select an image or video file to upload (max 50MB for images, 500MB for videos)",
 											"type": "file",
-											"src": []
+											"src": "/Users/slayanne/Downloads/hail-satin-rainbow.png"
 										}
 									]
 								},
