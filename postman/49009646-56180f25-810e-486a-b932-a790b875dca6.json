@@ -788,7 +788,7 @@
 					"response": []
 				},
 				{
-					"name": "Get Client by ID",
+					"name": "Get Client by ID (Admin Only)",
 					"id": "49009646-cdc147fb-cc47-4a51-95c5-163644c277e1",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
