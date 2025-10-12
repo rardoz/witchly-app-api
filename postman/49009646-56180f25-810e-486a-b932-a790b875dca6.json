@@ -944,8 +944,11 @@
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": ""
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation DeleteClient($clientId: String!) {\n    deleteClient(clientId: $clientId)\n}",
+								"variables": "{\n    \"clientId\": \"client_35502a1b5f12241576c66b8440799204\"\n  }"
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/graphql",
