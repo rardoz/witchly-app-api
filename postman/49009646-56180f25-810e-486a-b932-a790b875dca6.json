@@ -962,8 +962,11 @@
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": ""
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation RegenerateClientSecret($clientId: String!) {    regenerateClientSecret(clientId: $clientId)  \n}",
+								"variables": " {\n    \"clientId\": \"68e09bcfd38dd4f03e8adc11\"\n  }"
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/graphql",
