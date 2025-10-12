@@ -965,7 +965,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation RegenerateClientSecret($clientId: String!) {    regenerateClientSecret(clientId: $clientId)  \n}",
-								"variables": " {\n    \"clientId\": \"68e09bcfd38dd4f03e8adc11\"\n  }"
+								"variables": " {\n    \"clientId\": \"update-test-client\"\n  }"
 							}
 						},
 						"url": {
