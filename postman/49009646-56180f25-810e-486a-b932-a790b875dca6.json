@@ -1083,7 +1083,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "query GetTarotDeck($id: ID!) {\n    tarotDeck(id: $id) {\n        id\n        name\n        primaryImageUrl\n        cardBackgroundUrl\n        primaryColor\n        description\n        author\n        meta\n        layoutType\n        layoutCount\n        status\n        createdAt\n        updatedAt\n    }\n}",
-								"variables": "{\n    \"id\": \"68e9a8a738af61fcb45f7a33\"\n}"
+								"variables": "{\n    \"id\": \"68eb328199dcfa82327d86ed\"\n}"
 							}
 						},
 						"url": {
