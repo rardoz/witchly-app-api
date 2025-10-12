@@ -19,9 +19,9 @@ A modern TypeScript Express.js API with GraphQL and MongoDB integration, featuri
 - [🛡️ Advanced Session Security Features](#️-advanced-session-security-features)
 - [🔮 Tarot Deck Management System](#-tarot-deck-management-system)
 - [🧪 Comprehensive Testing Suite](#-comprehensive-testing-suite)
-- [📋 Postman Collection](#-postman-collection)
+- [📋 Postman Collection](#-postman-collection--api-documentation)
 - [🚀 DevOps & Development Tools](#-devops--development-tools)
-- [🌐 Production Deployment](#-production-deployment)
+- [🌐 Deployment](#-deployment)
 - [🔧 Development Workflow](#-development-workflow)
 - [📝 Environment Variables](#-environment-variables)
 - [🤝 Contributing](#-contributing)
@@ -119,29 +119,29 @@ src/
 │   ├── types/
 │   │   ├── User.ts          # GraphQL type definitions
 │   │   ├── ClientType.ts    # Client management types
-│   │   ├── SessionTypes.ts  # Session management types (NEW)
+│   │   ├── SessionTypes.ts  # Session management types
 │   │   └── Auth.ts          # Authentication response types
 │   ├── inputs/
 │   │   ├── UserInput.ts     # Input types for mutations
-│   │   └── SessionInput.ts  # Session operation inputs (NEW)
+│   │   └── SessionInput.ts  # Session operation inputs
 │   ├── resolvers/
 │   │   ├── UserResolver.ts  # User operations with enhanced scope validation
 │   │   ├── ClientResolver.ts # Client management (admin only)
 │   │   ├── AuthResolver.ts  # Authentication mutations
 │   │   ├── LoginResolver.ts # Unified login with session support (ENHANCED)
-│   │   └── SessionResolver.ts # Session management operations (NEW)
+│   │   └── SessionResolver.ts # Session management operations
 │   └── server.ts            # Apollo Server setup with enhanced auth context
 ├── services/
 │   ├── jwt.service.ts       # JWT token generation and validation
-│   └── session.service.ts   # Session management service (NEW)
+│   └── session.service.ts   # Session management service
 ├── test/
 │   ├── setup.ts             # Enhanced Jest test configuration with dual auth support
 │   ├── app.test.ts          # Basic app tests
 │   ├── auth.test.ts         # Authentication flow tests
-│   ├── session.test.ts      # Session management tests (NEW)
+│   ├── session.test.ts      # Session management tests
 │   ├── scopes.test.ts       # Scope validation unit tests
 │   ├── required-scope.test.ts # Required scope parameter tests
-│   ├── tarot-deck-resolver.test.ts # Tarot deck operations with dual auth (NEW)
+│   ├── tarot-deck-resolver.test.ts # Tarot deck operations with dual auth
 │   └── auth-scope-validation.test.ts # Scope integration tests
 ├── app.ts                   # Express app with GraphQL and enhanced auth
 └── index.ts                 # Server entry point
@@ -224,7 +224,7 @@ export class UserResolver {
 - `updateUser(id: ID!, input: UpdateUserInput!)` - Update user
 - `deleteUser(id: ID!)` - Delete user
 
-## 🔮 Tarot Deck Management System (NEW)
+## 🔮 Tarot Deck Management System
 
 ### Overview
 
@@ -1550,7 +1550,7 @@ The API features enterprise-grade testing with **2000+ lines of test code** cove
 declare global {
   var testRequest: ReturnType<typeof request>;
   
-  // Pre-configured request helpers (NEW)
+  // Pre-configured request helpers
   var adminUserAdminAppTestRequest: () => Test;  // Admin user + admin app credentials
   var basicUserBasicAppTestRequest: () => Test;  // Basic user + basic app credentials  
   var basicUserAdminAppTestRequest: () => Test;  // Basic user + admin app credentials
@@ -2329,7 +2329,7 @@ export interface GraphQLContext {
   // Request information
   request: Request;
 
-  // Enhanced helper functions for common permission patterns (NEW)
+  // Enhanced helper functions for common permission patterns
   hasAppAdminScope: (context: GraphQLContext) => void;
   hasAppWriteScope: (context: GraphQLContext) => void;
   hasAppReadScope: (context: GraphQLContext) => void;
