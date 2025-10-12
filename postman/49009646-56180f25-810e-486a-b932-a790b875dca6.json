@@ -1100,44 +1100,6 @@
 					"response": []
 				},
 				{
-					"name": "Get Tarot Decks by Status",
-					"id": "49009646-tarot-get-by-status",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "X-Session-Token",
-								"value": "{{sessionToken}}"
-							}
-						],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "query GetTarotDecksByStatus($status: String!) {\n    tarotDecksByStatus(status: $status) {\n        id\n        name\n        primaryImageUrl\n        cardBackgroundUrl\n        primaryColor\n        description\n        author\n        meta\n        layoutType\n        layoutCount\n        status\n        createdAt\n        updatedAt\n    }\n}",
-								"variables": "{\n    \"status\": \"active\"\n}"
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/graphql",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"graphql"
-							]
-						},
-						"description": "Get all tarot decks filtered by specific status (active or paused). Requires read scope."
-					},
-					"response": []
-				},
-				{
 					"name": "Create Tarot Deck",
 					"id": "49009646-tarot-create",
 					"protocolProfileBehavior": {
