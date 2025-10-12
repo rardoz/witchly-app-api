@@ -697,7 +697,7 @@ mutation {
 ```
 Response: `"User with this email already exists"` with HTTP 409
 
-## � Email Service & Two-Phase Signup System
+## 📧 Email Service & Two-Phase Signup System
 
 The API features a sophisticated two-phase signup system with email verification, powered by AWS SES integration.
 
@@ -771,20 +771,300 @@ mutation CompleteSignup {
 3. Marks email as verified
 4. Cleans up verification records
 
-### Email Templates
+### Email Templates & Handlebars Integration
 
-#### Verification Email Template
-- **Subject**: "Verify your email address"
-- **HTML Version**: Branded template with verification code
-- **Security**: 6-digit codes, 10-minute expiration
+The API features a sophisticated email template system powered by **Handlebars** templating engine with template caching, dynamic data injection, and professional HTML designs.
 
-#### Rate Limiting & Security Features
+#### Template Architecture
 
-- **1-minute cooldown** between verification code requests
-- **3-attempt limit** for code verification
-- **bcrypt hashing** for stored verification codes
-- **Auto-cleanup** via MongoDB TTL indexes
-- **Graceful email failures** (signup doesn't fail if email sending fails)
+**Email Template Service** (`src/services/email-template.service.ts`)
+- **Handlebars Integration**: Full support for dynamic template compilation
+- **Template Caching**: In-memory caching for performance optimization
+- **Dynamic Subject Lines**: Template-specific subject generation
+- **Type-Safe Data**: TypeScript interfaces for template data validation
+
+#### Available Email Templates
+
+##### 1. Signup Verification Template (`signup-verification.html`)
+```typescript
+// Template usage
+const template = await emailTemplateService.getTemplate('signup-verification', {
+  code: '123456',
+  expiryMinutes: 15
+});
+```
+
+**Template Features:**
+- **Subject**: "Your Witchly Verification Code"
+- **Handlebars Variables**: `{{code}}`, `{{expiryMinutes}}`
+- **Responsive Design**: Mobile-optimized HTML layout
+- **Branded Styling**: Witchly visual identity with purple accent colors
+- **Security Indicators**: Visual warnings about code expiration
+
+##### 2. Login Verification Template (`login-verification.html`)
+```typescript
+// Template usage with personalization
+const template = await emailTemplateService.getTemplate('login-verification', {
+  code: '456789',
+  expiryMinutes: 15,
+  userName: 'Jane Doe'
+});
+```
+
+**Template Features:**
+- **Subject**: "Your login verification code"
+- **Handlebars Variables**: `{{code}}`, `{{expiryMinutes}}`, `{{userName}}`
+- **Personalized Greeting**: Dynamic user name integration
+- **Consistent Branding**: Matches signup template design language
+
+#### Handlebars Template Structure
+
+**Template Data Interface:**
+```typescript
+interface EmailTemplateData {
+  code: string;                    // Verification code (required)
+  expiryMinutes: number;          // Code expiration time (required)
+  userName?: string;              // User personalization (optional)
+  [key: string]: unknown;        // Extensible for future data
+}
+```
+
+**Template Compilation Process:**
+1. **Template Loading**: HTML files loaded from `src/templates/emails/`
+2. **Handlebars Compilation**: Templates compiled into executable functions
+3. **Memory Caching**: Compiled templates cached for performance
+4. **Data Injection**: Dynamic data merged with template at runtime
+5. **HTML Generation**: Final HTML output with substituted variables
+
+#### Template File Structure
+
+```
+src/templates/emails/
+├── signup-verification.html     # Account creation verification
+└── login-verification.html      # Login verification
+```
+
+**HTML Template Example:**
+```html
+<!-- Handlebars variable substitution -->
+<div class="verification-code">{{code}}</div>
+
+<!-- Conditional logic support -->
+{{#if userName}}
+  <p class="greeting">Hello {{userName}},</p>
+{{else}}
+  <p class="greeting">Hello,</p>
+{{/if}}
+
+<!-- Dynamic content with fallbacks -->
+<p>This code expires in {{expiryMinutes}} minutes.</p>
+```
+
+#### Professional Email Design Features
+
+**Visual Design Elements:**
+- **Typography**: Modern system font stack (`-apple-system`, `BlinkMacSystemFont`, `Segoe UI`)
+- **Color Scheme**: Purple branding (`#6b46c1`, `#4F46E5`) with neutral grays
+- **Layout**: Centered 600px responsive container with proper spacing
+- **Code Display**: Monospace font with enhanced visibility and letter spacing
+
+**Accessibility Features:**
+- **High Contrast**: WCAG-compliant color combinations
+- **Readable Fonts**: Large, clear typography for verification codes
+- **Mobile Responsive**: Viewport meta tag and flexible layouts
+- **Screen Reader Support**: Semantic HTML structure
+
+**Security Design:**
+- **Visual Warnings**: Highlighted expiration notices with warning colors
+- **Code Emphasis**: Verification codes prominently displayed in bordered containers
+- **Clear Instructions**: Step-by-step guidance for code usage
+
+#### Template Caching & Performance
+
+**Cache Management:**
+```typescript
+// Template caching for performance
+private templateCache = new Map<string, {
+  htmlTemplate: HandlebarsTemplateDelegate;
+}>();
+
+// Cache invalidation for development
+emailTemplateService.clearCache();
+```
+
+**Performance Benefits:**
+- **First Load**: Template compilation on initial request
+- **Subsequent Requests**: Instant cache retrieval
+- **Memory Efficient**: Only stores compiled template functions
+- **Development Support**: Cache clearing for template updates
+
+### Verification Code & Token Management
+
+The API implements enterprise-grade verification code and token handling with comprehensive security measures, rate limiting, and automatic cleanup.
+
+#### Verification Code Generation
+
+**Secure Code Generation** (`VerificationService`)
+```typescript
+// 6-digit cryptographically random codes
+const codeResult = VerificationService.generateVerificationCode();
+// Returns: { code: '123456', expiresAt: Date, hashedCode: '' }
+
+// Secure bcrypt hashing (12 rounds)
+const hashedCode = await VerificationService.hashVerificationCode(code);
+```
+
+**Security Features:**
+- **6-Digit Format**: Exactly 6 numeric digits for optimal UX and security balance
+- **Cryptographic Randomness**: `Math.random()` within secure range (100000-999999)
+- **Bcrypt Hashing**: 12-round hashing before database storage
+- **Time-Limited**: 15-minute expiration window for security
+- **No Plain Text Storage**: Codes never stored in readable format
+
+#### Advanced Rate Limiting System
+
+**Multi-Layer Rate Protection:**
+```typescript
+// 1-minute cooldown between verification requests
+await VerificationService.enforceRateLimit(email);
+
+// 3-attempt limit per verification code
+const validation = await VerificationService.findAndValidateVerification(email, code);
+```
+
+**Rate Limiting Features:**
+- **Request Cooldown**: 1-minute minimum between verification code requests
+- **Attempt Limiting**: Maximum 3 attempts per verification code
+- **Automatic Cleanup**: Failed verification records auto-deleted after max attempts
+- **Progressive Feedback**: Remaining attempt count provided to users
+- **Security Escalation**: Rate limit errors escalate to new code requirement
+
+#### Token Validation & Security
+
+**Comprehensive Validation Pipeline:**
+```typescript
+// Format validation (6 digits only)
+VerificationService.validateVerificationCodeFormat(code);
+
+// Email format validation
+VerificationService.validateEmailFormat(email);
+
+// Database lookup with expiration check
+const verification = await EmailVerification.findOne({
+  email,
+  verified: false,
+  expiresAt: { $gt: new Date() }  // Not expired
+});
+
+// Secure bcrypt comparison
+const isValid = await bcrypt.compare(verificationCode, verification.code);
+```
+
+**Validation Security Layers:**
+1. **Format Validation**: Ensures exactly 6 numeric digits
+2. **Email Validation**: Uses `validator` library for RFC-compliant email checking
+3. **Expiration Checking**: Server-side timestamp validation
+4. **Attempt Tracking**: Database-stored attempt counter per verification
+5. **Cryptographic Verification**: bcrypt comparison for code validation
+
+#### Database Security & Cleanup
+
+**MongoDB TTL Indexes** (Time-To-Live)
+```typescript
+// Automatic document expiration
+emailVerificationSchema.index({ expireAfterSeconds: 0 });
+
+// Manual cleanup functions
+await VerificationService.cleanupExistingVerifications(email);
+await VerificationService.completeVerification(email);
+```
+
+**Cleanup Features:**
+- **TTL Indexes**: MongoDB automatically removes expired verification records
+- **Manual Cleanup**: Service functions for immediate cleanup after verification
+- **Duplicate Prevention**: Existing codes removed before generating new ones
+- **Zero Persistence**: No verification data retained after successful completion
+
+#### Token Lifecycle Management
+
+**Complete Verification Flow:**
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant API as API Server
+    participant DB as Database
+    participant Email as Email Service
+
+    U->>API: Request verification code
+    API->>DB: Check rate limiting
+    API->>API: Generate 6-digit code
+    API->>API: Hash with bcrypt (12 rounds)
+    API->>DB: Store hashed code + expiry
+    API->>Email: Send code via template
+    Email->>U: Receive verification email
+    
+    U->>API: Submit verification code
+    API->>DB: Find active verification
+    API->>API: Validate attempts < 3
+    API->>API: bcrypt.compare(code, hash)
+    API->>DB: Complete verification
+    API->>DB: Cleanup verification records
+    API->>U: Success response
+```
+
+#### Error Handling & User Feedback
+
+**Comprehensive Error States:**
+```typescript
+// Rate limiting errors
+throw new TooManyRequestsError(
+  'Please wait at least 1 minute before requesting another verification code'
+);
+
+// Attempt limit errors
+throw new TooManyRequestsError(
+  'Too many failed attempts. Please request a new verification code.'
+);
+
+// Validation errors with attempt feedback
+throw new ValidationError(
+  `Invalid verification code. ${remainingAttempts} attempts remaining.`
+);
+
+// Expiration errors
+throw new NotFoundError(
+  'Verification code not found or expired. Please request a new code.'
+);
+```
+
+**User Experience Features:**
+- **Clear Error Messages**: Descriptive feedback for each error scenario
+- **Attempt Counting**: Users informed of remaining attempts
+- **Guidance Provided**: Clear instructions for resolution
+- **Progressive Disclosure**: Appropriate detail level for each error type
+
+#### Development & Testing Support
+
+**Development Mode Features:**
+```typescript
+// Console logging for development
+if (process.env.NODE_ENV === 'development') {
+  console.log(`Generated verification code: ${code}`);
+}
+
+// Test utilities
+static get CODE_EXPIRY_MINUTES_VALUE(): number {
+  return VerificationService.CODE_EXPIRY_MINUTES;
+}
+```
+
+**Testing Integration:**
+- **Configurable Constants**: Expiry times and limits exposed for testing
+- **Service Methods**: Static methods for easy unit testing
+- **Mock Support**: Email service can be mocked for testing
+- **Clean State**: Verification cleanup ensures test isolation
+
+This verification system provides enterprise-level security while maintaining excellent user experience through clear feedback, reasonable time limits, and comprehensive error handling.
 
 ### Signup Error Handling
 
