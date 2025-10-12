@@ -1325,9 +1325,10 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "14bfee27-43f1-435d-bec4-2836e15bd0e0",
+				"id": "5cdf1604-28b0-42f4-9561-34c60d6fc0f4",
 				"type": "text/javascript",
 				"packages": {},
+				"requests": {},
 				"exec": [
 					""
 				]
@@ -1336,9 +1337,10 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "5e452c9b-6770-4b41-8e83-ed4dfec38914",
+				"id": "1c671dcf-800f-42b9-a30e-c8b801eeea13",
 				"type": "text/javascript",
 				"packages": {},
+				"requests": {},
 				"exec": [
 					""
 				]
@@ -1348,25 +1350,21 @@
 	"variable": [
 		{
 			"key": "accessToken",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
 			"key": "sessionToken",
 			"value": "",
-			"type": "string",
 			"description": "User session token for session-based authentication"
 		},
 		{
 			"key": "refreshToken",
 			"value": "",
-			"type": "string",
 			"description": "Refresh token for long-term sessions (keepMeLoggedIn: true)"
 		},
 		{
 			"key": "userId",
 			"value": "",
-			"type": "string",
 			"description": "Current user ID from login/session"
 		}
 	]
