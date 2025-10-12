@@ -10,9 +10,6 @@ export class User extends BaseProfileObjectType {
   email: string;
 
   @Field()
-  emailVerified: boolean;
-
-  @Field()
   handle: string;
 
   @Field(() => Date, { nullable: true })

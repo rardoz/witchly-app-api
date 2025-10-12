@@ -1,5 +1,4 @@
 import { type Request } from 'express';
-import { connectDB, disconnectDB } from '../config/database';
 import { type IUser, User } from '../models/User';
 import { UserSession } from '../models/UserSession';
 import { SessionService } from '../services/session.service';
@@ -11,14 +10,6 @@ interface MockRequest extends Partial<Request> {
 }
 
 describe('Session Security', () => {
-  beforeAll(async () => {
-    await connectDB();
-  });
-
-  afterAll(async () => {
-    await disconnectDB();
-  });
-
   beforeEach(async () => {
     // Clean up before each test with more specific targeting
     await User.deleteMany({

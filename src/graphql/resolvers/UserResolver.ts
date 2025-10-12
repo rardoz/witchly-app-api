@@ -23,9 +23,7 @@ export class UserResolver {
     @Arg('offset', () => Number, { nullable: true, defaultValue: 0 })
     offset: number
   ): Promise<UserType[]> {
-    if (!context.isAuthenticated || !context.hasScope('read')) {
-      throw new UnauthorizedError('Read access required');
-    }
+    context.hasUserReadAppReadScope(context);
 
     // Validate pagination parameters
     if (limit < 1 || limit > 100) {
@@ -48,9 +46,7 @@ export class UserResolver {
     @Ctx() context: GraphQLContext,
     @Arg('id', () => ID) id: string
   ): Promise<UserType | null> {
-    if (!context.isAuthenticated || !context.hasScope('read')) {
-      throw new UnauthorizedError('Read access required');
-    }
+    context.hasUserReadAppReadScope(context);
 
     const user = await UserModel.findById(id);
     if (!user) {
@@ -65,12 +61,8 @@ export class UserResolver {
     @Ctx() context: GraphQLContext,
     @Arg('input', () => CreateUserInput) input: CreateUserInput
   ): Promise<UserType> {
-    if (!context.isAuthenticated || !context.hasScope('write')) {
-      throw new UnauthorizedError('Write access required');
-    }
-    if (!context.hasUserScope('admin') && input.allowedScopes) {
-      throw new UnauthorizedError('Admin access required to set scopes');
-    }
+    // typical users will do this through the signup journey
+    context.hasUserAdminWriteAppWriteScope(context);
 
     try {
       const user = await UserModel.create(input);
@@ -92,12 +84,10 @@ export class UserResolver {
     @Arg('id', () => ID) id: string,
     @Arg('input', () => UpdateUserInput) input: UpdateUserInput
   ): Promise<UserType> {
-    if (!context.isAuthenticated || !context.hasScope('write')) {
-      throw new UnauthorizedError('Write access required');
-    }
+    context.hasAppWriteScope(context);
 
     if (!context.hasUserScope('admin') && input.allowedScopes) {
-      throw new UnauthorizedError('Admin access required to set scopes');
+      throw new UnauthorizedError('Admin session access required');
     }
 
     if (context.userId !== id.toString() && !context.hasUserScope('admin')) {
@@ -117,9 +107,7 @@ export class UserResolver {
     @Ctx() context: GraphQLContext,
     @Arg('id', () => ID) id: string
   ): Promise<boolean> {
-    if (!context.isAuthenticated || !context.hasScope('write')) {
-      throw new UnauthorizedError('Write access required');
-    }
+    context.hasAppWriteScope(context);
 
     if (context.userId !== id && !context.hasUserScope('admin')) {
       throw new UnauthorizedError('Users can only delete their own accounts');

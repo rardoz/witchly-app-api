@@ -9,7 +9,10 @@ export const connectDB = async (): Promise<void> => {
     }
 
     await mongoose.connect(mongoUri, { dbName: process.env.DB_NAME || 'test' });
-    console.log('MongoDB connected successfully');
+    console.log(
+      'MongoDB connected successfully to DB with name:',
+      process.env.DB_NAME || 'test'
+    );
   } catch (error) {
     console.error('MongoDB connection error:', error);
     if (process.env.NODE_ENV !== 'test') {

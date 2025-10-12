@@ -14,9 +14,7 @@ import {
 export class SessionResolver {
   @Query(() => [SessionInfoType])
   async mySessions(@Ctx() context: GraphQLContext): Promise<SessionInfoType[]> {
-    if (!context.isAuthenticated || !context.hasScope('read')) {
-      throw new UnauthorizedError('Read access required');
-    }
+    context.hasAppReadScope(context);
     if (!context.isUserAuthenticated || !context.sessionInfo) {
       throw new UnauthorizedError('User session required to view sessions');
     }
@@ -42,9 +40,7 @@ export class SessionResolver {
     @Ctx() context: GraphQLContext,
     @Arg('input') input: RefreshSessionInput
   ): Promise<RefreshSessionResponse> {
-    if (!context.isAuthenticated || !context.hasScope('write')) {
-      throw new UnauthorizedError('Write access required');
-    }
+    context.hasAppWriteScope(context);
 
     // Require user session for refresh token validation (security requirement)
     if (!context.isUserAuthenticated || !context.sessionInfo) {
@@ -69,9 +65,7 @@ export class SessionResolver {
 
   @Mutation(() => LogoutResponse)
   async logout(@Ctx() context: GraphQLContext): Promise<LogoutResponse> {
-    if (!context.isAuthenticated || !context.hasScope('write')) {
-      throw new UnauthorizedError('Write access required');
-    }
+    context.hasAppWriteScope(context);
     if (!context.isUserAuthenticated || !context.sessionInfo) {
       throw new UnauthorizedError('User session required to logout');
     }
@@ -91,9 +85,7 @@ export class SessionResolver {
   async logoutAllSessions(
     @Ctx() context: GraphQLContext
   ): Promise<LogoutAllSessionsResponse> {
-    if (!context.isAuthenticated || !context.hasScope('write')) {
-      throw new UnauthorizedError('Write access required');
-    }
+    context.hasAppWriteScope(context);
     if (!context.isUserAuthenticated || !context.sessionInfo) {
       throw new UnauthorizedError(
         'User session required to logout from all sessions'

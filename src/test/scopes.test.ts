@@ -15,7 +15,7 @@ describe('Scope Validation', () => {
     });
 
     test('should have correct valid scopes constant', () => {
-      expect(VALID_SCOPES).toEqual(['read', 'write', 'admin']);
+      expect(VALID_SCOPES).toEqual(['read', 'write', 'admin', 'basic']);
     });
   });
 

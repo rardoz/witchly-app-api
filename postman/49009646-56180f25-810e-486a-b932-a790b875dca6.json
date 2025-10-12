@@ -303,7 +303,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation CompleteLogin($input: CompleteLoginInput!) {   \n        completeLogin(input: $input) {\n            success\n            message\n            sessionToken\n            refreshToken\n            expiresIn\n            expiresAt\n            userId\n        }\n    }",
-								"variables": "{\n    \"input\": {\n        \"email\": \"witchlyapp@gmail.com\",     \n        \"verificationCode\": \"941982\",       \n        \"keepMeLoggedIn\": true   \n    }\n}"
+								"variables": "{\n    \"input\": {\n        \"email\": \"witchlyapp@gmail.com\",     \n        \"verificationCode\": \"712758\",       \n        \"keepMeLoggedIn\": true   \n    }\n}"
 							}
 						},
 						"url": {
@@ -356,6 +356,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -514,6 +519,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -548,13 +558,18 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "graphql",
 							"graphql": {
 								"query": "query GetUser($id: ID!) {\n    user(id: $id) {\n        id\n        name\n        email\n        handle\n        allowedScopes\n        emailVerified\n        lastLoginAt\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }\n }",
-								"variables": "{\n    \"id\": \"68e3236ad1117de1047a9ffc\"\n}"
+								"variables": "{\n    \"id\": \"68e4617a870854281db2b95d\"\n}"
 							}
 						},
 						"url": {
@@ -582,6 +597,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -627,7 +647,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation CreateUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n     id\n        name\n        email\n        handle\n        allowedScopes\n        emailVerified\n        lastLoginAt\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }  \n}",
-								"variables": "{\n    \"input\": {\n        \"name\": \"John Doe\",\n        \"email\": \"john.does@example.com\",\n        \"allowedScopes\": [\"read\", \"write\", \"admin\"],\n        \"profileImageUrl\": \"https://test.com\",\n        \"bio\": \"This is a bio\",\n        \"shortBio\": \"this is a short bio\",\n        \"handle\": \"handle\",\n        \"backdropImageUrl\": \"https://handle.com\",\n        \"instagramHandle\": \"instagram\",\n        \"tikTokHandle\": \"tik\",\n        \"twitterHandle\": \"twit\",\n        \"websiteUrl\": \"https://test.com\",\n        \"facebookUrl\": \"fb\",\n        \"snapchatHandle\": \"snap\",\n        \"primaryColor\": \"#FF5733\",\n        \"sign\": \"aries\",\n        \"sex\": \"male\",\n        \"location\": \"location\",\n        \"birthDate\": \"1990-01-01T00:00:00.000Z\",\n        \"pronouns\": \"he/him\"\n    }\n}"
+								"variables": "{\n    \"input\": {\n        \"name\": \"John Doe\",\n        \"email\": \"john.does.admin@example.com\",\n        \"allowedScopes\": [\"read\", \"write\", \"admin\"],\n        \"profileImageUrl\": \"https://test.com\",\n        \"bio\": \"This is a bio\",\n        \"shortBio\": \"this is a short bio\",\n        \"handle\": \"handle_joe_admin\",\n        \"backdropImageUrl\": \"https://handle.com\",\n        \"instagramHandle\": \"instagram\",\n        \"tikTokHandle\": \"tik\",\n        \"twitterHandle\": \"twit\",\n        \"websiteUrl\": \"https://test.com\",\n        \"facebookUrl\": \"fb\",\n        \"snapchatHandle\": \"snap\",\n        \"primaryColor\": \"#FF5733\",\n        \"sign\": \"aries\",\n        \"sex\": \"male\",\n        \"location\": \"location\",\n        \"birthDate\": \"1990-01-01T00:00:00.000Z\",\n        \"pronouns\": \"he/him\"\n    }\n}"
 							}
 						},
 						"url": {
@@ -655,13 +675,18 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {\n    updateUser(id: $id, input: $input) {\n        id\n        name\n        email\n        handle\n        allowedScopes\n        emailVerified\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }\n}",
-								"variables": "{\n    \"id\": \"68e07ce509c33f9b96339e25\",\n    \"input\": {\n        \"name\": \"John Doe\",\n        \"email\": \"johnzz.doe@example.com\",\n        \"allowedScopes\": [\"read\", \"write\", \"admin\"],\n        \"profileImageUrl\": \"https://test.com\",\n        \"bio\": \"This is a bio\",\n        \"shortBio\": \"this is a short bio\",\n        \"handle\": \"handlez\",\n        \"backdropImageUrl\": \"https://handle.com\",\n        \"instagramHandle\": \"instagram\",\n        \"tikTokHandle\": \"tik\",\n        \"twitterHandle\": \"twit\",\n        \"websiteUrl\": \"https://test.com\",\n        \"facebookUrl\": \"fb\",\n        \"snapchatHandle\": \"snap\",\n        \"primaryColor\": \"red\",\n        \"sign\": \"leo\",\n        \"sex\": \"male\",\n        \"location\": \"San Francisco, CA\",\n        \"birthDate\": \"1985-12-10\",\n        \"pronouns\": \"they/them\"\n    }\n  }"
+								"variables": "{\n    \"id\": \"68eb2b3be279fa2be6a093b1\",\n    \"input\": {\n        \"name\": \"John Doe\",\n        \"email\": \"johnzz.doe@example.com\",\n        \"allowedScopes\": [\"read\", \"write\", \"admin\"],\n        \"profileImageUrl\": \"https://test.com\",\n        \"bio\": \"This is a bio\",\n        \"shortBio\": \"this is a short bio\",\n        \"handle\": \"handlez\",\n        \"backdropImageUrl\": \"https://handle.com\",\n        \"instagramHandle\": \"instagram\",\n        \"tikTokHandle\": \"tik\",\n        \"twitterHandle\": \"twit\",\n        \"websiteUrl\": \"https://test.com\",\n        \"facebookUrl\": \"fb\",\n        \"snapchatHandle\": \"snap\",\n        \"primaryColor\": \"red\",\n        \"sign\": \"leo\",\n        \"sex\": \"male\",\n        \"location\": \"San Francisco, CA\",\n        \"birthDate\": \"1985-10-12T00:00:00.000Z\",\n        \"pronouns\": \"they/them\"\n    }\n  }"
 							}
 						},
 						"url": {
@@ -700,7 +725,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation DeleteUser( $id: ID! ) {\n        deleteUser(id: $id)\n }",
-								"variables": "{\n    \"id\": \"68e1a26c4eef852a416b23ce\"\n}"
+								"variables": "{\n    \"id\": \"68eb2b3be279fa2be6a093b1\"\n}"
 							}
 						},
 						"url": {
@@ -735,11 +760,19 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"query\": \"query GetClients {\\n    clients {\\n      id\\n      clientId\\n      name\\n      description\\n      isActive\\n      allowedScopes\\n      tokenExpiresIn\\n      lastUsed\\n      createdAt\\n      updatedAt\\n    }\\n  }\"\n}"
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetClients {    \n    clients {      \n        id      \n        clientId      \n        name      \n        description      \n        isActive      \n        allowedScopes     \n        tokenExpiresIn      \n        lastUsed      \n        createdAt      \n        updatedAt\n    }\n}",
+								"variables": "{}"
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/graphql",
@@ -766,11 +799,19 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"query\": \"query GetClient($clientId: String!) {\\n    client(clientId: $clientId) {\\n      id\\n      clientId\\n      name\\n      description\\n      isActive\\n      allowedScopes\\n      tokenExpiresIn\\n      lastUsed\\n      createdAt\\n      updatedAt\\n    }\\n  }\",\n  \"variables\": {\n    \"clientId\": \"CLIENT_ID_HERE\"\n  }\n}"
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetClient($clientId: String!) {    \n    client(clientId: $clientId) {      \n        id      \n        clientId      \n        name      \n        description      \n        isActive      \n        allowedScopes      \n        tokenExpiresIn      \n        lastUsed      \n        createdAt      \n        updatedAt    \n    }\n}",
+								"variables": " {\n    \"clientId\": \"update-test-client\"\n  }"
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/graphql",
@@ -817,11 +858,19 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"query\": \"mutation CreateClient($input: CreateClientInput!) {\\n    createClient(input: $input) {\\n      clientId\\n      clientSecret\\n    }\\n  }\",\n  \"variables\": {\n    \"input\": {\n      \"name\": \"Test Client\",\n      \"description\": \"A test OAuth2 client\",\n      \"allowedScopes\": [\"read\", \"write\"]\n    }\n  }\n}"
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation CreateClient($input: CreateClientInput!) {\n        createClient(input: $input) {\n            clientId\n            clientSecret\n    }\n}",
+								"variables": "{\n    \"input\": {\n      \"name\": \"DELete me too\",\n      \"description\": \"A Mobile App OAuth2 client with basic read write permissions\",\n      \"allowedScopes\": [\"read\", \"write\", \"basic\"]\n    }\n  }"
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/graphql",
@@ -848,11 +897,19 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"query\": \"mutation UpdateClient($clientId: String!, $input: UpdateClientInput!) {\\n    updateClient(clientId: $clientId, input: $input) {\\n      id\\n      clientId\\n      name\\n      description\\n      isActive\\n      allowedScopes\\n      tokenExpiresIn\\n      updatedAt\\n    }\\n  }\",\n  \"variables\": {\n    \"clientId\": \"CLIENT_ID_HERE\",\n    \"input\": {\n      \"name\": \"Updated Client Name\",\n      \"description\": \"Updated description\",\n      \"isActive\": true,\n      \"allowedScopes\": [\"read\", \"write\", \"admin\"]\n    }\n  }\n}"
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation UpdateClient($clientId: String!, $input: UpdateClientInput!) {    updateClient(clientId: $clientId, input: $input) {      \n        id\n        clientId\n        name\n        description\n        isActive\n        allowedScopes\n        tokenExpiresIn\n        updatedAt\n    }\n}",
+								"variables": " {\n    \"clientId\": \"client_35502a1b5f12241576c66b8440799204\",\n    \"input\": {\n      \"name\": \"DELETE THIS!\",\n      \"description\": \"NEED TO DELETE\",\n      \"isActive\": false,\n      \"allowedScopes\": [\"read\"]\n    }\n  }"
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/graphql",
@@ -879,11 +936,19 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"query\": \"mutation DeleteClient($clientId: String!) {\\n    deleteClient(clientId: $clientId)\\n  }\",\n  \"variables\": {\n    \"clientId\": \"CLIENT_ID_HERE\"\n  }\n}"
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation DeleteClient($clientId: String!) {\n    deleteClient(clientId: $clientId)\n}",
+								"variables": "{\n    \"clientId\": \"client_35502a1b5f12241576c66b8440799204\"\n  }"
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/graphql",
@@ -929,11 +994,19 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"query\": \"mutation RegenerateClientSecret($clientId: String!) {\\n    regenerateClientSecret(clientId: $clientId)\\n  }\",\n  \"variables\": {\n    \"clientId\": \"CLIENT_ID_HERE\"\n  }\n}"
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation RegenerateClientSecret($clientId: String!) {    regenerateClientSecret(clientId: $clientId)  \n}",
+								"variables": " {\n    \"clientId\": \"update-test-client\"\n  }"
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/graphql",
@@ -989,6 +1062,248 @@
 			],
 			"id": "49009646-ebe6ffae-bb8b-4df9-94e9-a523ad12c54b",
 			"description": "GraphQL schema exploration and introspection"
+		},
+		{
+			"name": "🔮 Tarot Decks (GraphQL)",
+			"item": [
+				{
+					"name": "Get All Tarot Decks",
+					"id": "49009646-tarot-get-all",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetTarotDecks($status: String!, $limit: Int, $offset: Int) {\n    tarotDecks(status: $status, limit: $limit, offset: $offset) {\n        id\n        name\n        primaryImageUrl\n        cardBackgroundUrl\n        primaryColor\n        description\n        author\n        meta\n        layoutType\n        layoutCount\n        status\n        createdAt\n        updatedAt\n    }\n}",
+								"variables": "{\n    \"status\": \"active\",\n    \"limit\": 10,\n    \"offset\": 0\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get paginated list of tarot decks filtered by status (active/paused). Requires read scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Tarot Deck by ID",
+					"id": "49009646-tarot-get-by-id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetTarotDeck($id: ID!) {\n    tarotDeck(id: $id) {\n        id\n        name\n        primaryImageUrl\n        cardBackgroundUrl\n        primaryColor\n        description\n        author\n        meta\n        layoutType\n        layoutCount\n        status\n        createdAt\n        updatedAt\n    }\n}",
+								"variables": "{\n    \"id\": \"68eb328199dcfa82327d86ed\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get a specific tarot deck by its ID. Requires read scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Tarot Deck",
+					"id": "49009646-tarot-create",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"description": "OAuth2 access token (required)"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"description": "User session token with admin scope (required)"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation CreateTarotDeck($input: CreateTarotDeckInput!) {\n    createTarotDeck(input: $input) {\n        success\n        message\n        id\n        name\n        primaryImageUrl\n        cardBackgroundUrl\n        primaryColor\n        description\n        author\n        meta\n        layoutType\n        layoutCount\n        status\n        createdAt\n        updatedAt\n    }\n}",
+								"variables": "{\n    \"input\": {\n        \"name\": \"Mystic Dreams Tarot 2\",\n        \"primaryImageUrl\": \"https://example.com/mystic-dreams.jpg\",\n        \"cardBackgroundUrl\": \"https://example.com/card-back.jpg\",\n        \"primaryColor\": \"#6B46C1\",\n        \"description\": \"A beautiful tarot deck inspired by mystical dreams and celestial energies. Perfect for beginners and experienced readers alike.\",\n        \"author\": \"Luna Starweaver\",\n        \"meta\": [\"mystical\", \"dreams\", \"celestial\", \"beginner-friendly\"],\n        \"layoutType\": \"classic\",\n        \"layoutCount\": 3,\n        \"status\": \"active\"\n    }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Create a new tarot deck. Requires write scope AND admin session scope. All fields are optional except status."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Tarot Deck",
+					"id": "49009646-tarot-update",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"description": "User session token with admin scope (required)"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation UpdateTarotDeck($id: ID!, $input: UpdateTarotDeckInput!) {\n    updateTarotDeck(id: $id, input: $input) {\n        success\n        message\n        id\n        name\n        primaryImageUrl\n        cardBackgroundUrl\n        primaryColor\n        description\n        author\n        meta\n        layoutType\n        layoutCount\n        status\n        createdAt\n        updatedAt\n    }\n}",
+								"variables": "{\n    \"id\": \"68eb31111a80560b29339d3d\",\n    \"input\": {\n        \"name\": \"Updated Deck Name 222\",\n        \"description\": \"Updated description with new insights and expanded guidance.\",\n        \"primaryColor\": \"#8B5CF6\",\n        \"status\": \"active\"\n    }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Update an existing tarot deck. Requires write scope AND admin session scope. Only provide fields you want to update."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Tarot Deck (Soft)",
+					"id": "49009646-tarot-delete-soft",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation DeleteTarotDeck($id: ID!, $hardDelete: Boolean) {\n    deleteTarotDeck(id: $id, hardDelete: $hardDelete) {\n        success\n        message\n    }\n}",
+								"variables": "{\n    \"id\": \"68eb328199dcfa82327d86ed\",\n    \"hardDelete\": false\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Soft delete a tarot deck (sets status to 'paused'). Requires write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Tarot Deck (Hard)",
+					"id": "49009646-tarot-delete-hard",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation DeleteTarotDeck($id: ID!, $hardDelete: Boolean) {\n    deleteTarotDeck(id: $id, hardDelete: $hardDelete) {\n        success\n        message\n    }\n}",
+								"variables": "{\n    \"id\": \"68e9a8a738af61fcb45f7a33\",\n    \"hardDelete\": true\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Permanently delete a tarot deck from the database. Requires write scope. Use with caution!"
+					},
+					"response": []
+				}
+			],
+			"id": "49009646-tarot-decks-section",
+			"description": "Complete CRUD operations for tarot deck management. Create/Update operations require admin session scope."
 		}
 	],
 	"auth": {
@@ -1005,9 +1320,10 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "14bfee27-43f1-435d-bec4-2836e15bd0e0",
+				"id": "5cdf1604-28b0-42f4-9561-34c60d6fc0f4",
 				"type": "text/javascript",
 				"packages": {},
+				"requests": {},
 				"exec": [
 					""
 				]
@@ -1016,9 +1332,10 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "5e452c9b-6770-4b41-8e83-ed4dfec38914",
+				"id": "1c671dcf-800f-42b9-a30e-c8b801eeea13",
 				"type": "text/javascript",
 				"packages": {},
+				"requests": {},
 				"exec": [
 					""
 				]
@@ -1028,25 +1345,21 @@
 	"variable": [
 		{
 			"key": "accessToken",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
 			"key": "sessionToken",
 			"value": "",
-			"type": "string",
 			"description": "User session token for session-based authentication"
 		},
 		{
 			"key": "refreshToken",
 			"value": "",
-			"type": "string",
 			"description": "Refresh token for long-term sessions (keepMeLoggedIn: true)"
 		},
 		{
 			"key": "userId",
 			"value": "",
-			"type": "string",
 			"description": "Current user ID from login/session"
 		}
 	]

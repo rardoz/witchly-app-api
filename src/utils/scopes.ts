@@ -6,7 +6,7 @@
  */
 
 // Valid scopes in the system
-export const VALID_SCOPES = ['read', 'write', 'admin'] as const;
+export const VALID_SCOPES = ['read', 'write', 'admin', 'basic'] as const;
 
 // Type for valid scopes
 export type ValidScope = (typeof VALID_SCOPES)[number];

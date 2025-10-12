@@ -9,7 +9,6 @@ import {
 import {
   ForbiddenError,
   NotFoundError,
-  UnauthorizedError,
   ValidationError,
 } from '../../utils/errors';
 import { validateClientScopes } from '../../utils/scopes';
@@ -24,11 +23,8 @@ import {
 export class ClientResolver {
   @Query(() => [ClientType])
   async clients(@Ctx() context: GraphQLContext): Promise<ClientType[]> {
-    // Only allow authenticated clients with admin scope
-    if (!context.isAuthenticated || !context.hasScope('admin')) {
-      throw new UnauthorizedError('Admin access required');
-    }
-
+    context.hasUserAdminWriteAppWriteScope(context);
+    context.hasAppAdminScope(context);
     const clients = await Client.find({}).sort({ createdAt: -1 });
     return clients.map((client) => ({
       id: String(client._id),
@@ -50,17 +46,14 @@ export class ClientResolver {
     @Ctx() context: GraphQLContext
   ): Promise<ClientType | null> {
     // Allow clients to view their own info, or admins to view any client
-    if (!context.isAuthenticated) {
-      throw new UnauthorizedError('Authentication required');
-    }
-
+    context.hasAppReadScope(context);
     const isOwnClient = context.client?.clientId === clientId;
-    const isAdmin = context.hasScope('admin');
 
-    if (!isOwnClient && !isAdmin) {
-      throw new ForbiddenError(
-        'Can only view own client info or need admin access'
-      );
+    if (
+      !isOwnClient &&
+      !(context.hasScope('admin') && context.hasUserScope('admin'))
+    ) {
+      throw new ForbiddenError('Can only view own client info');
     }
 
     const client = await Client.findOne({ clientId });
@@ -88,10 +81,8 @@ export class ClientResolver {
     @Ctx() context: GraphQLContext
   ): Promise<ClientCredentials> {
     // Only allow authenticated clients with admin scope
-    if (!context.isAuthenticated || !context.hasScope('admin')) {
-      throw new UnauthorizedError('Admin access required');
-    }
-
+    context.hasUserAdminWriteAppWriteScope(context);
+    context.hasAppAdminScope(context);
     // Validate scopes
     let validatedScopes: string[];
     try {
@@ -132,11 +123,8 @@ export class ClientResolver {
     @Arg('input') input: UpdateClientInput,
     @Ctx() context: GraphQLContext
   ): Promise<ClientType> {
-    // Only allow authenticated clients with admin scope
-    if (!context.isAuthenticated || !context.hasScope('admin')) {
-      throw new UnauthorizedError('Admin access required');
-    }
-
+    context.hasUserAdminWriteAppWriteScope(context);
+    context.hasAppAdminScope(context);
     const client = await Client.findOne({ clientId });
     if (!client) {
       throw new NotFoundError('Client not found');
@@ -180,10 +168,7 @@ export class ClientResolver {
     @Arg('clientId') clientId: string,
     @Ctx() context: GraphQLContext
   ): Promise<boolean> {
-    // Only allow authenticated clients with admin scope
-    if (!context.isAuthenticated || !context.hasScope('admin')) {
-      throw new UnauthorizedError('Admin access required');
-    }
+    context.hasAppAdminScope(context);
 
     const result = await Client.deleteOne({ clientId });
     return result.deletedCount > 0;
@@ -194,10 +179,8 @@ export class ClientResolver {
     @Arg('clientId') clientId: string,
     @Ctx() context: GraphQLContext
   ): Promise<string> {
-    // Only allow authenticated clients with admin scope
-    if (!context.isAuthenticated || !context.hasScope('admin')) {
-      throw new UnauthorizedError('Admin access required');
-    }
+    context.hasUserAdminWriteAppWriteScope(context);
+    context.hasAppAdminScope(context);
 
     const client = await Client.findOne({ clientId });
     if (!client) {
