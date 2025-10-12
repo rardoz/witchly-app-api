@@ -7,6 +7,7 @@ import {
   verifyAccessToken,
 } from '../services/jwt.service';
 import { type SessionInfo, SessionService } from '../services/session.service';
+import { UnauthorizedError } from '../utils/errors';
 
 // Extend Express Request to include client info and session info
 declare global {
@@ -154,15 +155,22 @@ export interface GraphQLContext {
 
   // Request information
   request: Request;
+
+  // Helper to enforce combined OAuth2 + user session scopes (throws on failure)
+  hasAppAdminScope: (context: GraphQLContext) => void;
+  hasAppWriteScope: (context: GraphQLContext) => void;
+  hasAppReadScope: (context: GraphQLContext) => void;
+  hasUserReadAppReadScope: (context: GraphQLContext) => void;
+  hasUserAdminWriteAppWriteScope: (context: GraphQLContext) => void;
 }
 
 export function createGraphQLContext(req: Request): GraphQLContext {
   const client = req.client;
   const sessionInfo = req.sessionInfo;
   const userScopes = req.userScopes;
-
   return {
     // OAuth2 context (existing)
+
     client: client || undefined,
     isAuthenticated: !!client,
     hasScope: (scope: string) => (client ? hasScope(client, scope) : false),
@@ -177,5 +185,49 @@ export function createGraphQLContext(req: Request): GraphQLContext {
 
     // Request information
     request: req,
+    hasAppAdminScope: (context: GraphQLContext) => {
+      if (!context.isAuthenticated || !context.hasScope('admin')) {
+        throw new UnauthorizedError('Admin access required');
+      }
+    },
+    hasAppWriteScope: (context: GraphQLContext) => {
+      if (!context.isAuthenticated || !context.hasScope('write')) {
+        throw new UnauthorizedError('Write access required');
+      }
+    },
+    hasAppReadScope: (context: GraphQLContext) => {
+      if (!context.isAuthenticated || !context.hasScope('read')) {
+        throw new UnauthorizedError('Read access required');
+      }
+    },
+    hasUserReadAppReadScope: (context: GraphQLContext) => {
+      if (
+        !context.isAuthenticated ||
+        !context.hasScope('read') ||
+        !context.hasUserScope('read')
+      ) {
+        throw new UnauthorizedError('Read access required');
+      }
+
+      if (!context.isUserAuthenticated) {
+        throw new UnauthorizedError('User authentication required');
+      }
+    },
+    hasUserAdminWriteAppWriteScope: (context: GraphQLContext) => {
+      if (
+        !context.isAuthenticated ||
+        !context.hasScope('write') ||
+        !context.hasUserScope('write')
+      ) {
+        throw new UnauthorizedError('Write access required');
+      }
+
+      // Check for admin session scope
+      if (!context.isUserAuthenticated || !context.hasUserScope('admin')) {
+        throw new UnauthorizedError(
+          'Admin session access required to update tarot decks'
+        );
+      }
+    },
   };
 }

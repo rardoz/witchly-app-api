@@ -10,7 +10,7 @@ describe('SessionService', () => {
     // Create a test user
     const user = await User.create({
       name: 'John Doe',
-      email: 'john.doe@example.com',
+      email: 'john.doeSession@example.com',
       allowedScopes: ['read', 'write', 'basic'],
       handle: 'johndoe123',
       emailVerified: true,

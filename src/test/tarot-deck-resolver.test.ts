@@ -1,14 +1,17 @@
 import { Client } from '../models/Client';
 import { TarotDeck } from '../models/TarotDeck';
+import { User } from '../models/User';
 import {
   generateClientId,
   generateClientSecret,
   hashClientSecret,
 } from '../services/jwt.service';
+import { SessionService } from '../services/session.service';
 
 describe('TarotDeckResolver GraphQL Endpoints', () => {
   let accessToken: string;
-
+  let userSessionToken: string;
+  let basicSessionToken: string;
   const testClient = {
     clientId: '',
     clientSecret: '',
@@ -32,7 +35,7 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
       clientSecret: testClient.hashedSecret,
       name: 'Test Client for Tarot Decks',
       description: 'Test client for tarot deck resolver tests',
-      allowedScopes: ['read', 'write'],
+      allowedScopes: ['read', 'write', 'admin'],
       tokenExpiresIn: 3600,
     });
     await client.save();
@@ -44,7 +47,7 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
           grant_type: "client_credentials"
           client_id: "${testClient.clientId}"
           client_secret: "${testClient.clientSecret}"
-          scope: "read write"
+          scope: "read write admin"
         ) {
           access_token
         }
@@ -55,12 +58,43 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
       .post('/graphql')
       .send({ query: authMutation });
     accessToken = tokenResponse.body.data.authenticate.access_token;
+
+    const user = await User.create({
+      name: 'Test User',
+      email: 'test.users@example.com',
+      allowedScopes: ['read', 'write', 'admin'],
+      bio: 'Test biography',
+      handle: 'test_user',
+    });
+    const session = await SessionService.createSession(
+      user.id,
+      true, // keepMeLoggedIn
+      'node-superagent/3.8.3', // Match supertest/superagent User-Agent
+      '::ffff:127.0.0.1'
+    );
+    userSessionToken = session.sessionToken;
+
+    const basicUser = await User.create({
+      name: 'Test User',
+      email: 'basic.users@example.com',
+      allowedScopes: ['read', 'write', 'basic'],
+      bio: 'Basic biography',
+      handle: 'basic_user',
+    });
+    const basicSession = await SessionService.createSession(
+      basicUser.id,
+      true, // keepMeLoggedIn
+      'node-superagent/3.8.3', // Match supertest/superagent User-Agent
+      '::ffff:127.0.0.1'
+    );
+    basicSessionToken = basicSession.sessionToken;
   }, 30000);
 
   afterAll(async () => {
     // Clean up test data
     await TarotDeck.deleteMany({ name: { $regex: /test/i } });
     await Client.deleteOne({ clientId: testClient.clientId });
+    await User.deleteMany({ email: /@example\.com$/i });
   });
 
   afterEach(async () => {
@@ -131,6 +165,8 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
       const response = await testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('X-Session-Token', userSessionToken)
+        .set('User-Agent', 'node-superagent/3.8.3')
         .send({ query });
 
       expect(response.status).toBe(200);
@@ -160,6 +196,8 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
       const response = await testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('X-Session-Token', userSessionToken)
+        .set('User-Agent', 'node-superagent/3.8.3')
         .send({ query });
 
       expect(response.status).toBe(200);
@@ -180,6 +218,8 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
       const response = await testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('X-Session-Token', userSessionToken)
+        .set('User-Agent', 'node-superagent/3.8.3')
         .send({ query });
 
       expect(response.status).toBe(200);
@@ -245,6 +285,8 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
       const response = await testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('X-Session-Token', userSessionToken)
+        .set('User-Agent', 'node-superagent/3.8.3')
         .send({ query });
 
       expect(response.status).toBe(200);
@@ -269,6 +311,8 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
       const response = await testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('X-Session-Token', userSessionToken)
+        .set('User-Agent', 'node-superagent/3.8.3')
         .send({ query });
 
       expect(response.status).toBe(404);
@@ -314,6 +358,8 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
       const response = await testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('X-Session-Token', basicSessionToken)
+        .set('User-Agent', 'node-superagent/3.8.3')
         .send({
           query: mutation,
           variables: {
@@ -354,6 +400,8 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
       const response = await testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('X-Session-Token', basicSessionToken)
+        .set('User-Agent', 'node-superagent/3.8.3')
         .send({
           query: mutation,
           variables: {
@@ -387,6 +435,8 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
       const response = await testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('X-Session-Token', basicSessionToken)
+        .set('User-Agent', 'node-superagent/3.8.3')
         .send({
           query: mutation,
           variables: {
@@ -420,6 +470,8 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
       const response = await testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('X-Session-Token', basicSessionToken)
+        .set('User-Agent', 'node-superagent/3.8.3')
         .send({
           query: mutation,
           variables: {
@@ -450,6 +502,8 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
       const response = await testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('X-Session-Token', userSessionToken)
+        .set('User-Agent', 'node-superagent/3.8.3')
         .send({
           query: mutation,
           variables: {
@@ -457,10 +511,10 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
           },
         });
 
-      expect(response.status).toBe(401);
-      expect(response.body.errors[0].extensions.code).toBe('UNAUTHORIZED');
+      expect(response.status).toBe(409);
+      expect(response.body.errors[0].extensions.code).toBe('CONFLICT');
       expect(response.body.errors[0].message).toContain(
-        'Admin session access required'
+        'A tarot deck with this name already exists'
       );
     });
 

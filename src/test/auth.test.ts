@@ -57,12 +57,14 @@ describe('JWT Client Credentials Authentication', () => {
     }, 10000);
 
     it('should allow access with valid token', async () => {
-      const query = `
-        query {
-          users {
-            id
-            name
-            email
+      const mutation = `
+        mutation {
+          initiateLogin(input: {
+            email: "nonexistent@example.com"
+          }) {
+            success
+            message
+            expiresAt
           }
         }
       `;
@@ -70,27 +72,11 @@ describe('JWT Client Credentials Authentication', () => {
       const response = await testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ query });
-
-      expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('data');
-    });
-    // This test is skipped because the 'users' query currently requires authentication.
-    it.skip('should work without token for public queries', async () => {
-      const query = `
-        query {
-          users {
-            id
-            name
-            email
-          }
-        }
-      `;
-
-      const response = await testRequest.post('/graphql').send({ query });
-
-      expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('data');
+        .send({ query: mutation });
+      expect(response.status).toBe(404);
+      expect(response.body.errors[0].message).toContain(
+        'No account found with this email address. Please sign up first.'
+      );
     });
 
     it('should reject invalid token', async () => {

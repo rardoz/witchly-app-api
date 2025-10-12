@@ -4,7 +4,6 @@ import { TarotDeck } from '../../models/TarotDeck';
 import {
   ConflictError,
   NotFoundError,
-  UnauthorizedError,
   ValidationError,
 } from '../../utils/errors';
 import {
@@ -30,9 +29,7 @@ export class TarotDeckResolver {
     @Arg('status', () => String, { nullable: true, defaultValue: 'active' })
     status: 'active' | 'paused'
   ): Promise<TarotDeckType[]> {
-    if (!context.isAuthenticated || !context.hasScope('read')) {
-      throw new UnauthorizedError('Read access required');
-    }
+    context.hasUserReadAppReadScope(context);
 
     // Validate pagination parameters
     if (limit < 1 || limit > 100) {
@@ -58,9 +55,7 @@ export class TarotDeckResolver {
     @Ctx() context: GraphQLContext,
     @Arg('id', () => ID) id: string
   ): Promise<TarotDeckType> {
-    if (!context.isAuthenticated || !context.hasScope('read')) {
-      throw new UnauthorizedError('Read access required');
-    }
+    context.hasUserReadAppReadScope(context);
 
     const deck = await TarotDeck.findById(id);
     if (!deck) {
@@ -75,16 +70,7 @@ export class TarotDeckResolver {
     @Ctx() context: GraphQLContext,
     @Arg('input') input: CreateTarotDeckInput
   ): Promise<CreateTarotDeckResponse> {
-    if (!context.isAuthenticated || !context.hasScope('write')) {
-      throw new UnauthorizedError('Write access required');
-    }
-
-    // Check for admin session scope
-    if (!context.isUserAuthenticated || !context.hasUserScope('admin')) {
-      throw new UnauthorizedError(
-        'Admin session access required to create tarot decks'
-      );
-    }
+    context.hasUserAdminWriteAppWriteScope(context);
 
     // Check if deck with same name already exists
     const existingDeck = await TarotDeck.findOne({ name: input.name });
@@ -152,16 +138,7 @@ export class TarotDeckResolver {
     @Arg('id', () => ID) id: string,
     @Arg('input') input: UpdateTarotDeckInput
   ): Promise<UpdateTarotDeckResponse> {
-    if (!context.isAuthenticated || !context.hasScope('write')) {
-      throw new UnauthorizedError('Write access required');
-    }
-
-    // Check for admin session scope
-    if (!context.isUserAuthenticated || !context.hasUserScope('admin')) {
-      throw new UnauthorizedError(
-        'Admin session access required to update tarot decks'
-      );
-    }
+    context.hasUserAdminWriteAppWriteScope(context);
 
     const deck = await TarotDeck.findById(id);
     if (!deck) {
@@ -240,9 +217,7 @@ export class TarotDeckResolver {
     @Arg('hardDelete', () => Boolean, { nullable: true, defaultValue: false })
     hardDelete: boolean
   ): Promise<DeleteTarotDeckResponse> {
-    if (!context.isAuthenticated || !context.hasScope('write')) {
-      throw new UnauthorizedError('Write access required');
-    }
+    context.hasUserAdminWriteAppWriteScope(context);
 
     const deck = await TarotDeck.findById(id);
     if (!deck) {

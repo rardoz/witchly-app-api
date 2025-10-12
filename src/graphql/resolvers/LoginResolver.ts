@@ -3,11 +3,7 @@ import { emailService } from '../../config/email';
 import { GraphQLContext } from '../../middleware/auth.middleware';
 import { SessionService } from '../../services/session.service';
 import { VerificationService } from '../../services/verification.service';
-import {
-  NotFoundError,
-  UnauthorizedError,
-  ValidationError,
-} from '../../utils/errors';
+import { NotFoundError, ValidationError } from '../../utils/errors';
 import { InitiateLoginInput } from '../inputs/LoginInput';
 import {
   CompleteLoginInput,
@@ -22,9 +18,7 @@ export class LoginResolver {
     @Ctx() context: GraphQLContext,
     @Arg('input') input: InitiateLoginInput
   ): Promise<InitiateLoginResponse> {
-    if (!context.isAuthenticated || !context.hasScope('write')) {
-      throw new UnauthorizedError('Write access required');
-    }
+    context.hasAppWriteScope(context);
 
     const { email } = input;
     // Validate email format
@@ -86,9 +80,7 @@ export class LoginResolver {
     @Ctx() context: GraphQLContext,
     @Arg('input') input: CompleteLoginInput
   ): Promise<CompleteLoginResponse> {
-    if (!context.isAuthenticated || !context.hasScope('write')) {
-      throw new UnauthorizedError('Write access required');
-    }
+    context.hasAppWriteScope(context);
 
     const { email, verificationCode, keepMeLoggedIn = false } = input;
 

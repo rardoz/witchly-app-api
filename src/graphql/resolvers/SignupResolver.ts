@@ -27,9 +27,7 @@ export class SignupResolver {
     @Ctx() context: GraphQLContext,
     @Arg('input') input: InitiateSignupInput
   ): Promise<InitiateSignupResponse> {
-    if (!context.isAuthenticated || !context.hasScope('write')) {
-      throw new UnauthorizedError('Write access required');
-    }
+    context.hasAppWriteScope(context);
 
     const { email } = input;
 
@@ -108,9 +106,7 @@ export class SignupResolver {
     @Ctx() context: GraphQLContext,
     @Arg('input') input: CompleteSignupInput
   ): Promise<CompleteLoginResponse> {
-    if (!context.isAuthenticated || !context.hasScope('write')) {
-      throw new UnauthorizedError('Write access required');
-    }
+    context.hasAppWriteScope(context);
 
     const { email, verificationCode } = input;
 

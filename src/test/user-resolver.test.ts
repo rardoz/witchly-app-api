@@ -24,14 +24,6 @@ describe('UserResolver GraphQL Endpoints', () => {
     handle: 'johndoe123',
   };
 
-  const _testAdminUser = {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    allowedScopes: ['read', 'write', 'admin'],
-    bio: 'Test user biography',
-    handle: 'johndoe123',
-  };
-
   beforeAll(async () => {
     // Generate test client credentials
     testClient.clientId = generateClientId();
@@ -82,6 +74,7 @@ describe('UserResolver GraphQL Endpoints', () => {
   });
 
   describe('Query: users', () => {
+    let userSessionToken: string;
     beforeEach(async () => {
       // Create some test users
       await User.create([
@@ -104,6 +97,20 @@ describe('UserResolver GraphQL Endpoints', () => {
           handle: 'user_3',
         },
       ]);
+      const user = await User.create({
+        name: 'Test User',
+        email: 'test.users@example.com',
+        allowedScopes: ['read', 'write', 'admin'],
+        bio: 'Test biography',
+        handle: 'test_user',
+      });
+      const session = await SessionService.createSession(
+        user.id,
+        true, // keepMeLoggedIn
+        'node-superagent/3.8.3', // Match supertest/superagent User-Agent
+        '::ffff:127.0.0.1'
+      );
+      userSessionToken = session.sessionToken;
     });
 
     it('should return list of users with authentication', async () => {
@@ -123,10 +130,12 @@ describe('UserResolver GraphQL Endpoints', () => {
       const response = await testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('X-Session-Token', userSessionToken)
+        .set('User-Agent', 'node-superagent/3.8.3')
         .send({ query });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.users).toHaveLength(3);
+      expect(response.body.data.users).toHaveLength(4);
       expect(response.body.data.users[0]).toHaveProperty('id');
       expect(response.body.data.users[0]).toHaveProperty('name');
       expect(response.body.data.users[0]).toHaveProperty('email');
@@ -147,6 +156,8 @@ describe('UserResolver GraphQL Endpoints', () => {
       const response = await testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('X-Session-Token', userSessionToken)
+        .set('User-Agent', 'node-superagent/3.8.3')
         .send({
           query,
           variables: { limit: 2, offset: 1 },
@@ -185,6 +196,8 @@ describe('UserResolver GraphQL Endpoints', () => {
       const response = await testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('X-Session-Token', userSessionToken)
+        .set('User-Agent', 'node-superagent/3.8.3')
         .send({
           query,
           variables: { limit: 150 },
@@ -210,6 +223,8 @@ describe('UserResolver GraphQL Endpoints', () => {
       const response = await testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('X-Session-Token', userSessionToken)
+        .set('User-Agent', 'node-superagent/3.8.3')
         .send({
           query,
           variables: { offset: -1 },
@@ -225,7 +240,7 @@ describe('UserResolver GraphQL Endpoints', () => {
 
   describe('Query: user', () => {
     let createdUserId: string;
-
+    let userSessionToken: string;
     beforeEach(async () => {
       const user = await User.create({
         name: 'Test User',
@@ -235,6 +250,15 @@ describe('UserResolver GraphQL Endpoints', () => {
         handle: 'test_user',
       });
       createdUserId = user.id;
+
+      // Create session for the user so they can update their own profile
+      const session = await SessionService.createSession(
+        createdUserId,
+        true, // keepMeLoggedIn
+        'node-superagent/3.8.3', // Match supertest/superagent User-Agent
+        '::ffff:127.0.0.1'
+      );
+      userSessionToken = session.sessionToken;
     });
 
     it('should return user by ID with authentication', async () => {
@@ -253,6 +277,8 @@ describe('UserResolver GraphQL Endpoints', () => {
       const response = await testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('X-Session-Token', userSessionToken)
+        .set('User-Agent', 'node-superagent/3.8.3')
         .send({
           query,
           variables: { id: createdUserId },
@@ -282,6 +308,8 @@ describe('UserResolver GraphQL Endpoints', () => {
       const response = await testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('X-Session-Token', userSessionToken)
+        .set('User-Agent', 'node-superagent/3.8.3')
         .send({
           query,
           variables: { id: nonExistentId },
@@ -927,6 +955,14 @@ describe('UserResolver GraphQL Endpoints', () => {
 
   describe('Integration: Full User Lifecycle', () => {
     it('should create, read, update, and delete a user', async () => {
+      const adminUser = await User.create({
+        name: 'Admin User',
+        email: 'admin@example.com',
+        allowedScopes: ['read', 'write', 'admin'], // Has admin scope
+        handle: 'admin_user',
+        emailVerified: true,
+      });
+
       // 1. Create user - without allowedScopes to use defaults
       const createMutation = `
         mutation CreateUser($input: CreateUserInput!) {
@@ -939,9 +975,19 @@ describe('UserResolver GraphQL Endpoints', () => {
         }
       `;
 
+      // Create session for the other user
+      const anotherSession = await SessionService.createSession(
+        adminUser.id,
+        true,
+        'node-superagent/3.8.3',
+        '::ffff:127.0.0.1'
+      );
+
       const createResponse = await testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('User-Agent', 'node-superagent/3.8.3')
+        .set('X-Session-Token', anotherSession.sessionToken)
         .send({
           query: createMutation,
           variables: {
@@ -979,6 +1025,8 @@ describe('UserResolver GraphQL Endpoints', () => {
       const readResponse = await testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('User-Agent', 'node-superagent/3.8.3')
+        .set('X-Session-Token', userSessionToken)
         .send({
           query: readQuery,
           variables: { id: userId },
@@ -1053,6 +1101,8 @@ describe('UserResolver GraphQL Endpoints', () => {
       const verifyResponse = await testRequest
         .post('/graphql')
         .set('Authorization', `Bearer ${accessToken}`)
+        .set('User-Agent', 'node-superagent/3.8.3')
+        .set('X-Session-Token', anotherSession.sessionToken)
         .send({
           query: verifyQuery,
           variables: { id: userId },
