@@ -800,7 +800,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"query\": \"query GetClient($clientId: String!) {\\n    client(clientId: $clientId) {\\n      id\\n      clientId\\n      name\\n      description\\n      isActive\\n      allowedScopes\\n      tokenExpiresIn\\n      lastUsed\\n      createdAt\\n      updatedAt\\n    }\\n  }\",\n  \"variables\": {\n    \"clientId\": \"CLIENT_ID_HERE\"\n  }\n}"
+							"raw": ""
 						},
 						"url": {
 							"raw": "{{baseUrl}}/graphql",
