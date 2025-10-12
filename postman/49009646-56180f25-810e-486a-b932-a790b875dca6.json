@@ -799,8 +799,11 @@
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": ""
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetClient($clientId: String!) {    \n    client(clientId: $clientId) {      \n        id      \n        clientId      \n        name      \n        description      \n        isActive      \n        allowedScopes      \n        tokenExpiresIn      \n        lastUsed      \n        createdAt      \n        updatedAt    \n    }\n}",
+								"variables": " {\n    \"clientId\": \"update-test-client\"\n  }"
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/graphql",
