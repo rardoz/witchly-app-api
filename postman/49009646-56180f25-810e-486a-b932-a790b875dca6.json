@@ -1096,7 +1096,7 @@
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "query GetAssets($limit: Int, $offset: Int) {\n    assets(limit: $limit, offset: $offset) {\n        id\n        fileName\n        hashedFileName\n        mimeType\n        fileSize\n        s3Key\n        s3Url\n        assetType\n        uploadedBy\n        createdAt\n        updatedAt\n    }\n}",
+										"query": "query GetAssets($limit: Int, $offset: Int) {\n    assets(limit: $limit, offset: $offset) {\n        assets {\n            id\n            fileName\n            hashedFileName\n            mimeType\n            fileSize\n            s3Key\n            s3Url\n            assetType\n            uploadedBy\n            createdAt\n            updatedAt\n        }\n        total\n        limit\n        offset\n    }\n}",
 										"variables": "{\n    \"limit\": 10,\n    \"offset\": 0\n}"
 									}
 								},
