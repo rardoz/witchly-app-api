@@ -9,6 +9,7 @@ import {
   createGraphQLContext,
   optionalAuth,
 } from './middleware/auth.middleware';
+import { assetRoutes } from './routes/assets';
 
 // Utility function to handle Apollo Server response parsing and status extraction
 function processApolloResponse(response: HTTPGraphQLResponse): {
@@ -57,8 +58,11 @@ const app = express();
 app.set('trust proxy', true);
 
 // Middleware
-app.use(cors());
+app.use(cors({ origin: '*' }));
 app.use(express.json());
+
+// API Routes
+app.use('/api/assets', assetRoutes);
 // Initialize MongoDB and GraphQL
 const initializeServer = async () => {
   try {
