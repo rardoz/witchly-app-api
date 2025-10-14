@@ -40,9 +40,7 @@ export class AssetResolver {
     includeSignedUrl?: boolean
   ): Promise<AssetsResponse> {
     // Require authentication and read scope
-    if (!context.isAuthenticated || !context.hasScope('read')) {
-      throw new UnauthorizedError('Read access required');
-    }
+    context.hasUserReadAppReadScope(context);
 
     // Validate pagination
     if (limit < 1 || limit > 100) {
@@ -114,9 +112,7 @@ export class AssetResolver {
     includeSignedUrl?: boolean
   ): Promise<AssetGraphQLType> {
     // Require authentication and read scope
-    if (!context.isAuthenticated || !context.hasScope('read')) {
-      throw new UnauthorizedError('Read access required');
-    }
+    context.hasUserReadAppReadScope(context);
 
     // Validate ObjectId format
     if (!Types.ObjectId.isValid(id)) {
@@ -164,14 +160,11 @@ export class AssetResolver {
     includeSignedUrl?: boolean
   ): Promise<AssetsResponse> {
     // Require user session authentication
-    if (!context.isUserAuthenticated || !context.sessionInfo) {
+    if (!context.sessionInfo) {
       throw new UnauthorizedError('User session required to view your assets');
     }
 
-    // Also require OAuth2 read scope
-    if (!context.isAuthenticated || !context.hasScope('read')) {
-      throw new UnauthorizedError('Read access required');
-    }
+    context.hasUserReadAppReadScope(context);
 
     // Validate pagination
     if (limit < 1 || limit > 100) {
@@ -239,12 +232,10 @@ export class AssetResolver {
     @Arg('uploadId', () => ID) uploadId: string
   ): Promise<UploadProgressType> {
     // Require authentication and read scope
-    if (!context.isAuthenticated || !context.hasScope('read')) {
-      throw new UnauthorizedError('Read access required');
-    }
+    context.hasUserReadAppReadScope(context);
 
     // Require user session authentication
-    if (!context.isUserAuthenticated || !context.sessionInfo) {
+    if (!context.sessionInfo) {
       throw new UnauthorizedError(
         'User session required to view upload progress'
       );
@@ -276,12 +267,10 @@ export class AssetResolver {
     @Arg('input', () => ChunkUploadInitInput) input: ChunkUploadInitInput
   ): Promise<InitializeUploadResponse> {
     // Require authentication and write scope
-    if (!context.isAuthenticated || !context.hasScope('write')) {
-      throw new UnauthorizedError('Write access required for asset uploads');
-    }
+    context.hasUserWriteAppWriteScope(context);
 
     // Require user session authentication
-    if (!context.isUserAuthenticated || !context.sessionInfo) {
+    if (!context.sessionInfo) {
       throw new UnauthorizedError('User session required for asset uploads');
     }
 
@@ -328,12 +317,10 @@ export class AssetResolver {
     @Arg('input', () => CancelUploadInput) input: CancelUploadInput
   ): Promise<CancelUploadResponse> {
     // Require authentication and write scope
-    if (!context.isAuthenticated || !context.hasScope('write')) {
-      throw new UnauthorizedError('Write access required');
-    }
+    context.hasUserWriteAppWriteScope(context);
 
     // Require user session authentication
-    if (!context.isUserAuthenticated || !context.sessionInfo) {
+    if (!context.sessionInfo) {
       throw new UnauthorizedError('User session required');
     }
 

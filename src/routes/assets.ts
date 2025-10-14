@@ -1,6 +1,9 @@
 import { Request, Response, Router } from 'express';
 import { Types } from 'mongoose';
-import { optionalAuth } from '../middleware/auth.middleware';
+import {
+  createGraphQLContext,
+  optionalAuth,
+} from '../middleware/auth.middleware';
 import {
   createUploadMiddleware,
   processStreamedFileUpload,
@@ -51,10 +54,9 @@ router.post(
   createUploadMiddleware().single('file'),
   async (req: Request, res: Response) => {
     try {
+      const context = createGraphQLContext(req);
       // Check OAuth2 authentication and write scope
-      if (!req.client?.scopes?.includes('write')) {
-        throw new UnauthorizedError('Write access required for asset uploads');
-      }
+      context.hasUserWriteAppWriteScope(context);
 
       // Check user session authentication
       if (!req.sessionInfo?.userId) {
