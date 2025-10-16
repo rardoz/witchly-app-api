@@ -1310,8 +1310,8 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": [],
-									"description": "Select an image or video file to upload"
+									"description": "Select an image or video file to upload",
+									"src": []
 								}
 							]
 						},
