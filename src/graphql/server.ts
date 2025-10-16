@@ -6,6 +6,7 @@ import {
 } from '@apollo/server';
 import { type GraphQLFormattedError } from 'graphql';
 import { buildSchema } from 'type-graphql';
+import { AssetResolver } from './resolvers/AssetResolver';
 import { AuthResolver } from './resolvers/AuthResolver';
 import { ClientResolver } from './resolvers/ClientResolver';
 import { LoginResolver } from './resolvers/LoginResolver';
@@ -98,6 +99,7 @@ export const createApolloServer = async (): Promise<ApolloServer> => {
       LoginResolver,
       SessionResolver,
       TarotDeckResolver,
+      AssetResolver,
     ],
     validate: false,
   });

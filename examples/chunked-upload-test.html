@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Witchly API - Chunked Upload Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .config-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007bff;
+        }
+
+        .config-section h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="url"],
+        input[type="password"],
+        input[type="email"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="url"]:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .file-upload-section {
+            text-align: center;
+            margin: 30px 0;
+            padding: 30px;
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            transition: border-color 0.3s;
+        }
+
+        .file-upload-section:hover {
+            border-color: #007bff;
+        }
+
+        .file-input {
+            margin: 20px 0;
+        }
+
+        .file-input input[type="file"] {
+            display: none;
+        }
+
+        .file-input label {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #007bff;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: 600;
+        }
+
+        .file-input label:hover {
+            background: #0056b3;
+        }
+
+        .file-info {
+            margin: 15px 0;
+            padding: 15px;
+            background: #e7f3ff;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .upload-controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        button {
+            padding: 12px 24px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #218838;
+        }
+
+        .btn-primary:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #c82333;
+        }
+
+        .progress-section {
+            margin: 30px 0;
+            display: none;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 25px;
+            background-color: #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .chunk-progress {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .status-section {
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .status-success {
+            background: #d1edff;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+
+        .status-info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            color: #0c5460;
+        }
+
+        .log-section {
+            margin-top: 30px;
+        }
+
+        .log-container {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            height: 200px;
+            overflow-y: auto;
+            padding: 15px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            word-wrap: break-word;
+        }
+
+        .log-entry.info {
+            color: #007bff;
+        }
+
+        .log-entry.success {
+            color: #28a745;
+        }
+
+        .log-entry.error {
+            color: #dc3545;
+        }
+
+        .log-entry.warning {
+            color: #ffc107;
+        }
+
+        .settings-row {
+            display: grid;
+            grid-template-columns: 1fr 100px;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .chunk-size-input {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🧪 Witchly API - Chunked Upload Test</h1>
+        <p><strong>Complete test interface for chunked file uploads with authentication</strong></p>
+        <p>Follow the steps below to authenticate and test chunked file uploads:</p>
+        <ol>
+            <li><strong>OAuth2 Authentication:</strong> Enter your client credentials and get an OAuth2 token</li>
+            <li><strong>User Login:</strong> Enter your email, get a verification code, and complete login</li>
+            <li><strong>File Upload:</strong> Select a file and test the chunked upload process</li>
+        </ol>
+
+        <!-- Authentication Section -->
+        <div class="config-section">
+            <h3>� Authentication</h3>
+            <div class="form-group">
+                <label for="apiBaseUrl">API Base URL:</label>
+                <input type="url" id="apiBaseUrl" placeholder="http://localhost:3002" value="http://localhost:3002">
+            </div>
+
+            <!-- OAuth2 Section -->
+            <div class="form-group">
+                <h4>Step 1: OAuth2 Client Authentication</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div style="margin-right: 20px">
+                        <label for="clientId">Client ID:</label>
+                        <input type="text" id="clientId" placeholder="your-client-id">
+                    </div>
+                    <div>
+                        <label for="clientSecret">Client Secret:</label>
+                        <input type="password" id="clientSecret" placeholder="your-client-secret">
+                    </div>
+                </div>
+                <button id="authenticateBtn" class="btn-primary" style="margin-top: 10px;">Get OAuth2 Token</button>
+                <div id="oauth2Status" style="margin-top: 10px; font-weight: bold;"></div>
+                <div class="form-group">
+                    <label for="bearerToken">OAuth2 Bearer Token:</label>
+                    <input type="text" id="bearerToken" placeholder="Will be populated automatically" readonly>
+                </div>
+            </div>
+
+            <!-- Login Section -->
+            <div class="form-group">
+                <h4>Step 2: User Login</h4>
+                <div class="form-group">
+                    <label for="loginEmail">Email:</label>
+                    <input type="email" id="loginEmail" placeholder="your-email@example.com">
+                </div>
+                <button id="initiateLoginBtn" class="btn-primary" disabled>Send Verification Code</button>
+                <div id="loginStatus" style="margin-top: 10px; font-weight: bold;"></div>
+
+                <div id="verificationSection" style="display: none; margin-top: 15px;">
+                    <div class="form-group">
+                        <label for="verificationCode">Verification Code:</label>
+                        <input type="text" id="verificationCode" placeholder="6-digit code" maxlength="6">
+                    </div>
+                    <button id="completeLoginBtn" class="btn-primary">Complete Login</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="sessionToken">User Session Token:</label>
+                    <input type="text" id="sessionToken" placeholder="Will be populated after login" readonly>
+                </div>
+            </div>
+
+            <!-- Configuration -->
+            <div class="form-group">
+                <h4>Upload Settings</h4>
+                <div class="settings-row">
+                    <div>
+                        <label for="chunkSize">Chunk Size (MB):</label>
+                        <input type="number" id="chunkSize" class="chunk-size-input" min="1" max="100" value="5">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Token Management -->
+            <div class="form-group">
+                <button id="clearTokensBtn" class="btn-secondary"
+                    style="background-color: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Clear
+                    Stored Tokens</button>
+                <small style="color: #6c757d; display: block; margin-top: 5px;">✨ Tokens are automatically saved to
+                    localStorage and restored on page reload</small>
+            </div>
+        </div>
+
+        <!-- File Upload Section -->
+        <div class="file-upload-section">
+            <h3>📁 Select File for Chunked Upload</h3>
+            <p>Supported: Images (JPG, PNG, GIF, WebP) and Videos (MP4, MOV, AVI, WebM)</p>
+
+            <div class="file-input">
+                <label for="fileInput">Choose File</label>
+                <input type="file" id="fileInput" accept="image/*,video/*">
+            </div>
+
+            <div class="file-info" id="fileInfo">
+                <h4>📄 File Information</h4>
+                <div id="fileDetails"></div>
+            </div>
+        </div>
+
+        <!-- Upload Controls -->
+        <div class="upload-controls">
+            <button id="startUpload" class="btn-primary" disabled>Start Chunked Upload</button>
+            <button id="cancelUpload" class="btn-secondary" disabled>Cancel Upload</button>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="progress-section" id="progressSection">
+            <h3>📊 Upload Progress</h3>
+            <div class="progress-info">
+                <span id="progressText">Preparing upload...</span>
+                <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar">0%</div>
+            </div>
+            <div class="chunk-progress" id="chunkProgress">
+                Chunks: 0 / 0 uploaded
+            </div>
+        </div>
+
+        <!-- Status Section -->
+        <div class="status-section" id="statusSection">
+            <div id="statusMessage"></div>
+        </div>
+
+        <!-- Log Section -->
+        <div class="log-section">
+            <h3>📋 Upload Log</h3>
+            <div class="log-container" id="logContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentFile = null;
+        let uploadSession = null;
+        let isUploading = false;
+        let uploadAborted = false;
+
+        // DOM elements
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileDetails = document.getElementById('fileDetails');
+        const startUploadBtn = document.getElementById('startUpload');
+        const cancelUploadBtn = document.getElementById('cancelUpload');
+        const progressSection = document.getElementById('progressSection');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const progressPercent = document.getElementById('progressPercent');
+        const chunkProgress = document.getElementById('chunkProgress');
+        const statusSection = document.getElementById('statusSection');
+        const statusMessage = document.getElementById('statusMessage');
+        const logContainer = document.getElementById('logContainer');
+
+        // Authentication DOM elements
+        const authenticateBtn = document.getElementById('authenticateBtn');
+        const clientIdInput = document.getElementById('clientId');
+        const clientSecretInput = document.getElementById('clientSecret');
+        const bearerTokenInput = document.getElementById('bearerToken');
+        const oauth2Status = document.getElementById('oauth2Status');
+        const initiateLoginBtn = document.getElementById('initiateLoginBtn');
+        const loginEmailInput = document.getElementById('loginEmail');
+        const loginStatus = document.getElementById('loginStatus');
+        const verificationSection = document.getElementById('verificationSection');
+        const verificationCodeInput = document.getElementById('verificationCode');
+        const completeLoginBtn = document.getElementById('completeLoginBtn');
+        const sessionTokenInput = document.getElementById('sessionToken');
+
+        // Configuration
+        const apiBaseUrl = () => document.getElementById('apiBaseUrl').value.trim();
+        const bearerToken = () => document.getElementById('bearerToken').value.trim();
+        const sessionToken = () => document.getElementById('sessionToken').value.trim();
+        const chunkSizeMB = () => parseInt(document.getElementById('chunkSize').value) || 5;
+
+        // localStorage functions
+        function saveTokensToLocalStorage() {
+            const bearer = bearerToken();
+            const session = sessionToken();
+
+            if (bearer) {
+                localStorage.setItem('witchly_bearer_token', bearer);
+            }
+            if (session) {
+                localStorage.setItem('witchly_session_token', session);
+            }
+        }
+
+        function loadTokensFromLocalStorage() {
+            const bearer = localStorage.getItem('witchly_bearer_token');
+            const session = localStorage.getItem('witchly_session_token');
+
+            if (bearer) {
+                bearerTokenInput.value = bearer;
+                oauth2Status.textContent = '✅ OAuth2 token loaded from localStorage';
+                oauth2Status.style.color = '#28a745';
+                initiateLoginBtn.disabled = false;
+            }
+
+            if (session) {
+                sessionTokenInput.value = session;
+                loginStatus.textContent = '✅ Session token loaded from localStorage';
+                loginStatus.style.color = '#28a745';
+
+                // Enable upload if file is selected
+                if (currentFile) {
+                    startUploadBtn.disabled = false;
+                }
+            }
+        }
+
+        function clearTokensFromLocalStorage() {
+            localStorage.removeItem('witchly_bearer_token');
+            localStorage.removeItem('witchly_session_token');
+            bearerTokenInput.value = '';
+            sessionTokenInput.value = '';
+            oauth2Status.textContent = '';
+            loginStatus.textContent = '';
+            initiateLoginBtn.disabled = true;
+            startUploadBtn.disabled = true;
+        }
+
+        // Utility functions
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function showStatus(message, type = 'info') {
+            statusSection.className = `status-section status-${type}`;
+            statusSection.style.display = 'block';
+            statusMessage.textContent = message;
+        }
+
+        function hideStatus() {
+            statusSection.style.display = 'none';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function getMimeType(fileName) {
+            const extension = fileName.toLowerCase().split('.').pop();
+            const mimeTypes = {
+                'jpg': 'image/jpeg',
+                'jpeg': 'image/jpeg',
+                'png': 'image/png',
+                'gif': 'image/gif',
+                'webp': 'image/webp',
+                'mp4': 'video/mp4',
+                'mov': 'video/quicktime',
+                'avi': 'video/x-msvideo',
+                'webm': 'video/webm'
+            };
+            return mimeTypes[extension] || 'application/octet-stream';
+        }
+
+        async function calculateChunkHash(chunk) {
+            const arrayBuffer = await chunk.arrayBuffer();
+            const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // Authentication functions
+        async function authenticateOAuth2() {
+            const clientId = clientIdInput.value.trim();
+            const clientSecret = clientSecretInput.value.trim();
+
+            if (!clientId || !clientSecret) {
+                oauth2Status.textContent = 'Please enter Client ID and Client Secret';
+                oauth2Status.style.color = '#dc3545';
+                return;
+            }
+
+            oauth2Status.textContent = 'Authenticating...';
+            oauth2Status.style.color = '#007bff';
+            authenticateBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${apiBaseUrl()}/graphql`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: `
+                            mutation Authenticate($grantType: String!, $clientId: String!, $clientSecret: String!, $scope: String!) {
+                                authenticate(
+                                    grant_type: $grantType
+                                    client_id: $clientId
+                                    client_secret: $clientSecret
+                                    scope: $scope
+                                ) {
+                                    access_token
+                                    token_type
+                                    expires_in
+                                    scope
+                                }
+                            }
+                        `,
+                        variables: {
+                            grantType: 'client_credentials',
+                            clientId: clientId,
+                            clientSecret: clientSecret,
+                            scope: 'read write'
+                        }
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.errors) {
+                    throw new Error(result.errors[0].message);
+                }
+
+                const { access_token, expires_in } = result.data.authenticate;
+                bearerTokenInput.value = access_token;
+                oauth2Status.textContent = `✅ OAuth2 authenticated! Token expires in ${expires_in} seconds`;
+                oauth2Status.style.color = '#28a745';
+
+                // Save to localStorage
+                saveTokensToLocalStorage();
+
+                // Enable login button
+                initiateLoginBtn.disabled = false;
+
+                log(`OAuth2 authentication successful. Token expires in ${expires_in} seconds`, 'success');
+            } catch (error) {
+                oauth2Status.textContent = `❌ Authentication failed: ${error.message}`;
+                oauth2Status.style.color = '#dc3545';
+                log(`OAuth2 authentication failed: ${error.message}`, 'error');
+            } finally {
+                authenticateBtn.disabled = false;
+            }
+        }
+
+        async function initiateLogin() {
+            const email = loginEmailInput.value.trim();
+            const token = bearerTokenInput.value.trim();
+
+            if (!email) {
+                loginStatus.textContent = 'Please enter your email address';
+                loginStatus.style.color = '#dc3545';
+                return;
+            }
+
+            if (!token) {
+                loginStatus.textContent = 'Please authenticate with OAuth2 first';
+                loginStatus.style.color = '#dc3545';
+                return;
+            }
+
+            loginStatus.textContent = 'Sending verification code...';
+            loginStatus.style.color = '#007bff';
+            initiateLoginBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${apiBaseUrl()}/graphql`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        query: `
+                            mutation InitiateLogin($input: InitiateLoginInput!) {
+                                initiateLogin(input: $input) {
+                                    success
+                                    message
+                                    expiresAt
+                                }
+                            }
+                        `,
+                        variables: {
+                            input: { email: email }
+                        }
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.errors) {
+                    throw new Error(result.errors[0].message);
+                }
+
+                const { success, message, expiresAt } = result.data.initiateLogin;
+
+                if (success) {
+                    loginStatus.textContent = `✅ ${message}`;
+                    loginStatus.style.color = '#28a745';
+                    verificationSection.style.display = 'block';
+                    verificationCodeInput.focus();
+
+                    log(`Verification code sent to ${email}. Expires at ${new Date(expiresAt).toLocaleTimeString()}`, 'success');
+                } else {
+                    throw new Error(message);
+                }
+
+            } catch (error) {
+                loginStatus.textContent = `❌ Login initiation failed: ${error.message}`;
+                loginStatus.style.color = '#dc3545';
+                log(`Login initiation failed: ${error.message}`, 'error');
+            } finally {
+                initiateLoginBtn.disabled = false;
+            }
+        }
+
+        async function completeLogin() {
+            const email = loginEmailInput.value.trim();
+            const code = verificationCodeInput.value.trim();
+            const token = bearerTokenInput.value.trim();
+
+            if (!code || code.length !== 6) {
+                loginStatus.textContent = 'Please enter the 6-digit verification code';
+                loginStatus.style.color = '#dc3545';
+                return;
+            }
+
+            loginStatus.textContent = 'Completing login...';
+            loginStatus.style.color = '#007bff';
+            completeLoginBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${apiBaseUrl()}/graphql`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        query: `
+                            mutation CompleteLogin($input: CompleteLoginInput!) {
+                                completeLogin(input: $input) {
+                                        success
+                                        message
+                                        sessionToken
+                                        refreshToken
+                                        expiresIn
+                                        expiresAt
+                                        userId
+                                }
+                            }
+                        `,
+                        variables: {
+                            input: {
+                                email: email,
+                                verificationCode: code,
+                                keepMeLoggedIn: true
+                            }
+                        }
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.errors) {
+                    throw new Error(result.errors[0].message);
+                }
+
+                const { success, message, sessionToken, refreshToken, expiresIn, expiresAt, userId } = result.data.completeLogin;
+
+                if (success && sessionToken) {
+                    sessionTokenInput.value = sessionToken;
+                    loginStatus.textContent = `✅ ${message}`;
+                    loginStatus.style.color = '#28a745';
+                    verificationSection.style.display = 'none';
+
+                    // Save to localStorage
+                    saveTokensToLocalStorage();
+
+                    // Enable upload button if file is selected
+                    if (currentFile) {
+                        startUploadBtn.disabled = false;
+                    }
+
+                    log(`${message}`, 'success');
+                } else {
+                    throw new Error(message || 'Login completion failed');
+                }
+
+            } catch (error) {
+                loginStatus.textContent = `❌ Login completion failed: ${error.message}`;
+                loginStatus.style.color = '#dc3545';
+                log(`Login completion failed: ${error.message}`, 'error');
+            } finally {
+                completeLoginBtn.disabled = false;
+            }
+        }
+
+        // Event handlers
+        // Authentication event listeners
+        authenticateBtn.addEventListener('click', authenticateOAuth2);
+        initiateLoginBtn.addEventListener('click', initiateLogin);
+        completeLoginBtn.addEventListener('click', completeLogin);
+
+        // Clear tokens button
+        const clearTokensBtn = document.getElementById('clearTokensBtn');
+        if (clearTokensBtn) {
+            clearTokensBtn.addEventListener('click', function () {
+                clearTokensFromLocalStorage();
+                log('Tokens cleared from localStorage', 'info');
+            });
+        }
+
+        // Allow Enter key to submit verification code
+        verificationCodeInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                completeLogin();
+            }
+        });
+
+        // File upload event listeners
+        fileInput.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                currentFile = file;
+                displayFileInfo(file);
+                // Only enable upload if both file is selected AND user is authenticated
+                if (bearerTokenInput.value && sessionTokenInput.value) {
+                    startUploadBtn.disabled = false;
+                }
+                log(`File selected: ${file.name} (${formatFileSize(file.size)})`);
+            } else {
+                currentFile = null;
+                fileInfo.style.display = 'none';
+                startUploadBtn.disabled = true;
+            }
+        });
+
+        startUploadBtn.addEventListener('click', startChunkedUpload);
+        cancelUploadBtn.addEventListener('click', cancelUpload);
+
+        // Initialize tokens from localStorage on page load
+        window.addEventListener('load', function () {
+            loadTokensFromLocalStorage();
+        });
+
+        function displayFileInfo(file) {
+            const chunkSize = chunkSizeMB() * 1024 * 1024;
+            const totalChunks = Math.ceil(file.size / chunkSize);
+
+            fileDetails.innerHTML = `
+                <p><strong>Name:</strong> ${file.name}</p>
+                <p><strong>Size:</strong> ${formatFileSize(file.size)}</p>
+                <p><strong>Type:</strong> ${file.type || getMimeType(file.name)}</p>
+                <p><strong>Chunk Size:</strong> ${formatFileSize(chunkSize)}</p>
+                <p><strong>Total Chunks:</strong> ${totalChunks}</p>
+            `;
+            fileInfo.style.display = 'block';
+        }
+
+        async function startChunkedUpload() {
+            if (!currentFile) {
+                showStatus('Please select a file first', 'error');
+                return;
+            }
+
+            if (!bearerToken()) {
+                showStatus('Please authenticate with OAuth2 first (Step 1)', 'error');
+                return;
+            }
+
+            if (!sessionToken()) {
+                showStatus('Please complete user login first (Step 2)', 'error');
+                return;
+            }
+
+            isUploading = true;
+            uploadAborted = false;
+            startUploadBtn.disabled = true;
+            cancelUploadBtn.disabled = false;
+            progressSection.style.display = 'block';
+            hideStatus();
+
+            try {
+                log('Starting chunked upload initialization...');
+
+                // Step 1: Initialize upload
+                await initializeUpload();
+
+                // Step 2: Upload chunks
+                await uploadChunks();
+
+                // Step 3: Wait for completion
+                await waitForCompletion();
+
+            } catch (error) {
+                log(`Upload failed: ${error.message}`, 'error');
+                showStatus(`Upload failed: ${error.message}`, 'error');
+            } finally {
+                isUploading = false;
+                startUploadBtn.disabled = false;
+                cancelUploadBtn.disabled = true;
+            }
+        }
+
+        async function initializeUpload() {
+            const chunkSize = chunkSizeMB() * 1024 * 1024;
+            const totalChunks = Math.ceil(currentFile.size / chunkSize);
+
+            const response = await fetch(`${apiBaseUrl()}/graphql`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${bearerToken()}`,
+                    'X-Session-Token': sessionToken()
+                },
+                body: JSON.stringify({
+                    query: `
+                        mutation InitializeChunkedUpload($input: ChunkUploadInitInput!) {
+                            initializeChunkedUpload(input: $input) {
+                                uploadId
+                                chunkSize
+                            }
+                        }
+                    `,
+                    variables: {
+                        input: {
+                            fileName: currentFile.name,
+                            mimeType: currentFile.type || getMimeType(currentFile.name),
+                            totalSize: currentFile.size,
+                            chunkSize: chunkSize
+                        }
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.errors?.[0]?.message || 'Failed to initialize upload');
+            }
+
+            const result = await response.json();
+
+            if (result.errors) {
+                throw new Error(result.errors[0].message);
+            }
+
+            uploadSession = {
+                uploadId: result.data.initializeChunkedUpload.uploadId,
+                chunkSize: result.data.initializeChunkedUpload.chunkSize
+            };
+
+            log(`Upload initialized - ID: ${uploadSession.uploadId}`);
+
+            updateProgress(0, totalChunks, 0);
+        }
+
+        async function uploadChunks() {
+            const totalChunks = Math.ceil(currentFile.size / uploadSession.chunkSize);
+
+            log(`Starting to upload ${totalChunks} chunks...`);
+
+            for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+                if (uploadAborted) {
+                    log('Upload aborted by user', 'warning');
+                    return;
+                }
+
+                const start = chunkIndex * uploadSession.chunkSize;
+                const end = Math.min(start + uploadSession.chunkSize, currentFile.size);
+                const chunk = currentFile.slice(start, end);
+
+                log(`Uploading chunk ${chunkIndex + 1}/${totalChunks} (${formatFileSize(chunk.size)})`);
+
+                try {
+                    await uploadChunk(chunkIndex, chunk);
+                    updateProgress(chunkIndex + 1, totalChunks, Math.round(((chunkIndex + 1) / totalChunks) * 100));
+                } catch (error) {
+                    log(`Failed to upload chunk ${chunkIndex + 1}: ${error.message}`, 'error');
+                    throw error;
+                }
+            }
+
+            log('All chunks uploaded successfully', 'success');
+        }
+
+        async function uploadChunk(chunkIndex, chunk) {
+            const chunkHash = await calculateChunkHash(chunk);
+
+            // Convert chunk to raw binary data
+            const chunkData = await chunk.arrayBuffer();
+
+            const response = await fetch(`${apiBaseUrl()}/api/assets/chunked/upload/${uploadSession.uploadId}/${chunkIndex}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${bearerToken()}`,
+                    'X-Session-Token': sessionToken(),
+                    'X-Chunk-Hash': chunkHash,
+                    'Content-Type': 'application/octet-stream'
+                },
+                body: chunkData
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || `Failed to upload chunk ${chunkIndex}`);
+            }
+
+            return await response.json();
+        }
+
+        async function waitForCompletion() {
+            log('Waiting for upload completion...');
+
+            while (true) {
+                if (uploadAborted) {
+                    return;
+                }
+
+                try {
+                    const { progress } = await getUploadProgress();
+                    if (progress.status === 'completed') {
+                        log('Upload completed successfully!', 'success');
+                        showStatus('Upload completed successfully! Asset has been created.', 'success');
+                        updateProgress(progress.chunksUploaded, progress.totalChunks, 100);
+                        return;
+                    } else if (progress.status === 'failed') {
+                        throw new Error('Upload failed on server');
+                    }
+
+                    updateProgress(progress.chunksUploaded, progress.totalChunks, progress.progress);
+
+                    // Wait 1 second before checking again
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                } catch (error) {
+                    log(`Error checking progress: ${error.message}`, 'error');
+                    throw error;
+                }
+            }
+        }
+
+        async function getUploadProgress() {
+            const query = `
+                query GetUploadProgress($uploadId: ID!) {
+                    uploadProgress(uploadId: $uploadId) {
+                        uploadId
+                        fileName
+                        totalSize
+                        uploadedSize
+                        chunksUploaded
+                        totalChunks
+                        progress
+                        status
+                        createdAt
+                        lastUpdated
+                    }
+                }
+            `;
+
+            const response = await fetch(`${apiBaseUrl()}/graphql`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${bearerToken()}`,
+                    'X-Session-Token': sessionToken()
+                },
+                body: JSON.stringify({
+                    query,
+                    variables: {
+                        uploadId: uploadSession.uploadId
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to get progress');
+            }
+
+            const result = await response.json();
+
+            if (result.errors) {
+                throw new Error(result.errors[0].message || 'GraphQL error');
+            }
+
+            // Return in the same format as the old REST endpoint
+            return {
+                success: true,
+                progress: result.data.uploadProgress
+            };
+        }
+
+        async function cancelUpload() {
+            if (!uploadSession) {
+                return;
+            }
+
+            uploadAborted = true;
+            log('Cancelling upload...', 'warning');
+
+            try {
+                const response = await fetch(`${apiBaseUrl()}/graphql`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${bearerToken()}`,
+                        'X-Session-Token': sessionToken()
+                    },
+                    body: JSON.stringify({
+                        query: `
+                            mutation CancelUpload($input: CancelUploadInput!) {
+                                cancelUpload(input: $input) {
+                                    success
+                                    message
+                                }
+                            }
+                        `,
+                        variables: {
+                            input: {
+                                uploadId: uploadSession.uploadId
+                            }
+                        }
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.errors) {
+                    throw new Error(result.errors[0].message);
+                }
+
+                if (result.data.cancelUpload.success) {
+                    log('Upload cancelled successfully', 'warning');
+                    showStatus('Upload cancelled', 'warning');
+                } else {
+                    log('Failed to cancel upload on server', 'error');
+                }
+            } catch (error) {
+                log(`Error cancelling upload: ${error.message}`, 'error');
+            }
+
+            isUploading = false;
+            startUploadBtn.disabled = false;
+            cancelUploadBtn.disabled = true;
+        }
+
+        function updateProgress(chunksUploaded, totalChunks, percentage) {
+            progressBar.style.width = `${percentage}%`;
+            progressBar.textContent = `${percentage}%`;
+            progressPercent.textContent = `${percentage}%`;
+            progressText.textContent = `Uploading... ${formatFileSize(chunksUploaded * uploadSession.chunkSize)} of ${formatFileSize(currentFile.size)}`;
+            chunkProgress.textContent = `Chunks: ${chunksUploaded} / ${totalChunks} uploaded`;
+        }
+
+        // Initialize
+        log('Chunked upload test page loaded');
+        log('Please configure your API settings and select a file to begin');
+    </script>
+</body>
+
+</html>

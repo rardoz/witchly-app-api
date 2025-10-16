@@ -18,6 +18,7 @@ A modern TypeScript Express.js API with GraphQL and MongoDB integration, featuri
 - [📱 Session Management System](#-session-management-system)
 - [🛡️ Advanced Session Security Features](#️-advanced-session-security-features)
 - [🔮 Tarot Deck Management System](#-tarot-deck-management-system)
+- [📁 Asset Management System](#-asset-management-system)
 - [🧪 Comprehensive Testing Suite](#-comprehensive-testing-suite)
 - [📋 Postman Collection](#-postman-collection--api-documentation)
 - [🚀 DevOps & Development Tools](#-devops--development-tools)
@@ -1804,6 +1805,455 @@ Example session query:
   "query": "query { mySessions { sessionId keepMeLoggedIn lastUsedAt expiresAt isActive } }"
 }
 ```
+
+## 📁 Asset Management System
+
+### Overview
+
+The Witchly App API features a comprehensive **dual-strategy asset management system** designed for modern media-rich applications. The system supports both simple file uploads for smaller assets and chunked uploads for large files, with direct AWS S3 integration, performance optimization, and enterprise-grade security.
+
+### Key Features
+
+- **🔄 Dual Upload Strategies**: Simple streaming uploads (up to 500MB) and chunked uploads for large files
+- **☁️ AWS S3 Integration**: Direct streaming to S3 with multipart upload support and intelligent chunking
+- **⚡ Smart Performance**: Optional signed URL generation to reduce unnecessary S3 API calls
+- **🎬 File Type Support**: Images (JPG, PNG, GIF, WebP) and videos (MP4, MOV, AVI, WebM)
+- **📊 Progress Tracking**: Real-time upload progress monitoring for chunked uploads
+- **🔐 Dual Authentication**: OAuth2 scope validation + user session tokens for comprehensive security
+- **🧹 Automatic Cleanup**: TTL indexes for expired upload sessions and MongoDB optimization
+
+### Architecture
+
+#### Upload Strategies
+
+**1. Simple Upload (REST Endpoint)**
+- **Best for**: Files up to 500MB
+- **Method**: Direct multipart/form-data streaming to S3
+- **Endpoint**: `POST /api/assets/upload`
+- **Benefits**: Single request, immediate completion, optimal for smaller files
+
+**2. Chunked Upload (GraphQL + REST Hybrid)**
+- **Best for**: Large files, resumable uploads, progress tracking
+- **Method**: Initialize via GraphQL, upload chunks via REST
+- **Flow**: Initialize → Upload chunks → Automatic completion
+- **Benefits**: Resumable, progress tracking, handles network interruptions
+
+#### Security Model
+
+The asset system implements **dual authentication** for maximum security:
+
+```typescript
+// Required Headers for Asset Operations
+{
+  "Authorization": "Bearer YOUR_OAUTH2_TOKEN",     // OAuth2 with read/write scope
+  "X-Session-Token": "YOUR_USER_SESSION_TOKEN"    // User session validation
+}
+```
+
+### GraphQL Operations
+
+#### Asset Queries
+
+**Get All Assets (Paginated)**
+```graphql
+query GetAssets($limit: Int, $offset: Int, $assetType: AssetTypeEnum, $signedUrl: Boolean) {
+  assets(limit: $limit, offset: $offset, assetType: $assetType, signedUrl: $signedUrl) {
+    assets {
+      id
+      fileName
+      hashedFileName
+      mimeType
+      fileSize
+      s3Key
+      s3Url
+      signedUrl          # Optional - only generated when requested
+      assetType
+      uploadedBy
+      createdAt
+      updatedAt
+    }
+    total
+    limit
+    offset
+  }
+}
+```
+
+**Get Single Asset**
+```graphql
+query GetAsset($id: ID!, $signedUrl: Boolean) {
+  asset(id: $id, signedUrl: $signedUrl) {
+    id
+    fileName
+    hashedFileName
+    mimeType
+    fileSize
+    s3Key
+    s3Url
+    signedUrl          # Optional - reduces S3 API calls when false
+    assetType
+    uploadedBy
+    createdAt
+    updatedAt
+  }
+}
+```
+
+**Get User's Assets**
+```graphql
+query GetMyAssets($limit: Int, $offset: Int, $assetType: AssetTypeEnum, $signedUrl: Boolean) {
+  myAssets(limit: $limit, offset: $offset, assetType: $assetType, signedUrl: $signedUrl) {
+    assets {
+      id
+      fileName
+      hashedFileName
+      mimeType
+      fileSize
+      s3Key
+      s3Url
+      signedUrl
+      assetType
+      uploadedBy
+      createdAt
+      updatedAt
+    }
+    total
+    limit
+    offset
+  }
+}
+```
+
+#### Chunked Upload Operations
+
+**Initialize Chunked Upload**
+```graphql
+mutation InitializeChunkedUpload($input: ChunkUploadInitInput!) {
+  initializeChunkedUpload(input: $input) {
+    uploadId
+    chunkSize
+  }
+}
+
+# Input Variables
+{
+  "input": {
+    "fileName": "large-video.mp4",
+    "mimeType": "video/mp4",
+    "totalSize": 1073741824,    # 1GB in bytes
+    "chunkSize": 10485760       # 10MB chunks (optional, system will optimize)
+  }
+}
+```
+
+**Track Upload Progress**
+```graphql
+query GetUploadProgress($uploadId: ID!) {
+  uploadProgress(uploadId: $uploadId) {
+    uploadId
+    fileName
+    totalSize
+    uploadedSize
+    chunksUploaded
+    totalChunks
+    progress              # Percentage (0-100)
+    status               # 'pending' | 'uploading' | 'completed' | 'failed' | 'cancelled'
+    createdAt
+    lastUpdated
+  }
+}
+```
+
+**Cancel Upload**
+```graphql
+mutation CancelUpload($input: CancelUploadInput!) {
+  cancelUpload(input: $input) {
+    success
+    message
+  }
+}
+
+# Input Variables
+{
+  "input": {
+    "uploadId": "your-upload-session-id"
+  }
+}
+```
+
+### REST Endpoints
+
+#### Simple Upload
+```bash
+# Upload a single file (up to 500MB)
+curl -X POST "http://localhost:3000/api/assets/upload" \
+  -H "Authorization: Bearer YOUR_OAUTH2_TOKEN" \
+  -H "X-Session-Token: YOUR_SESSION_TOKEN" \
+  -F "file=@/path/to/your/file.jpg"
+
+# Response
+{
+  "asset": {
+    "id": "asset_id_here",
+    "fileName": "original-name.jpg",
+    "hashedFileName": "abc123def456_20241025_original-name.jpg",
+    "mimeType": "image/jpeg",
+    "fileSize": 2048576,
+    "s3Key": "assets/abc123def456_20241025_original-name.jpg",
+    "s3Url": "https://your-bucket.s3.amazonaws.com/assets/abc123def456_20241025_original-name.jpg",
+    "assetType": "image",
+    "uploadedBy": "user_id_here",
+    "createdAt": "2024-10-25T10:30:00.000Z",
+    "updatedAt": "2024-10-25T10:30:00.000Z"
+  },
+  "message": "File uploaded successfully"
+}
+```
+
+#### Chunked Upload
+```bash
+# Upload individual chunks (after GraphQL initialization)
+curl -X POST "http://localhost:3000/api/assets/chunked/upload/{uploadId}/{chunkIndex}" \
+  -H "Authorization: Bearer YOUR_OAUTH2_TOKEN" \
+  -H "X-Session-Token: YOUR_SESSION_TOKEN" \
+  -H "Content-Type: application/octet-stream" \
+  -H "X-Chunk-Hash: sha256_hash_of_chunk_data" \
+  --data-binary @chunk_file.bin
+
+# Response for each chunk
+{
+  "success": true,
+  "message": "Chunk uploaded successfully",
+  "chunkIndex": 0,
+  "uploadId": "upload_session_id"
+}
+```
+
+### Performance Features
+
+#### Optional Signed URLs
+The system implements **smart signed URL generation** to optimize performance:
+
+```graphql
+# Only generate signed URLs when needed
+query GetAssets($signedUrl: Boolean) {
+  assets(signedUrl: $signedUrl) {
+    s3Url         # Always available - public S3 URL
+    signedUrl     # Only generated when $signedUrl = true
+  }
+}
+```
+
+**Benefits:**
+- **Reduced S3 API calls**: Avoid unnecessary signed URL generation
+- **Faster responses**: Skip signing when public URLs suffice
+- **Cost optimization**: Minimize S3 API usage charges
+
+#### Automatic Cleanup
+- **Upload Sessions**: TTL index automatically removes expired chunked upload sessions
+- **Orphaned Files**: Background cleanup of incomplete uploads
+- **MongoDB Optimization**: Efficient indexing for asset queries and user associations
+
+### File Type Support & Validation
+
+#### Supported File Types
+
+**Images**
+- **JPEG**: `.jpg`, `.jpeg` (up to 50MB)
+- **PNG**: `.png` (up to 50MB)
+- **GIF**: `.gif` (up to 50MB)
+- **WebP**: `.webp` (up to 50MB)
+
+**Videos**
+- **MP4**: `.mp4` (up to 500MB simple, unlimited chunked)
+- **MOV**: `.mov` (up to 500MB simple, unlimited chunked)
+- **AVI**: `.avi` (up to 500MB simple, unlimited chunked)
+- **WebM**: `.webm` (up to 500MB simple, unlimited chunked)
+
+#### Validation Rules
+- **File size limits**: Enforced at both server and S3 levels
+- **MIME type validation**: Server-side verification against file headers
+- **File extension checking**: Prevents malicious file uploads
+- **Hash verification**: SHA256 integrity checking for chunked uploads
+
+### Error Handling
+
+#### Common Error Scenarios
+
+**File Size Exceeded**
+```json
+{
+  "errors": [{
+    "message": "File size exceeds maximum limit of 500MB for simple uploads",
+    "extensions": {
+      "code": "VALIDATION_ERROR",
+      "maxSize": 524288000,
+      "receivedSize": 600000000
+    }
+  }]
+}
+```
+
+**Unsupported File Type**
+```json
+{
+  "errors": [{
+    "message": "Unsupported file type. Allowed: images (jpg, png, gif, webp) and videos (mp4, mov, avi, webm)",
+    "extensions": {
+      "code": "VALIDATION_ERROR",
+      "receivedType": "application/pdf",
+      "allowedTypes": ["image/*", "video/*"]
+    }
+  }]
+}
+```
+
+**Upload Session Expired**
+```json
+{
+  "errors": [{
+    "message": "Upload session has expired or does not exist",
+    "extensions": {
+      "code": "NOT_FOUND",
+      "uploadId": "expired_upload_id"
+    }
+  }]
+}
+```
+
+### Integration Examples
+
+#### Frontend Integration (React/TypeScript)
+
+**Simple Upload Component**
+```typescript
+const uploadFile = async (file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await fetch('/api/assets/upload', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${oauthToken}`,
+      'X-Session-Token': sessionToken
+    },
+    body: formData
+  });
+
+  const result = await response.json();
+  return result.asset;
+};
+```
+
+**Chunked Upload with Progress**
+```typescript
+const uploadLargeFile = async (file: File, onProgress: (progress: number) => void) => {
+  // 1. Initialize chunked upload
+  const initResponse = await apolloClient.mutate({
+    mutation: INITIALIZE_CHUNKED_UPLOAD,
+    variables: {
+      input: {
+        fileName: file.name,
+        mimeType: file.type,
+        totalSize: file.size,
+        chunkSize: 10 * 1024 * 1024 // 10MB chunks
+      }
+    }
+  });
+
+  const { uploadId, chunkSize } = initResponse.data.initializeChunkedUpload;
+  const totalChunks = Math.ceil(file.size / chunkSize);
+
+  // 2. Upload chunks
+  for (let i = 0; i < totalChunks; i++) {
+    const start = i * chunkSize;
+    const end = Math.min(start + chunkSize, file.size);
+    const chunk = file.slice(start, end);
+    
+    // Generate chunk hash for integrity
+    const chunkHash = await generateSHA256(chunk);
+
+    await fetch(`/api/assets/chunked/upload/${uploadId}/${i}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${oauthToken}`,
+        'X-Session-Token': sessionToken,
+        'Content-Type': 'application/octet-stream',
+        'X-Chunk-Hash': chunkHash
+      },
+      body: chunk
+    });
+
+    // Update progress
+    onProgress((i + 1) / totalChunks * 100);
+  }
+
+  // 3. Monitor completion (optional)
+  const progressResponse = await apolloClient.query({
+    query: GET_UPLOAD_PROGRESS,
+    variables: { uploadId }
+  });
+
+  return progressResponse.data.uploadProgress;
+};
+```
+
+### Database Schema
+
+#### Asset Model
+```typescript
+interface IAsset extends Document {
+  fileName: string;           // Original filename
+  hashedFileName: string;     // Unique hashed filename with timestamp
+  mimeType: string;          // MIME type validation
+  fileSize: number;          // File size in bytes
+  s3Key: string;             // S3 object key
+  s3Url: string;             // Public S3 URL
+  assetType: 'image' | 'video'; // Categorization
+  uploadedBy: ObjectId;      // User reference
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+#### Upload Session Model
+```typescript
+interface IUploadSession extends Document {
+  uploadId: string;          // Unique session identifier
+  fileName: string;          // Target filename
+  mimeType: string;          // File MIME type
+  totalSize: number;         // Total file size
+  chunkSize: number;         // Chunk size for upload
+  chunksUploaded: number;    // Progress tracking
+  totalChunks: number;       // Total expected chunks
+  uploadedBy: ObjectId;      // User reference
+  status: 'pending' | 'uploading' | 'completed' | 'failed' | 'cancelled';
+  s3UploadId?: string;       // S3 multipart upload ID
+  parts: Array<{            // S3 multipart upload parts
+    partNumber: number;
+    etag: string;
+  }>;
+  expiresAt: Date;          // TTL for automatic cleanup
+  createdAt: Date;
+  lastUpdated: Date;
+}
+```
+
+### Monitoring & Analytics
+
+#### Upload Metrics
+- **Success/failure rates** by upload type (simple vs chunked)
+- **Average upload times** by file size and type
+- **Chunk retry rates** for network resilience monitoring
+- **Storage utilization** and S3 costs tracking
+
+#### Performance Monitoring
+- **S3 API call reduction** through optional signed URLs
+- **Database query optimization** for asset retrieval
+- **Memory usage** during streaming uploads
+- **Network bandwidth** utilization patterns
+
+The asset management system provides a robust, scalable foundation for media-rich applications while maintaining optimal performance and security standards through innovative dual authentication and smart resource management.
 
 ## 🧪 Comprehensive Testing Suite
 
