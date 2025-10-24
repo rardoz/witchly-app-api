@@ -160,6 +160,7 @@ export interface GraphQLContext {
   hasAppAdminScope: (context: GraphQLContext) => void;
   hasAppWriteScope: (context: GraphQLContext) => void;
   hasAppReadScope: (context: GraphQLContext) => void;
+  hasUserWriteAppWriteScope: (context: GraphQLContext) => void;
   hasUserReadAppReadScope: (context: GraphQLContext) => void;
   hasUserAdminWriteAppWriteScope: (context: GraphQLContext) => void;
 }
@@ -198,6 +199,17 @@ export function createGraphQLContext(req: Request): GraphQLContext {
     hasAppReadScope: (context: GraphQLContext) => {
       if (!context.isAuthenticated || !context.hasScope('read')) {
         throw new UnauthorizedError('Read access required');
+      }
+    },
+    hasUserWriteAppWriteScope: (context: GraphQLContext) => {
+      if (!context.isAuthenticated) {
+        throw new UnauthorizedError('App authentication required');
+      }
+      if (!context.isUserAuthenticated) {
+        throw new UnauthorizedError('User authentication required');
+      }
+      if (!context.hasScope('write') || !context.hasUserScope('write')) {
+        throw new UnauthorizedError('Write access required');
       }
     },
     hasUserReadAppReadScope: (context: GraphQLContext) => {

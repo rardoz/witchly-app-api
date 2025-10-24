@@ -39,6 +39,17 @@ jobs:
         env:
           # Map your GitHub environment secrets to environment variables
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
-
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          ASSETS_DEFAULT_CHUNK_SIZE_MB: ${{ vars.ASSETS_DEFAULT_CHUNK_SIZE_MB }}
+          ASSETS_MAX_CHUNK_SIZE_MB: ${{ vars.ASSETS_MAX_CHUNK_SIZE_MB }}
+          ASSETS_MIN_CHUNK_SIZE_MB: ${{ vars.ASSETS_MIN_CHUNK_SIZE_MB }}
+          ASSETS_SINGLE_PART_UPLOAD_THRESHOLD_MB: ${{ vars.ASSETS_SINGLE_PART_UPLOAD_THRESHOLD_MB }}
+          ASSETS_MAX_VIDEO_SIZE_MB: ${{ vars.ASSETS_MAX_VIDEO_SIZE_MB }}
+          ASSETS_MAX_IMAGE_SIZE_MB: ${{ vars.ASSETS_MAX_IMAGE_SIZE_MB }}
+          AWS_S3_BUCKET_NAME: ${{ vars.AWS_S3_BUCKET_NAME }}
+          AWS_S3_DIRECTORY_PREFIX: ${{ vars.AWS_S3_DIRECTORY_PREFIX }}
+          AWS_S3_URL_EXPIRATION_MINUTES: ${{ vars.AWS_S3_URL_EXPIRATION_MINUTES }}
       - name: Build application
         run: npm run build && rm -rf dist
