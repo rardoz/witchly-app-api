@@ -6,6 +6,7 @@ import { Asset } from '../../models/Asset';
 import {
   type ChunkUploadInit,
   cancelUpload,
+  DEFAULT_CHUNK_SIZE,
   getUploadProgress,
   initializeChunkedUpload,
 } from '../../services/upload.service';
@@ -282,7 +283,7 @@ export class AssetResolver {
     }
 
     try {
-      const chunkSize = input.chunkSize || 10 * 1024 * 1024; // Default 10MB
+      const chunkSize = input.chunkSize || DEFAULT_CHUNK_SIZE;
       const totalChunks = Math.ceil(input.totalSize / chunkSize);
 
       const initData: ChunkUploadInit = {

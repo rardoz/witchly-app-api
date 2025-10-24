@@ -82,8 +82,16 @@ export interface AssetCreationResult {
   };
 }
 
-const MAX_IMAGE_SIZE = 50 * 1024 * 1024; // 50MB
-const MAX_VIDEO_SIZE = 500 * 1024 * 1024; // 500MB
+const MAX_IMAGE_SIZE_MB = process.env.ASSETS_MAX_IMAGE_SIZE_MB
+  ? Number.parseInt(process.env.ASSETS_MAX_IMAGE_SIZE_MB, 10)
+  : 50; // 50MB
+
+const MAX_VIDEO_SIZE_MB = process.env.ASSETS_MAX_VIDEO_SIZE_MB
+  ? Number.parseInt(process.env.ASSETS_MAX_VIDEO_SIZE_MB, 10)
+  : 500; // 500MB
+
+const MAX_IMAGE_SIZE = MAX_IMAGE_SIZE_MB * 1024 * 1024; // 50MB
+const MAX_VIDEO_SIZE = MAX_VIDEO_SIZE_MB * 1024 * 1024; // 500MB
 
 const ALLOWED_IMAGE_TYPES = [
   'image/jpeg',
@@ -300,11 +308,29 @@ export async function processStreamedFileUpload(
   }
 }
 
+const DEFAULT_CHUNK_SIZE_MB = process.env.ASSETS_DEFAULT_CHUNK_SIZE_MB
+  ? Number.parseInt(process.env.ASSETS_DEFAULT_CHUNK_SIZE_MB, 10)
+  : 5;
+
+const DEFAULT_MIN_CHUNK_SIZE_MB = process.env.ASSETS_MIN_CHUNK_SIZE_MB
+  ? Number.parseInt(process.env.ASSETS_MIN_CHUNK_SIZE_MB, 10)
+  : 1;
+
+const DEFAULT_MAX_CHUNK_SIZE_MB = process.env.ASSETS_MAX_CHUNK_SIZE_MB
+  ? Number.parseInt(process.env.ASSETS_MAX_CHUNK_SIZE_MB, 10)
+  : 100;
+
+const DEFAULT_SINGLE_PART_UPLOAD_THRESHOLD_MB = process.env
+  .ASSETS_SINGLE_PART_UPLOAD_THRESHOLD_MB
+  ? Number.parseInt(process.env.ASSETS_SINGLE_PART_UPLOAD_THRESHOLD_MB, 10)
+  : 5;
+
 // Chunked upload constants
-const DEFAULT_CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunks
-const MIN_CHUNK_SIZE = 1 * 1024 * 1024; // 1MB minimum
-const MAX_CHUNK_SIZE = 100 * 1024 * 1024; // 100MB maximum
-const SINGLE_UPLOAD_THRESHOLD = 5 * 1024 * 1024; // Use single upload for files < 5MB
+export const DEFAULT_CHUNK_SIZE = DEFAULT_CHUNK_SIZE_MB * 1024 * 1024; // 5MB chunks
+export const MIN_CHUNK_SIZE = DEFAULT_MIN_CHUNK_SIZE_MB * 1024 * 1024; // 1MB minimum
+export const MAX_CHUNK_SIZE = DEFAULT_MAX_CHUNK_SIZE_MB * 1024 * 1024; // 100MB maximum
+export const SINGLE_UPLOAD_THRESHOLD =
+  DEFAULT_SINGLE_PART_UPLOAD_THRESHOLD_MB * 1024 * 1024; // Use single upload for files < 5MB
 
 /**
  * Initialize a chunked upload session
