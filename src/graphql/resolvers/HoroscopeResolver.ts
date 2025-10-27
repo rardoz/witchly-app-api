@@ -1,23 +1,24 @@
-interface PlainHoroscope {
-  _id: unknown;
-  locale: string;
-  horoscopeDate: Date;
-  horoscopeText: string;
-  sign: string;
-  status: string;
-  user: unknown;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+// Removed PlainHoroscopeSign and PlainHoroscope interfaces; use HoroscopeSignType and HoroscopeType instead
 
 import { Arg, Ctx, ID, Int, Mutation, Query, Resolver } from 'type-graphql';
 import { GraphQLContext } from '../../middleware/auth.middleware';
 import { Horoscope } from '../../models/Horoscope';
+import { HoroscopeSign } from '../../models/HoroscopeSign';
 import { NotFoundError, ValidationError } from '../../utils/errors';
 import {
   CreateHoroscopeInput,
   UpdateHoroscopeInput,
 } from '../inputs/HoroscopeInput';
+import {
+  CreateHoroscopeSignInput,
+  UpdateHoroscopeSignInput,
+} from '../inputs/HoroscopeSignInput';
+import {
+  CreateHoroscopeSignResponse,
+  DeleteHoroscopeSignResponse,
+  HoroscopeSignType,
+  UpdateHoroscopeSignResponse,
+} from '../types/HoroscopeSignTypes';
 import {
   CreateHoroscopeResponse,
   DeleteHoroscopeResponse,
@@ -46,16 +47,20 @@ export class HoroscopeResolver {
         user: input.user,
       });
       await horoscope.save();
-      const plain = horoscope.toObject() as PlainHoroscope;
+      const obj = horoscope.toObject();
       return {
         success: true,
         message: 'Horoscope created successfully',
         horoscope: {
-          ...plain,
-          id: plain._id ? plain._id.toString() : '',
-          user: plain.user ? plain.user.toString() : '',
-          createdAt: plain.createdAt ?? new Date(0),
-          updatedAt: plain.updatedAt ?? new Date(0),
+          id: obj._id ? obj._id.toString() : '',
+          locale: obj.locale,
+          horoscopeDate: obj.horoscopeDate,
+          horoscopeText: obj.horoscopeText,
+          sign: obj.sign,
+          status: obj.status,
+          user: obj.user ? obj.user.toString() : '',
+          createdAt: obj.createdAt ?? new Date(0),
+          updatedAt: obj.updatedAt ?? new Date(0),
         },
       };
     } catch (error) {
@@ -99,16 +104,20 @@ export class HoroscopeResolver {
         horoscope.user = new Types.ObjectId(input.user);
       }
       await horoscope.save();
-      const plain = horoscope.toObject() as PlainHoroscope;
+      const obj = horoscope.toObject();
       return {
         success: true,
         message: 'Horoscope updated successfully',
         horoscope: {
-          ...plain,
-          id: plain._id ? plain._id.toString() : '',
-          user: plain.user ? plain.user.toString() : '',
-          createdAt: plain.createdAt ?? new Date(0),
-          updatedAt: plain.updatedAt ?? new Date(0),
+          id: obj._id ? obj._id.toString() : '',
+          locale: obj.locale,
+          horoscopeDate: obj.horoscopeDate,
+          horoscopeText: obj.horoscopeText,
+          sign: obj.sign,
+          status: obj.status,
+          user: obj.user ? obj.user.toString() : '',
+          createdAt: obj.createdAt ?? new Date(0),
+          updatedAt: obj.updatedAt ?? new Date(0),
         },
       };
     } catch (error) {
@@ -169,15 +178,170 @@ export class HoroscopeResolver {
       .limit(limit)
       .populate('user');
     return horoscopes.map((doc) => {
-      const plain = doc.toObject() as PlainHoroscope;
+      const obj = doc.toObject();
       return {
-        ...plain,
-        id: plain._id ? plain._id.toString() : '',
-        user: plain.user ? plain.user.toString() : '',
-        createdAt: plain.createdAt ?? new Date(0),
-        updatedAt: plain.updatedAt ?? new Date(0),
+        id: obj._id ? obj._id.toString() : '',
+        locale: obj.locale,
+        horoscopeDate: obj.horoscopeDate,
+        horoscopeText: obj.horoscopeText,
+        sign: obj.sign,
+        status: obj.status,
+        user: obj.user ? obj.user.toString() : '',
+        createdAt: obj.createdAt ?? new Date(0),
+        updatedAt: obj.updatedAt ?? new Date(0),
       };
     });
   }
-  // End of HoroscopeResolver
+  // --- Horoscope Sign Endpoints ---
+
+  @Mutation(() => CreateHoroscopeSignResponse)
+  async createHoroscopeSign(
+    @Ctx() context: GraphQLContext,
+    @Arg('input', () => CreateHoroscopeSignInput)
+    input: CreateHoroscopeSignInput
+  ): Promise<CreateHoroscopeSignResponse> {
+    context.hasUserAdminWriteAppWriteScope(context);
+    if (!input.sign || !input.locale) {
+      throw new ValidationError('Sign and locale are required');
+    }
+    // Enforce uniqueness of sign+locale
+    const existing = await HoroscopeSign.findOne({
+      sign: input.sign,
+      locale: input.locale,
+    });
+    if (existing) {
+      throw new ValidationError('Sign and locale combination must be unique');
+    }
+    try {
+      const signDoc = new HoroscopeSign(input);
+      await signDoc.save();
+      const obj = signDoc.toObject();
+      return {
+        success: true,
+        message: 'Horoscope sign created successfully',
+        sign: {
+          id: obj._id ? obj._id.toString() : '',
+          sign: obj.sign,
+          locale: obj.locale,
+          description: obj.description ?? '',
+          signDateStart: obj.signDateStart ?? new Date(0),
+          signDateEnd: obj.signDateEnd ?? new Date(0),
+          imageAsset: obj.imageAsset ?? '',
+          title: obj.title ?? '',
+          createdAt: obj.createdAt ?? new Date(0),
+          updatedAt: obj.updatedAt ?? new Date(0),
+        },
+      };
+    } catch (error) {
+      console.error('Error creating horoscope sign:', error);
+      throw new ValidationError('Failed to create horoscope sign');
+    }
+  }
+
+  @Query(() => [HoroscopeSignType])
+  async getHoroscopeSigns(
+    @Ctx() context: GraphQLContext,
+    @Arg('locale', () => String) locale: string,
+    @Arg('sign', () => String, { nullable: true }) sign?: string
+  ): Promise<HoroscopeSignType[]> {
+    context.hasUserAdminWriteAppWriteScope(context);
+    const filter: Record<string, unknown> = { locale };
+    if (sign) filter.sign = sign;
+    const signs = await HoroscopeSign.find(filter).sort({ sign: 1 });
+    return signs.map((doc) => {
+      const obj = doc.toObject();
+      return {
+        id: obj._id ? obj._id.toString() : '',
+        sign: obj.sign,
+        locale: obj.locale,
+        description: obj.description ?? '',
+        signDateStart: obj.signDateStart ?? new Date(0),
+        signDateEnd: obj.signDateEnd ?? new Date(0),
+        imageAsset: obj.imageAsset ?? '',
+        title: obj.title ?? '',
+        createdAt: obj.createdAt ?? new Date(0),
+        updatedAt: obj.updatedAt ?? new Date(0),
+      };
+    });
+  }
+
+  @Mutation(() => DeleteHoroscopeSignResponse)
+  async deleteHoroscopeSign(
+    @Ctx() context: GraphQLContext,
+    @Arg('id', () => ID) id: string
+  ): Promise<DeleteHoroscopeSignResponse> {
+    context.hasUserAdminWriteAppWriteScope(context);
+    const signDoc = await HoroscopeSign.findById(id);
+    if (!signDoc) {
+      throw new NotFoundError('Horoscope sign not found');
+    }
+    try {
+      await HoroscopeSign.findByIdAndDelete(id);
+      return {
+        success: true,
+        message: 'Horoscope sign deleted successfully',
+      };
+    } catch (error) {
+      console.error('Error deleting horoscope sign:', error);
+      throw new ValidationError('Failed to delete horoscope sign');
+    }
+  }
+
+  @Mutation(() => UpdateHoroscopeSignResponse)
+  async updateHoroscopeSign(
+    @Ctx() context: GraphQLContext,
+    @Arg('id', () => ID) id: string,
+    @Arg('input', () => UpdateHoroscopeSignInput)
+    input: UpdateHoroscopeSignInput
+  ): Promise<UpdateHoroscopeSignResponse> {
+    context.hasUserAdminWriteAppWriteScope(context);
+    const signDoc = await HoroscopeSign.findById(id);
+    if (!signDoc) {
+      throw new NotFoundError('Horoscope sign not found');
+    }
+    // If updating sign+locale, enforce uniqueness
+    if (input.sign && input.locale) {
+      const existing = await HoroscopeSign.findOne({
+        sign: input.sign,
+        locale: input.locale,
+        _id: { $ne: id },
+      });
+      if (existing) {
+        throw new ValidationError('Sign and locale combination must be unique');
+      }
+    }
+    try {
+      if (input.sign !== undefined) signDoc.sign = input.sign;
+      if (input.locale !== undefined) signDoc.locale = input.locale;
+      if (input.description !== undefined)
+        signDoc.description = input.description;
+      if (input.signDateStart !== undefined)
+        signDoc.signDateStart = input.signDateStart;
+      if (input.signDateEnd !== undefined)
+        signDoc.signDateEnd = input.signDateEnd;
+      if (input.imageAsset !== undefined) signDoc.imageAsset = input.imageAsset;
+      if (input.title !== undefined) signDoc.title = input.title;
+      await signDoc.save();
+      const obj = signDoc.toObject();
+      return {
+        success: true,
+        message: 'Horoscope sign updated successfully',
+        sign: {
+          id: obj._id ? obj._id.toString() : '',
+          sign: obj.sign,
+          locale: obj.locale,
+          description: obj.description ?? '',
+          signDateStart: obj.signDateStart ?? new Date(0),
+          signDateEnd: obj.signDateEnd ?? new Date(0),
+          imageAsset: obj.imageAsset ?? '',
+          title: obj.title ?? '',
+          createdAt: obj.createdAt ?? new Date(0),
+          updatedAt: obj.updatedAt ?? new Date(0),
+        },
+      };
+    } catch (error) {
+      console.error('Error updating horoscope sign:', error);
+      throw new ValidationError('Failed to update horoscope sign');
+    }
+  }
 }
