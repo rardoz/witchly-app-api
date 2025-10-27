@@ -1737,8 +1737,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation CreateHoroscopeSign($input: CreateHoroscopeSignInput!) {\n  createHoroscopeSign(input: $input) {\n    success\n    message\n    sign {\n      _id\n      sign\n      locale\n      description\n      signDateStart\n      signDateEnd\n      imageAsset\n      title\n      createdAt\n      updatedAt\n      asset {\n        id\n      }\n    }\n  }\n}",
-								"variables": "{\n  \"input\": {\n    \"sign\": \"aries\",\n    \"locale\": \"fr\",\n    \"description\": \"The first sign of the zodiac.\",\n    \"signDateStart\": \"2025-03-21T00:00:00.000Z\",\n    \"signDateEnd\": \"2025-04-19T00:00:00.000Z\",\n    \"asset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"title\": \"Aries\"\n  }\n}"
+								"query": "mutation CreateHoroscopeSign($input: CreateHoroscopeSignInput!) {\n  createHoroscopeSign(input: $input) {\n    success\n    message\n    sign {\n      _id\n      sign\n      locale\n      description\n      signDateStart\n      signDateEnd\n      imageAsset\n      title\n      createdAt\n      updatedAt\n      asset {\n        id\n        s3Key\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"sign\": \"ariess\",\n    \"locale\": \"fr\",\n    \"description\": \"The first sign of the zodiac.\",\n    \"signDateStart\": \"2025-03-21T00:00:00.000Z\",\n    \"signDateEnd\": \"2025-04-19T00:00:00.000Z\",\n    \"asset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"title\": \"Aries\"\n  }\n}"
 							}
 						},
 						"url": {
