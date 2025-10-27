@@ -1929,8 +1929,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation UpdateHoroscope($id: ID!, $input: UpdateHoroscopeInput!) {\n  updateHoroscope(id: $id, input: $input) {\n    success\n    message\n    horoscope {\n      id\n      sign\n      status\n      locale\n      horoscopeDate\n      horoscopeText\n      user\n      createdAt\n      updatedAt\n    }\n  }\n}",
-								"variables": "{\n  \"id\": \"<REPLACE_WITH_HOROSCOPE_ID>\",\n  \"input\": {\n    \"status\": \"sent\",\n    \"horoscopeText\": \"Updated text\"\n  }\n}"
+								"query": "mutation UpdateHoroscope($id: ID!, $input: UpdateHoroscopeInput!) {\n  updateHoroscope(id: $id, input: $input) {\n    success\n    message\n    horoscope {\n      _id\n      sign\n      status\n      locale\n      horoscopeDate\n      horoscopeText\n      user {\n        id\n        handle\n        name\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"id\": \"68fffb336921e52051373b15\",\n  \"input\": {\n    \"status\": \"sent\",\n    \"horoscopeText\": \"Updated text\"\n  }\n}"
 							}
 						},
 						"url": {
