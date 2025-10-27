@@ -1775,8 +1775,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation UpdateHoroscopeSign($id: ID!, $input: UpdateHoroscopeSignInput!) {\n  updateHoroscopeSign(id: $id, input: $input) {\n    success\n    message\n    sign {\n      id\n      sign\n      locale\n      description\n      signDateStart\n      signDateEnd\n      imageAsset\n      title\n      createdAt\n      updatedAt\n    }\n  }\n}",
-								"variables": "{\n  \"id\": \"<REPLACE_WITH_SIGN_ID>\",\n  \"input\": {\n    \"description\": \"Updated description\"\n  }\n}"
+								"query": "mutation UpdateHoroscopeSign($id: ID!, $input: UpdateHoroscopeSignInput!) {\n  updateHoroscopeSign(id: $id, input: $input) {\n    success\n    message\n    sign {\n      _id\n      sign\n      locale\n      description\n      signDateStart\n      signDateEnd\n      asset {\n        id\n        s3Key\n      }\n      title\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"id\": \"6900002db07abd64c9841353\",\n  \"input\": {\n    \"description\": \"Updated description\"\n  }\n}"
 							}
 						},
 						"url": {
