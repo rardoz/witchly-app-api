@@ -1890,7 +1890,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation CreateHoroscope($input: CreateHoroscopeInput!) {\n  createHoroscope(input: $input) {\n    success\n    message\n    horoscope {\n      id\n      sign\n      status\n      locale\n      horoscopeDate\n      horoscopeText\n      user\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"query": "mutation CreateHoroscope($input: CreateHoroscopeInput!) {\n  createHoroscope(input: $input) {\n    success\n    message\n    horoscope {\n      _id\n      sign\n      status\n      locale\n      horoscopeDate\n      horoscopeText\n      user\n      createdAt\n      updatedAt\n    }\n  }\n}",
 								"variables": "{\n  \"input\": {\n    \"sign\": \"aries\",\n    \"status\": \"pending\",\n    \"locale\": \"en\",\n    \"horoscopeDate\": \"2025-10-27T00:00:00.000Z\",\n    \"horoscopeText\": \"You will have a great day!\"\n  }\n}"
 							}
 						},
