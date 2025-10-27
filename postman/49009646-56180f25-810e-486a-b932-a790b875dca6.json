@@ -1968,7 +1968,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation DeleteHoroscope($id: ID!) {\n  deleteHoroscope(id: $id) {\n    success\n    message\n  }\n}",
-								"variables": "{\n  \"id\": \"<REPLACE_WITH_HOROSCOPE_ID>\"\n}"
+								"variables": "{\n  \"id\": \"68fffb336921e52051373b15\"\n}"
 							}
 						},
 						"url": {
