@@ -1814,7 +1814,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation DeleteHoroscopeSign($id: ID!) {\n  deleteHoroscopeSign(id: $id) {\n    success\n    message\n  }\n}",
-								"variables": "{\n  \"id\": \"<REPLACE_WITH_SIGN_ID>\"\n}"
+								"variables": "{\n  \"id\": \"6900002db07abd64c9841353\"\n}"
 							}
 						},
 						"url": {
