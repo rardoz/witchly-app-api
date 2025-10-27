@@ -1699,7 +1699,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetHoroscopeSigns($locale: String!, $sign: String) {\n  getHoroscopeSigns(locale: $locale, sign: $sign) {\n    id\n    sign\n    locale\n    description\n    signDateStart\n    signDateEnd\n    imageAsset\n    title\n    createdAt\n    updatedAt\n  }\n}",
+								"query": "query GetHoroscopeSigns($locale: String!, $sign: String) {\n  getHoroscopeSigns(locale: $locale, sign: $sign) {\n    _id\n    sign\n    locale\n    description\n    signDateStart\n    signDateEnd\n    asset {\n        id\n        s3Key\n    }\n    title\n    createdAt\n    updatedAt\n  }\n}",
 								"variables": "{\n  \"locale\": \"en\",\n  \"sign\": \"aries\"\n}"
 							}
 						},
