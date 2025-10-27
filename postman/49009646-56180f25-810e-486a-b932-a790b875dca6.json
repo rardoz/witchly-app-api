@@ -1679,6 +1679,94 @@
 			"name": "🔮 Horoscopes (GraphQL)",
 			"item": [
 				{
+					"name": "Get Horoscope Signs",
+					"id": "49009646-horoscopesign-get-all",
+					"protocolProfileBehavior": { "disableBodyPruning": true },
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-Session-Token", "value": "{{sessionToken}}" }
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetHoroscopeSigns($locale: String!, $sign: String) {\n  getHoroscopeSigns(locale: $locale, sign: $sign) {\n    id\n    sign\n    locale\n    description\n    signDateStart\n    signDateEnd\n    imageAsset\n    title\n    createdAt\n    updatedAt\n  }\n}",
+								"variables": "{\n  \"locale\": \"en\",\n  \"sign\": \"aries\"\n}"
+							}
+						},
+						"url": { "raw": "{{baseUrl}}/graphql", "host": ["{{baseUrl}}"], "path": ["graphql"] },
+						"description": "Get all horoscope signs for a locale, optionally filter by sign. Requires admin/write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Horoscope Sign",
+					"id": "49009646-horoscopesign-create",
+					"protocolProfileBehavior": { "disableBodyPruning": true },
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-Session-Token", "value": "{{sessionToken}}" }
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation CreateHoroscopeSign($input: CreateHoroscopeSignInput!) {\n  createHoroscopeSign(input: $input) {\n    success\n    message\n    sign {\n      id\n      sign\n      locale\n      description\n      signDateStart\n      signDateEnd\n      imageAsset\n      title\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"sign\": \"aries\",\n    \"locale\": \"en\",\n    \"description\": \"The first sign of the zodiac.\",\n    \"signDateStart\": \"2025-03-21T00:00:00.000Z\",\n    \"signDateEnd\": \"2025-04-19T00:00:00.000Z\",\n    \"imageAsset\": \"aries.png\",\n    \"title\": \"Aries\"\n  }\n}"
+							}
+						},
+						"url": { "raw": "{{baseUrl}}/graphql", "host": ["{{baseUrl}}"], "path": ["graphql"] },
+						"description": "Create a new horoscope sign. Requires admin/write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Horoscope Sign",
+					"id": "49009646-horoscopesign-update",
+					"protocolProfileBehavior": { "disableBodyPruning": true },
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-Session-Token", "value": "{{sessionToken}}" }
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation UpdateHoroscopeSign($id: ID!, $input: UpdateHoroscopeSignInput!) {\n  updateHoroscopeSign(id: $id, input: $input) {\n    success\n    message\n    sign {\n      id\n      sign\n      locale\n      description\n      signDateStart\n      signDateEnd\n      imageAsset\n      title\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"id\": \"<REPLACE_WITH_SIGN_ID>\",\n  \"input\": {\n    \"description\": \"Updated description\"\n  }\n}"
+							}
+						},
+						"url": { "raw": "{{baseUrl}}/graphql", "host": ["{{baseUrl}}"], "path": ["graphql"] },
+						"description": "Update an existing horoscope sign. Requires admin/write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Horoscope Sign",
+					"id": "49009646-horoscopesign-delete",
+					"protocolProfileBehavior": { "disableBodyPruning": true },
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-Session-Token", "value": "{{sessionToken}}" }
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation DeleteHoroscopeSign($id: ID!) {\n  deleteHoroscopeSign(id: $id) {\n    success\n    message\n  }\n}",
+								"variables": "{\n  \"id\": \"<REPLACE_WITH_SIGN_ID>\"\n}"
+							}
+						},
+						"url": { "raw": "{{baseUrl}}/graphql", "host": ["{{baseUrl}}"], "path": ["graphql"] },
+						"description": "Delete a horoscope sign by ID. Requires admin/write scope."
+					},
+					"response": []
+				},
+				{
 					"name": "Get All Horoscopes",
 					"id": "49009646-horoscope-get-all",
 					"protocolProfileBehavior": {
