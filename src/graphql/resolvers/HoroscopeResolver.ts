@@ -274,7 +274,8 @@ export class HoroscopeResolver {
         signDoc.signDateStart = input.signDateStart;
       if (input.signDateEnd !== undefined)
         signDoc.signDateEnd = input.signDateEnd;
-      //if (input.imageAsset !== undefined) signDoc.imageAsset = input.imageAsset;
+      if (input.asset !== undefined)
+        signDoc.asset = new Types.ObjectId(input.asset);
       if (input.title !== undefined) signDoc.title = input.title;
       await signDoc.save();
       await signDoc.populate('asset');
