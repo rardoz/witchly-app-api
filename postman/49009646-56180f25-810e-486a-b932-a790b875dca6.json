@@ -1676,7 +1676,7 @@
 			"description": "Complete CRUD operations for tarot deck management. Create/Update operations require admin session scope."
 		},
 		{
-			"name": "🔮 Horoscopes (GraphQL)",
+			"name": "♒ Horoscopes (GraphQL)",
 			"item": [
 				{
 					"name": "Get Horoscope Signs",
