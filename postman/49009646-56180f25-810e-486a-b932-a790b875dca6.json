@@ -1026,7 +1026,7 @@
 			"description": "OAuth2 client management operations via GraphQL"
 		},
 		{
-			"name": "� Asset Management (GraphQL + REST)",
+			"name": "Asset Management (GraphQL + REST)",
 			"item": [
 				{
 					"name": "Get All Assets (Paginated)",
