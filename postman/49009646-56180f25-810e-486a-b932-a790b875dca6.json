@@ -1578,8 +1578,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation UpdateTarotDeck($id: ID!, $input: UpdateTarotDeckInput!) {\n    updateTarotDeck(id: $id, input: $input) {\n        success\n        message\n        deck {\n            _id\n            name\n            user {\n                id\n                handle\n            }\n            primaryAsset {\n                s3Key\n            }\n            cardBackgroundAsset {\n                s3Key\n            }\n            primaryColor\n            description\n            author\n            meta\n            layoutType\n            layoutCount\n            status\n            createdAt\n            updatedAt\n        }\n    }\n}",
-								"variables": "{\n    \"id\": \"69001f190a9ce53d9b0c9fa5\",\n    \"input\": {\n        \"name\": \"Updated Deck Name 2223\",\n        \"description\": \"Updated description with new insights and expanded guidance.\",\n        \"primaryColor\": \"#8B5CF6\",\n        \"status\": \"active\"\n    }\n}"
+								"query": "mutation UpdateTarotDeck($id: ID!, $input: UpdateTarotDeckInput!) {\n    updateTarotDeck(id: $id, input: $input) {\n        success\n        message\n        deck {\n            _id\n            name\n            locale\n            user {\n                id\n                handle\n            }\n            primaryAsset {\n                s3Key\n            }\n            cardBackgroundAsset {\n                s3Key\n            }\n            primaryColor\n            description\n            author\n            meta\n            layoutType\n            layoutCount\n            status\n            createdAt\n            updatedAt\n        }\n    }\n}",
+								"variables": "{\n    \"id\": \"690026b334abcd28512e690b\",\n    \"input\": {\n        \"name\": \"Updated Deck Name 2223333\",\n        \"locale\": \"en\",\n        \"description\": \"Updated description with new insights and expanded guidance.\",\n        \"primaryColor\": \"#8B5CF6\",\n        \"status\": \"active\"\n    }\n}"
 							}
 						},
 						"url": {
