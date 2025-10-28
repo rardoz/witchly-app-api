@@ -18,7 +18,7 @@ export class CreateHoroscopeSignInput {
   signDateEnd?: Date;
 
   @Field({ nullable: true })
-  imageAsset?: string;
+  asset?: string;
 
   @Field({ nullable: true })
   title?: string;
@@ -42,7 +42,7 @@ export class UpdateHoroscopeSignInput {
   signDateEnd?: Date;
 
   @Field({ nullable: true })
-  imageAsset?: string;
+  asset?: string;
 
   @Field({ nullable: true })
   title?: string;

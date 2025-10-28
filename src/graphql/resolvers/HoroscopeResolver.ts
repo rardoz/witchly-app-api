@@ -1,6 +1,8 @@
 // Removed PlainHoroscopeSign and PlainHoroscope interfaces; use HoroscopeSignType and HoroscopeType instead
 
+import { Types } from 'mongoose';
 import { Arg, Ctx, ID, Int, Mutation, Query, Resolver } from 'type-graphql';
+
 import { GraphQLContext } from '../../middleware/auth.middleware';
 import { Horoscope } from '../../models/Horoscope';
 import { HoroscopeSign } from '../../models/HoroscopeSign';
@@ -44,24 +46,14 @@ export class HoroscopeResolver {
         horoscopeText: input.horoscopeText,
         sign: input.sign,
         status: input.status || 'pending',
-        user: input.user,
+        user: new Types.ObjectId(context.userId),
       });
       await horoscope.save();
-      const obj = horoscope.toObject();
+      await horoscope.populate('user');
       return {
         success: true,
         message: 'Horoscope created successfully',
-        horoscope: {
-          id: obj._id ? obj._id.toString() : '',
-          locale: obj.locale,
-          horoscopeDate: obj.horoscopeDate,
-          horoscopeText: obj.horoscopeText,
-          sign: obj.sign,
-          status: obj.status,
-          user: obj.user ? obj.user.toString() : '',
-          createdAt: obj.createdAt ?? new Date(0),
-          updatedAt: obj.updatedAt ?? new Date(0),
-        },
+        horoscope: horoscope as unknown as HoroscopeType,
       };
     } catch (error) {
       console.error('Error creating horoscope:', error);
@@ -97,28 +89,14 @@ export class HoroscopeResolver {
         (input.status === 'sent' || input.status === 'pending')
       )
         horoscope.status = input.status;
-      if (input.user !== undefined) {
-        // Convert string to ObjectId
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const { Types } = require('mongoose');
-        horoscope.user = new Types.ObjectId(input.user);
-      }
+
+      horoscope.user = new Types.ObjectId(context.userId);
       await horoscope.save();
-      const obj = horoscope.toObject();
+      await horoscope.populate('user');
       return {
         success: true,
         message: 'Horoscope updated successfully',
-        horoscope: {
-          id: obj._id ? obj._id.toString() : '',
-          locale: obj.locale,
-          horoscopeDate: obj.horoscopeDate,
-          horoscopeText: obj.horoscopeText,
-          sign: obj.sign,
-          status: obj.status,
-          user: obj.user ? obj.user.toString() : '',
-          createdAt: obj.createdAt ?? new Date(0),
-          updatedAt: obj.updatedAt ?? new Date(0),
-        },
+        horoscope: horoscope as unknown as HoroscopeType,
       };
     } catch (error) {
       console.error('Error updating horoscope:', error);
@@ -177,20 +155,7 @@ export class HoroscopeResolver {
       .skip(offset)
       .limit(limit)
       .populate('user');
-    return horoscopes.map((doc) => {
-      const obj = doc.toObject();
-      return {
-        id: obj._id ? obj._id.toString() : '',
-        locale: obj.locale,
-        horoscopeDate: obj.horoscopeDate,
-        horoscopeText: obj.horoscopeText,
-        sign: obj.sign,
-        status: obj.status,
-        user: obj.user ? obj.user.toString() : '',
-        createdAt: obj.createdAt ?? new Date(0),
-        updatedAt: obj.updatedAt ?? new Date(0),
-      };
-    });
+    return horoscopes as unknown as HoroscopeType[];
   }
   // --- Horoscope Sign Endpoints ---
 
@@ -215,22 +180,11 @@ export class HoroscopeResolver {
     try {
       const signDoc = new HoroscopeSign(input);
       await signDoc.save();
-      const obj = signDoc.toObject();
+      await signDoc.populate('asset');
       return {
         success: true,
         message: 'Horoscope sign created successfully',
-        sign: {
-          id: obj._id ? obj._id.toString() : '',
-          sign: obj.sign,
-          locale: obj.locale,
-          description: obj.description ?? '',
-          signDateStart: obj.signDateStart ?? new Date(0),
-          signDateEnd: obj.signDateEnd ?? new Date(0),
-          imageAsset: obj.imageAsset ?? '',
-          title: obj.title ?? '',
-          createdAt: obj.createdAt ?? new Date(0),
-          updatedAt: obj.updatedAt ?? new Date(0),
-        },
+        sign: signDoc as unknown as HoroscopeSignType,
       };
     } catch (error) {
       console.error('Error creating horoscope sign:', error);
@@ -241,28 +195,29 @@ export class HoroscopeResolver {
   @Query(() => [HoroscopeSignType])
   async getHoroscopeSigns(
     @Ctx() context: GraphQLContext,
-    @Arg('locale', () => String) locale: string,
-    @Arg('sign', () => String, { nullable: true }) sign?: string
+    @Arg('locale', () => String, { nullable: true }) locale?: string,
+    @Arg('sign', () => String, { nullable: true }) sign?: string,
+    @Arg('limit', () => Int, { nullable: true, defaultValue: 10 })
+    limit: number = 10,
+    @Arg('offset', () => Int, { nullable: true, defaultValue: 0 })
+    offset: number = 0
   ): Promise<HoroscopeSignType[]> {
     context.hasUserAdminWriteAppWriteScope(context);
-    const filter: Record<string, unknown> = { locale };
+    if (limit < 1 || limit > 100) {
+      throw new ValidationError('Limit must be between 1 and 100');
+    }
+    if (offset < 0) {
+      throw new ValidationError('Offset must be non-negative');
+    }
+    const filter: Record<string, unknown> = {};
+    if (locale) filter.locale = locale;
     if (sign) filter.sign = sign;
-    const signs = await HoroscopeSign.find(filter).sort({ sign: 1 });
-    return signs.map((doc) => {
-      const obj = doc.toObject();
-      return {
-        id: obj._id ? obj._id.toString() : '',
-        sign: obj.sign,
-        locale: obj.locale,
-        description: obj.description ?? '',
-        signDateStart: obj.signDateStart ?? new Date(0),
-        signDateEnd: obj.signDateEnd ?? new Date(0),
-        imageAsset: obj.imageAsset ?? '',
-        title: obj.title ?? '',
-        createdAt: obj.createdAt ?? new Date(0),
-        updatedAt: obj.updatedAt ?? new Date(0),
-      };
-    });
+    const signs = await HoroscopeSign.find(filter)
+      .sort({ sign: 1 })
+      .skip(offset)
+      .limit(limit)
+      .populate('asset');
+    return signs as unknown as HoroscopeSignType[];
   }
 
   @Mutation(() => DeleteHoroscopeSignResponse)
@@ -319,25 +274,14 @@ export class HoroscopeResolver {
         signDoc.signDateStart = input.signDateStart;
       if (input.signDateEnd !== undefined)
         signDoc.signDateEnd = input.signDateEnd;
-      if (input.imageAsset !== undefined) signDoc.imageAsset = input.imageAsset;
+      //if (input.imageAsset !== undefined) signDoc.imageAsset = input.imageAsset;
       if (input.title !== undefined) signDoc.title = input.title;
       await signDoc.save();
-      const obj = signDoc.toObject();
+      await signDoc.populate('asset');
       return {
         success: true,
         message: 'Horoscope sign updated successfully',
-        sign: {
-          id: obj._id ? obj._id.toString() : '',
-          sign: obj.sign,
-          locale: obj.locale,
-          description: obj.description ?? '',
-          signDateStart: obj.signDateStart ?? new Date(0),
-          signDateEnd: obj.signDateEnd ?? new Date(0),
-          imageAsset: obj.imageAsset ?? '',
-          title: obj.title ?? '',
-          createdAt: obj.createdAt ?? new Date(0),
-          updatedAt: obj.updatedAt ?? new Date(0),
-        },
+        sign: signDoc as unknown as HoroscopeSignType,
       };
     } catch (error) {
       console.error('Error updating horoscope sign:', error);

@@ -1,10 +1,11 @@
 import { Field, ID, ObjectType } from 'type-graphql';
+import { User } from './User';
 // Removed UserType import as it is no longer used
 
 @ObjectType()
 export class HoroscopeType {
   @Field(() => ID)
-  id: string;
+  _id: unknown;
 
   @Field()
   locale: string;
@@ -21,8 +22,8 @@ export class HoroscopeType {
   @Field()
   status: string;
 
-  @Field(() => ID)
-  user: string; // Changed type from UserType to string
+  @Field(() => User)
+  user: User;
 
   @Field()
   createdAt: Date;

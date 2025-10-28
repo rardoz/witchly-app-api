@@ -1,7 +1,6 @@
 import { HoroscopeSign } from '../models/HoroscopeSign';
 
 describe('HoroscopeSignResolver', () => {
-  let createdSignId: string;
   const testLocale = 'en_US';
   const testSign = 'aries';
 
@@ -9,50 +8,58 @@ describe('HoroscopeSignResolver', () => {
     await HoroscopeSign.deleteMany({});
   });
 
-  it('should create a horoscope sign', async () => {
+  async function _createHoroscope(locale: string) {
     const mutation = `
       mutation CreateHoroscopeSign($input: CreateHoroscopeSignInput!) {
         createHoroscopeSign(input: $input) {
           success
           message
           sign {
-            id
+            _id
             sign
             locale
             description
             signDateStart
             signDateEnd
-            imageAsset
+            asset {
+              id
+              s3Key
+            }
             title
           }
         }
       }
     `;
+
     const variables = {
       input: {
         sign: testSign,
-        locale: testLocale,
+        locale: locale,
         description: 'The first sign of the zodiac',
         signDateStart: '2025-03-21T00:00:00.000Z',
         signDateEnd: '2025-04-19T00:00:00.000Z',
-        imageAsset: 'https://example.com/aries.png',
+        asset: '64b8f0f2c2a1f2a5d6e8b123',
         title: 'Aries the Ram',
       },
     };
     const res = await global
       .adminUserAdminAppTestRequest()
       .send({ query: mutation, variables });
-    expect(res.body.data.createHoroscopeSign.success).toBe(true);
-    expect(res.body.data.createHoroscopeSign.sign.sign).toBe(testSign);
-    expect(res.body.data.createHoroscopeSign.sign.locale).toBe(testLocale);
-    createdSignId = res.body.data.createHoroscopeSign.sign.id;
+    return res.body.data;
+  }
+  it('should create a horoscope sign', async () => {
+    const data = await _createHoroscope(testLocale);
+    expect(data.createHoroscopeSign.success).toBe(true);
+    expect(data.createHoroscopeSign.sign.sign).toBe(testSign);
+    expect(data.createHoroscopeSign.sign.locale).toBe(testLocale);
   });
 
   it('should get horoscope signs by locale', async () => {
+    await _createHoroscope('en_CA');
     const query = `
       query GetHoroscopeSigns($locale: String!) {
         getHoroscopeSigns(locale: $locale) {
-          id
+          _id
           sign
           locale
           description
@@ -69,13 +76,14 @@ describe('HoroscopeSignResolver', () => {
   });
 
   it('should update a horoscope sign', async () => {
+    const data = await _createHoroscope('en_GB');
     const mutation = `
       mutation UpdateHoroscopeSign($id: ID!, $input: UpdateHoroscopeSignInput!) {
         updateHoroscopeSign(id: $id, input: $input) {
           success
           message
           sign {
-            id
+            _id
             sign
             locale
             description
@@ -85,7 +93,7 @@ describe('HoroscopeSignResolver', () => {
       }
     `;
     const variables = {
-      id: createdSignId,
+      id: data.createHoroscopeSign.sign._id,
       input: {
         description: 'Updated description',
         title: 'Updated Aries Title',
@@ -104,6 +112,8 @@ describe('HoroscopeSignResolver', () => {
   });
 
   it('should delete a horoscope sign', async () => {
+    const data = await _createHoroscope('en_AU');
+    const createdSignId = data.createHoroscopeSign.sign._id;
     const mutation = `
       mutation DeleteHoroscopeSign($id: ID!) {
         deleteHoroscopeSign(id: $id) {

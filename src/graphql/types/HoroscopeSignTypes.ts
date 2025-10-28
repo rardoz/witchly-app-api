@@ -1,9 +1,10 @@
 import { Field, ID, ObjectType } from 'type-graphql';
+import { Asset } from './AssetTypes';
 
 @ObjectType()
 export class HoroscopeSignType {
   @Field(() => ID)
-  id!: string;
+  _id: unknown;
 
   @Field()
   sign!: string;
@@ -31,6 +32,9 @@ export class HoroscopeSignType {
 
   @Field()
   updatedAt!: Date;
+
+  @Field(() => Asset, { nullable: true })
+  asset?: Asset;
 }
 
 @ObjectType()

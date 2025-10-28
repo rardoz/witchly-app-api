@@ -1,4 +1,4 @@
-import { type Document, model, Schema } from 'mongoose';
+import { type Document, model, Schema, Types } from 'mongoose';
 
 export interface IHoroscopeSign extends Document {
   sign: string;
@@ -6,7 +6,7 @@ export interface IHoroscopeSign extends Document {
   description?: string;
   signDateStart?: Date;
   signDateEnd?: Date;
-  imageAsset?: string;
+  asset?: Types.ObjectId;
   title?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -19,7 +19,7 @@ const horoscopeSignSchema = new Schema<IHoroscopeSign>(
     description: { type: String },
     signDateStart: { type: Date },
     signDateEnd: { type: Date },
-    imageAsset: { type: String },
+    asset: { type: Schema.Types.ObjectId, ref: 'Asset' },
     title: { type: String },
   },
   { timestamps: true }

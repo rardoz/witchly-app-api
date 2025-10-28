@@ -1,25 +1,7 @@
 import { Horoscope } from '../models/Horoscope';
-import { IUser, User } from '../models/User';
 
 describe('HoroscopeResolver', () => {
-  let testUser: IUser;
-
-  beforeAll(async () => {
-    // Create a test user and get access token (mock or use fixtures)
-    testUser = await User.create({
-      email: 'testuser@example.com',
-      userType: 'basic',
-      emailVerified: true,
-      handle: 'testuser',
-    });
-  });
-
-  afterAll(async () => {
-    await Horoscope.deleteMany({});
-    await User.deleteMany({});
-  });
-
-  it('should create a horoscope', async () => {
+  async function _createHoroscope() {
     const mutation = `
       mutation {
         createHoroscope(input: {
@@ -27,16 +9,17 @@ describe('HoroscopeResolver', () => {
           horoscopeDate: "2025-10-27T00:00:00.000Z",
           horoscopeText: "You will have a great day!",
           sign: "aries",
-          status: "pending",
-          user: "${testUser.id}"
+          status: "pending"
         }) {
           success
           message
           horoscope {
-            id
+            _id
             sign
             status
-            user
+            user {
+             id
+            }
           }
         }
       }
@@ -44,37 +27,47 @@ describe('HoroscopeResolver', () => {
     const res = await global
       .adminUserAdminAppTestRequest()
       .send({ query: mutation });
+    return res;
+  }
+  it('should create a horoscope', async () => {
+    const res = await _createHoroscope();
     expect(res.body.data.createHoroscope.success).toBe(true);
     expect(res.body.data.createHoroscope.horoscope.sign).toBe('aries');
+    expect(res.body.data.createHoroscope.horoscope.user.id).toBe(
+      global.adminUserId
+    );
   });
 
   it('should get horoscopes with filter', async () => {
+    await _createHoroscope();
     const query = `
       query {
         horoscopes(sign: "aries", status: "pending", limit: 5, offset: 0) {
-          id
+          _id
           sign
           status
-          user
+          user {
+            id
+          }
         }
       }
     `;
     const res = await global.adminUserAdminAppTestRequest().send({ query });
     expect(res.body.data.horoscopes.length).toBeGreaterThan(0);
-    expect(res.body.data.horoscopes[0].sign).toBe('aries');
+    expect(res.body.data.horoscopes[0].user.id).toBe(global.adminUserId);
   });
 
   it('should update a horoscope', async () => {
+    await _createHoroscope();
     const horoscope = await Horoscope.findOne({ sign: 'aries' });
     expect(horoscope).not.toBeNull();
-    if (!horoscope) throw new Error('Horoscope not found for update test');
     const mutation = `
       mutation {
-        updateHoroscope(id: "${horoscope.id}", input: { status: "sent" }) {
+        updateHoroscope(id: "${horoscope?.id}", input: { status: "sent" }) {
           success
           message
           horoscope {
-            id
+            _id
             status
           }
         }
@@ -88,6 +81,7 @@ describe('HoroscopeResolver', () => {
   });
 
   it('should delete a horoscope', async () => {
+    await _createHoroscope();
     const horoscope = await Horoscope.findOne({ sign: 'aries' });
     expect(horoscope).not.toBeNull();
     if (!horoscope) throw new Error('Horoscope not found for delete test');

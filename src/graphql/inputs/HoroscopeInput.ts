@@ -1,4 +1,4 @@
-import { Field, ID, InputType } from 'type-graphql';
+import { Field, InputType } from 'type-graphql';
 
 @InputType()
 export class CreateHoroscopeInput {
@@ -16,9 +16,6 @@ export class CreateHoroscopeInput {
 
   @Field({ defaultValue: 'pending' })
   status: string;
-
-  @Field(() => ID)
-  user: string;
 }
 
 @InputType()
@@ -37,7 +34,4 @@ export class UpdateHoroscopeInput {
 
   @Field({ nullable: true })
   status?: string;
-
-  @Field(() => ID, { nullable: true })
-  user?: string;
 }
