@@ -1540,7 +1540,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation CreateTarotDeck($input: CreateTarotDeckInput!) {\n    createTarotDeck(input: $input) {\n        success\n        message\n        deck {\n            _id\n            name\n            locale\n            user {\n                id\n                handle\n            }\n            primaryAsset {\n                s3Key\n            }\n            cardBackgroundAsset {\n                s3Key\n            }\n            primaryColor\n            description\n            author\n            meta\n            layoutType\n            layoutCount\n            status\n            createdAt\n            updatedAt\n        }\n    }\n}",
-								"variables": "{\n    \"input\": {\n        \"name\": \"Mystic Dreams Tarot 19s1.0ssss\",\n        \"locale\": \"en\",\n        \"primaryAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n        \"cardBackgroundAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n        \"primaryColor\": \"#6B46C1\",\n        \"description\": \"A beautiful tarot deck inspired by mystical dreams and celestial energies. Perfect for beginners and experienced readers alike.\",\n        \"author\": \"Luna Starweaver\",\n        \"meta\": [\"mystical\", \"dreams\", \"celestial\", \"beginner-friendly\"],\n        \"layoutType\": \"classic\",\n        \"layoutCount\": 3,\n        \"status\": \"active\"\n    }\n}"
+								"variables": "{\n    \"input\": {\n        \"name\": \"Mystic Dreams Tarot 19s1.0ssss\",\n        \"locale\": \"en_US\",\n        \"primaryAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n        \"cardBackgroundAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n        \"primaryColor\": \"#6B46C1\",\n        \"description\": \"A beautiful tarot deck inspired by mystical dreams and celestial energies. Perfect for beginners and experienced readers alike.\",\n        \"author\": \"Luna Starweaver\",\n        \"meta\": [\"mystical\", \"dreams\", \"celestial\", \"beginner-friendly\"],\n        \"layoutType\": \"classic\",\n        \"layoutCount\": 3,\n        \"status\": \"active\"\n    }\n}"
 							}
 						},
 						"url": {
@@ -1617,7 +1617,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation DeleteTarotDeck($id: ID!, $hardDelete: Boolean) {\n    deleteTarotDeck(id: $id, hardDelete: $hardDelete) {\n        success\n        message\n    }\n}",
-								"variables": "{\n    \"id\": \"69001f190a9ce53d9b0c9fa5\",\n    \"hardDelete\": false\n}"
+								"variables": "{\n    \"id\": \"690026b334abcd28512e690b\",\n    \"hardDelete\": false\n}"
 							}
 						},
 						"url": {
