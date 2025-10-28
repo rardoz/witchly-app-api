@@ -1396,7 +1396,7 @@
 			"description": "Complete asset management system supporting both simple and chunked uploads with GraphQL queries and REST endpoints. Features S3 integration, signed URLs, progress tracking, and dual authentication."
 		},
 		{
-			"name": "�🔍 GraphQL Introspection",
+			"name": "🔍 GraphQL Introspection",
 			"item": [
 				{
 					"name": "GraphQL Schema Introspection",
