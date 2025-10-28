@@ -1617,7 +1617,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation DeleteTarotDeck($id: ID!, $hardDelete: Boolean) {\n    deleteTarotDeck(id: $id, hardDelete: $hardDelete) {\n        success\n        message\n    }\n}",
-								"variables": "{\n    \"id\": \"68eb328199dcfa82327d86ed\",\n    \"hardDelete\": false\n}"
+								"variables": "{\n    \"id\": \"69001f190a9ce53d9b0c9fa5\",\n    \"hardDelete\": false\n}"
 							}
 						},
 						"url": {
@@ -1655,7 +1655,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation DeleteTarotDeck($id: ID!, $hardDelete: Boolean) {\n    deleteTarotDeck(id: $id, hardDelete: $hardDelete) {\n        success\n        message\n    }\n}",
-								"variables": "{\n    \"id\": \"68e9a8a738af61fcb45f7a33\",\n    \"hardDelete\": true\n}"
+								"variables": "{\n    \"id\": \"69001f190a9ce53d9b0c9fa5\",\n    \"hardDelete\": true\n}"
 							}
 						},
 						"url": {
