@@ -139,7 +139,7 @@ export class HoroscopeResolver {
     @Arg('offset', () => Int, { nullable: true, defaultValue: 0 })
     offset: number = 0
   ): Promise<HoroscopeType[]> {
-    context.hasUserAdminWriteAppWriteScope(context);
+    context.hasUserReadAppReadScope(context);
     if (limit < 1 || limit > 100) {
       throw new ValidationError('Limit must be between 1 and 100');
     }
@@ -202,7 +202,7 @@ export class HoroscopeResolver {
     @Arg('offset', () => Int, { nullable: true, defaultValue: 0 })
     offset: number = 0
   ): Promise<HoroscopeSignType[]> {
-    context.hasUserAdminWriteAppWriteScope(context);
+    context.hasUserReadAppReadScope(context);
     if (limit < 1 || limit > 100) {
       throw new ValidationError('Limit must be between 1 and 100');
     }
