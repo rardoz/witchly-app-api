@@ -5,7 +5,6 @@ import {
   IsInt,
   IsOptional,
   IsString,
-  IsUrl,
   Max,
   MaxLength,
   Min,
@@ -24,13 +23,11 @@ export class CreateTarotDeckInput {
 
   @Field({ nullable: true })
   @IsOptional()
-  @IsUrl({}, { message: 'Primary image URL must be a valid URL' })
-  primaryImageUrl?: string;
+  primaryAsset?: string;
 
   @Field({ nullable: true })
   @IsOptional()
-  @IsUrl({}, { message: 'Card background URL must be a valid URL' })
-  cardBackgroundUrl?: string;
+  cardBackgroundAsset?: string;
 
   @Field({ nullable: true })
   @IsOptional()
@@ -83,6 +80,11 @@ export class CreateTarotDeckInput {
     message: 'Status must be either "active", "paused", or "deleted"',
   })
   status?: 'active' | 'paused' | 'deleted';
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  locale?: string;
 }
 
 @InputType()
@@ -96,13 +98,11 @@ export class UpdateTarotDeckInput {
 
   @Field({ nullable: true })
   @IsOptional()
-  @IsUrl({}, { message: 'Primary image URL must be a valid URL' })
-  primaryImageUrl?: string;
+  primaryAsset?: string;
 
   @Field({ nullable: true })
   @IsOptional()
-  @IsUrl({}, { message: 'Card background URL must be a valid URL' })
-  cardBackgroundUrl?: string;
+  cardBackgroundAsset?: string;
 
   @Field({ nullable: true })
   @IsOptional()
@@ -155,4 +155,9 @@ export class UpdateTarotDeckInput {
     message: 'Status must be either "active", "paused", or "deleted"',
   })
   status?: 'active' | 'paused' | 'deleted';
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  locale?: string;
 }

@@ -1,3 +1,4 @@
+import { Types } from 'mongoose';
 import { Arg, Ctx, ID, Int, Mutation, Query, Resolver } from 'type-graphql';
 import { GraphQLContext } from '../../middleware/auth.middleware';
 import { TarotDeck } from '../../models/TarotDeck';
@@ -27,7 +28,9 @@ export class TarotDeckResolver {
     @Arg('offset', () => Int, { nullable: true, defaultValue: 0 })
     offset: number,
     @Arg('status', () => String, { nullable: true, defaultValue: 'active' })
-    status: 'active' | 'paused' | 'deleted'
+    status: 'active' | 'paused' | 'deleted',
+    @Arg('locale', () => String, { nullable: true })
+    locale: string
   ): Promise<TarotDeckType[]> {
     context.hasUserReadAppReadScope(context);
 
@@ -40,14 +43,20 @@ export class TarotDeckResolver {
       throw new ValidationError('Offset must be non-negative');
     }
 
-    const filter = { status };
+    const filter = { status } as { status: string; locale?: string };
+    if (locale) {
+      filter.locale = locale;
+    }
 
     const decks = await TarotDeck.find(filter)
       .sort({ createdAt: -1 })
       .skip(offset)
-      .limit(limit);
+      .limit(limit)
+      .populate('primaryAsset')
+      .populate('cardBackgroundAsset')
+      .populate('user');
 
-    return decks as TarotDeckType[];
+    return decks as unknown as TarotDeckType[];
   }
 
   @Query(() => TarotDeckType)
@@ -57,12 +66,16 @@ export class TarotDeckResolver {
   ): Promise<TarotDeckType> {
     context.hasUserReadAppReadScope(context);
 
-    const deck = await TarotDeck.findById(id);
+    const deck = await TarotDeck.findById(id)
+      .populate('primaryAsset')
+      .populate('cardBackgroundAsset')
+      .populate('user');
+
     if (!deck) {
       throw new NotFoundError('Tarot deck not found');
     }
 
-    return deck as TarotDeckType;
+    return deck as unknown as TarotDeckType;
   }
 
   @Mutation(() => CreateTarotDeckResponse)
@@ -73,7 +86,10 @@ export class TarotDeckResolver {
     context.hasUserAdminWriteAppWriteScope(context);
 
     // Check if deck with same name already exists
-    const existingDeck = await TarotDeck.findOne({ name: input.name });
+    const existingDeck = await TarotDeck.findOne({
+      name: input.name,
+      locale: input.locale,
+    });
     if (existingDeck) {
       throw new ConflictError('A tarot deck with this name already exists');
     }
@@ -99,8 +115,9 @@ export class TarotDeckResolver {
     try {
       const deck = new TarotDeck({
         name: input.name,
-        primaryImageUrl: input.primaryImageUrl,
-        cardBackgroundUrl: input.cardBackgroundUrl,
+        locale: input.locale,
+        primaryAsset: input.primaryAsset,
+        cardBackgroundAsset: input.cardBackgroundAsset,
         primaryColor: input.primaryColor,
         description: input.description,
         author: input.author,
@@ -108,24 +125,16 @@ export class TarotDeckResolver {
         layoutType: input.layoutType || 'default',
         layoutCount: input.layoutCount || 1,
         status: input.status || 'active',
+        user: context.userId,
       });
 
       await deck.save();
 
+      await deck.populate('primaryAsset');
+      await deck.populate('cardBackgroundAsset');
+      await deck.populate('user');
       return {
-        id: deck.id,
-        name: deck.name,
-        primaryImageUrl: deck.primaryImageUrl,
-        cardBackgroundUrl: deck.cardBackgroundUrl,
-        primaryColor: deck.primaryColor,
-        description: deck.description,
-        author: deck.author,
-        meta: deck.meta,
-        layoutType: deck.layoutType,
-        layoutCount: deck.layoutCount,
-        status: deck.status,
-        createdAt: deck.createdAt,
-        updatedAt: deck.updatedAt,
+        deck: deck as unknown as TarotDeckType,
         success: true,
         message: 'Tarot deck created successfully',
       } as CreateTarotDeckResponse;
@@ -154,6 +163,7 @@ export class TarotDeckResolver {
     if (input.name && input.name !== deck.name) {
       const existingDeck = await TarotDeck.findOne({
         name: input.name,
+        locale: input.locale,
         _id: { $ne: id },
       });
       if (existingDeck) {
@@ -182,8 +192,13 @@ export class TarotDeckResolver {
     try {
       // Update only provided fields
       if (input.name !== undefined) deck.name = input.name;
-      if (input.primaryImageUrl !== undefined)
-        deck.primaryImageUrl = input.primaryImageUrl;
+      if (input.locale !== undefined) deck.locale = input.locale;
+      if (input.primaryAsset !== undefined)
+        deck.primaryAsset = new Types.ObjectId(input.primaryAsset);
+      if (input.cardBackgroundAsset !== undefined)
+        deck.cardBackgroundAsset = new Types.ObjectId(
+          input.cardBackgroundAsset
+        );
       if (input.primaryColor !== undefined)
         deck.primaryColor = input.primaryColor;
       if (input.description !== undefined) deck.description = input.description;
@@ -192,23 +207,13 @@ export class TarotDeckResolver {
       if (input.layoutType !== undefined) deck.layoutType = input.layoutType;
       if (input.layoutCount !== undefined) deck.layoutCount = input.layoutCount;
       if (input.status !== undefined) deck.status = input.status;
-
+      deck.user = new Types.ObjectId(context.userId);
       await deck.save();
-
+      await deck.populate('primaryAsset');
+      await deck.populate('cardBackgroundAsset');
+      await deck.populate('user');
       return {
-        id: deck.id,
-        name: deck.name,
-        primaryImageUrl: deck.primaryImageUrl,
-        cardBackgroundUrl: deck.cardBackgroundUrl,
-        primaryColor: deck.primaryColor,
-        description: deck.description,
-        author: deck.author,
-        meta: deck.meta,
-        layoutType: deck.layoutType,
-        layoutCount: deck.layoutCount,
-        status: deck.status,
-        createdAt: deck.createdAt,
-        updatedAt: deck.updatedAt,
+        deck: deck as unknown as TarotDeckType,
         success: true,
         message: 'Tarot deck updated successfully',
       } as UpdateTarotDeckResponse;

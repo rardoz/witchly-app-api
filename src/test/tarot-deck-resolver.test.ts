@@ -11,8 +11,9 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
     await TarotDeck.create([
       {
         name: 'Test Deck 1',
-        primaryImageUrl: 'https://example.com/deck1.jpg',
-        cardBackgroundUrl: 'https://example.com/card-bg1.jpg',
+        locale: 'en',
+        primaryAsset: '68ff7ebe04e43ae41ca0fc59',
+        cardBackgroundAsset: '68ff7ebe04e43ae41ca0fc59',
         primaryColor: '#FF5733',
         description: 'A test tarot deck',
         author: 'Test Author',
@@ -23,7 +24,9 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
       },
       {
         name: 'Test Deck 2',
-        primaryImageUrl: 'https://example.com/deck2.jpg',
+        locale: 'en',
+        primaryAsset: '68ff7ebe04e43ae41ca0fc59',
+        cardBackgroundAsset: '68ff7ebe04e43ae41ca0fc59',
         primaryColor: '#33FF57',
         description: 'Another test tarot deck',
         author: 'Another Author',
@@ -34,7 +37,9 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
       },
       {
         name: 'Test Deck 3 Inactive',
-        primaryImageUrl: 'https://example.com/deck3.jpg',
+        locale: 'en',
+        primaryAsset: '68ff7ebe04e43ae41ca0fc59',
+        cardBackgroundAsset: '68ff7ebe04e43ae41ca0fc59',
         primaryColor: '#3357FF',
         description: 'An inactive test deck',
         author: 'Test Author',
@@ -51,10 +56,19 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
       const query = `
         query {
           tarotDecks(status: "active") {
-            id
+            _id
             name
-            primaryImageUrl
-            cardBackgroundUrl
+            locale
+            primaryAsset {
+              s3Key
+            }
+            cardBackgroundAsset {
+              s3Key
+            }
+            user {
+              id
+              handle
+            }
             primaryColor
             description
             author
@@ -87,7 +101,8 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
       const query = `
         query {
           tarotDecks(status: "paused") {
-            id
+            _id
+            locale
             name
             status
           }
@@ -106,8 +121,9 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
       const query = `
         query {
           tarotDecks(limit: 1, offset: 0) {
-            id
+            _id
             name
+            locale
           }
         }
       `;
@@ -124,8 +140,9 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
       const query = `
         query {
           tarotDecks {
-            id
+            _id
             name
+            locale
           }
         }
       `;
@@ -143,8 +160,9 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
     beforeEach(async () => {
       const deck = await TarotDeck.create({
         name: 'Test Single Deck',
-        primaryImageUrl: 'https://example.com/single.jpg',
-        cardBackgroundUrl: 'https://example.com/single-bg.jpg',
+        locale: 'en',
+        primaryAsset: '68ff7ebe04e43ae41ca0fc59',
+        cardBackgroundAsset: '68ff7ebe04e43ae41ca0fc59',
         primaryColor: '#FF5733',
         description: 'A single test deck',
         author: 'Test Author',
@@ -161,10 +179,19 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
       const query = `
         query {
           tarotDeck(id: "${testDeckId}") {
-            id
+            _id
             name
-            primaryImageUrl
-            cardBackgroundUrl
+            locale
+            primaryAsset {
+              s3Key
+            }
+            cardBackgroundAsset {
+              s3Key
+            }
+            user {
+              id
+              handle
+            }
             primaryColor
             description
             author
@@ -193,8 +220,9 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
       const query = `
         query {
           tarotDeck(id: "${fakeId}") {
-            id
+            _id
             name
+            locale
           }
         }
       `;
@@ -211,8 +239,9 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
   describe('Mutation: createTarotDeck', () => {
     const validDeckData = {
       name: 'Test Creation Deck',
-      primaryImageUrl: 'https://example.com/create.jpg',
-      cardBackgroundUrl: 'https://example.com/create-bg.jpg',
+      locale: 'en',
+      primaryAsset: '68ff7ebe04e43ae41ca0fc59',
+      cardBackgroundAsset: '68ff7ebe04e43ae41ca0fc59',
       primaryColor: '#FF5733',
       description: 'A deck for testing creation',
       author: 'Test Creator',
@@ -228,17 +257,28 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
           createTarotDeck(input: $input) {
             success
             message
-            id
-            name
-            primaryImageUrl
-            cardBackgroundUrl
-            primaryColor
-            description
-            author
-            meta
-            layoutType
-            layoutCount
-            status
+            deck {
+              _id
+              name
+              locale
+              primaryAsset {
+                s3Key
+              }
+              cardBackgroundAsset {
+                s3Key
+              }
+              user {
+                id
+                handle
+              }
+              primaryColor
+              description
+              author
+              meta
+              layoutType
+              layoutCount
+              status
+            }
           }
         }
       `;
@@ -260,7 +300,9 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
     it('should require admin session scope for deck creation with default values', async () => {
       const minimalDeckData = {
         name: 'Test Minimal Deck',
-        primaryImageUrl: 'https://example.com/minimal.jpg',
+        locale: 'en',
+        primaryAsset: '68ff7ebe04e43ae41ca0fc59',
+        cardBackgroundAsset: '68ff7ebe04e43ae41ca0fc59',
         primaryColor: '#FF5733',
         description: 'A minimal deck',
         author: 'Minimal Author',
@@ -270,12 +312,24 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
         mutation CreateTarotDeck($input: CreateTarotDeckInput!) {
           createTarotDeck(input: $input) {
             success
-            name
-            meta
-            cardBackgroundUrl
-            layoutType
-            layoutCount
-            status
+            deck {
+              name
+              meta
+              locale
+              primaryAsset {
+                s3Key
+              }
+              cardBackgroundAsset {
+                s3Key
+              }
+              user {
+                id
+                handle
+              }
+              layoutType
+              layoutCount
+              status
+            }
           }
         }
       `;
@@ -305,7 +359,10 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
         mutation CreateTarotDeck($input: CreateTarotDeckInput!) {
           createTarotDeck(input: $input) {
             success
-            name
+            deck {
+              _id
+              name
+            }
           }
         }
       `;
@@ -327,7 +384,7 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
     it('should require admin session scope for all deck creation attempts', async () => {
       const invalidDeckData = {
         ...validDeckData,
-        cardBackgroundUrl: 'not-a-valid-url',
+        cardBackgroundAsset: '68ff7ebe04e43ae41ca0fc59',
         name: 'Test Invalid Card Background URL Deck',
       };
 
@@ -335,7 +392,10 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
         mutation CreateTarotDeck($input: CreateTarotDeckInput!) {
           createTarotDeck(input: $input) {
             success
-            name
+            deck {
+              _id
+              name
+            }
           }
         }
       `;
@@ -362,7 +422,11 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
         mutation CreateTarotDeck($input: CreateTarotDeckInput!) {
           createTarotDeck(input: $input) {
             success
-            name
+            deck {
+              _id
+              name
+              locale
+           }
           }
         }
       `;
@@ -386,7 +450,11 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
         mutation CreateTarotDeck($input: CreateTarotDeckInput!) {
           createTarotDeck(input: $input) {
             success
-            name
+            deck {
+              _id
+              locale
+              name
+            }
           }
         }
       `;

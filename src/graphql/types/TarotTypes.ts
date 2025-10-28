@@ -1,18 +1,23 @@
 import { Field, ID, ObjectType } from 'type-graphql';
+import { Asset } from './AssetTypes';
+import { User } from './User';
 
 @ObjectType()
 export class TarotDeckType {
   @Field(() => ID)
-  id!: string;
+  _id: unknown;
 
   @Field({ nullable: true })
   name?: string;
 
   @Field({ nullable: true })
-  primaryImageUrl?: string;
+  primaryAsset?: Asset;
 
   @Field({ nullable: true })
-  cardBackgroundUrl?: string;
+  cardBackgroundAsset?: Asset;
+
+  @Field(() => User, { nullable: true })
+  user: User;
 
   @Field({ nullable: true })
   primaryColor?: string;
@@ -40,24 +45,33 @@ export class TarotDeckType {
 
   @Field()
   updatedAt!: Date;
+
+  @Field({ nullable: true })
+  locale?: string;
 }
 
 @ObjectType()
-export class CreateTarotDeckResponse extends TarotDeckType {
+export class CreateTarotDeckResponse {
   @Field()
   success!: boolean;
 
   @Field()
   message!: string;
+
+  @Field(() => TarotDeckType)
+  deck: TarotDeckType;
 }
 
 @ObjectType()
-export class UpdateTarotDeckResponse extends TarotDeckType {
+export class UpdateTarotDeckResponse {
   @Field()
   success!: boolean;
 
   @Field()
   message!: string;
+
+  @Field(() => TarotDeckType)
+  deck: TarotDeckType;
 }
 
 @ObjectType()
