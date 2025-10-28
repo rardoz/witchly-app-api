@@ -2029,65 +2029,6 @@
 		{
 			"key": "accessToken",
 			"value": ""
-		},
-		{
-			"key": "sessionToken",
-			"value": "",
-			"description": "User session token for session-based authentication"
-		},
-		{
-			"key": "refreshToken",
-			"value": "",
-			"description": "Refresh token for long-term sessions (keepMeLoggedIn: true)"
-		},
-		{
-			"key": "userId",
-			"value": "",
-			"description": "Current user ID from login/session"
-		},
-		{
-			"key": "uploadId",
-			"value": "",
-			"description": "Upload session ID for chunked uploads"
-		},
-		{
-			"key": "chunkSize",
-			"value": "",
-			"description": "Recommended chunk size for chunked uploads"
-		},
-		{
-			"key": "lastUploadedAssetId",
-			"value": "",
-			"description": "ID of the most recently uploaded asset"
-		},
-		{
-			"key": "TEST_FILE_NAME",
-			"value": "",
-			"description": "Name of the test file for chunked upload (e.g., 'my-video.mp4')"
-		},
-		{
-			"key": "TEST_FILE_MIME_TYPE",
-			"value": "",
-			"description": "MIME type of the test file (e.g., 'video/mp4', 'image/jpeg')"
-		},
-		{
-			"key": "TEST_FILE_SIZE",
-			"value": "",
-			"description": "Size of the test file in bytes (e.g., 10485760 for 10MB)"
-		},
-		{
-			"key": "CHUNK_SIZE",
-			"value": "5242880",
-			"description": "Chunk size for uploads in bytes (default: 5MB)"
-		},
-		{
-			"key": "currentChunkIndex",
-			"value": "0",
-			"description": "Current chunk index for multi-chunk uploads"
-		},
-		{
-			"key": "chunkCalculatorScript",
-			"value": ""
 		}
 	]
 }
