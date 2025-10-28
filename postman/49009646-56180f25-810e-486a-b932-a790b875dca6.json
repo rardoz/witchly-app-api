@@ -1674,6 +1674,319 @@
 			],
 			"id": "49009646-tarot-decks-section",
 			"description": "Complete CRUD operations for tarot deck management. Create/Update operations require admin session scope."
+		},
+		{
+			"name": "🔮 Horoscopes (GraphQL)",
+			"item": [
+				{
+					"name": "Get Horoscope Signs",
+					"id": "49009646-horoscopesign-get-all",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetHoroscopeSigns($locale: String, $sign: String, $limit: Int, $offset: Int) {\n  getHoroscopeSigns(locale: $locale, sign: $sign, limit: $limit, offset: $offset) {\n    _id\n    sign\n    locale\n    description\n    signDateStart\n    signDateEnd\n    asset {\n        id\n        s3Key\n    }\n    title\n    createdAt\n    updatedAt\n  }\n}",
+								"variables": "{\n  \"locale\": null,\n  \"sign\": null,\n  \"limit\": 1,\n  \"offset\": 0\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get all horoscope signs for a locale, optionally filter by sign. Requires admin/write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Horoscope Sign",
+					"id": "49009646-horoscopesign-create",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation CreateHoroscopeSign($input: CreateHoroscopeSignInput!) {\n  createHoroscopeSign(input: $input) {\n    success\n    message\n    sign {\n      _id\n      sign\n      locale\n      description\n      signDateStart\n      signDateEnd\n      imageAsset\n      title\n      createdAt\n      updatedAt\n      asset {\n        id\n        s3Key\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"sign\": \"ariess\",\n    \"locale\": \"fr\",\n    \"description\": \"The first sign of the zodiac.\",\n    \"signDateStart\": \"2025-03-21T00:00:00.000Z\",\n    \"signDateEnd\": \"2025-04-19T00:00:00.000Z\",\n    \"asset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"title\": \"Aries\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Create a new horoscope sign. Requires admin/write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Horoscope Sign",
+					"id": "49009646-horoscopesign-update",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation UpdateHoroscopeSign($id: ID!, $input: UpdateHoroscopeSignInput!) {\n  updateHoroscopeSign(id: $id, input: $input) {\n    success\n    message\n    sign {\n      _id\n      sign\n      locale\n      description\n      signDateStart\n      signDateEnd\n      asset {\n        id\n        s3Key\n      }\n      title\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"id\": \"6900002db07abd64c9841353\",\n  \"input\": {\n    \"description\": \"Updated description\",\n    \"sign\": \"aquarius\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Update an existing horoscope sign. Requires admin/write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Horoscope Sign",
+					"id": "49009646-horoscopesign-delete",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation DeleteHoroscopeSign($id: ID!) {\n  deleteHoroscopeSign(id: $id) {\n    success\n    message\n  }\n}",
+								"variables": "{\n  \"id\": \"6900002db07abd64c9841353\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Delete a horoscope sign by ID. Requires admin/write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Horoscopes",
+					"id": "49009646-horoscope-get-all",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetHoroscopes($sign: String, $status: String, $limit: Int, $offset: Int) {\n  horoscopes(sign: $sign, status: $status, limit: $limit, offset: $offset) {\n    _id\n    sign\n    status\n    locale\n    horoscopeDate\n    horoscopeText\n    user {\n        id\n        handle\n        name\n    }\n    createdAt\n    updatedAt\n  }\n}",
+								"variables": "{\n  \"sign\": \"aries\",\n  \"status\": \"pending\",\n  \"limit\": 10,\n  \"offset\": 0\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get paginated list of horoscopes filtered by sign/status. Requires read scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Horoscope",
+					"id": "49009646-horoscope-create",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"description": "User session token with admin scope (required)"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation CreateHoroscope($input: CreateHoroscopeInput!) {\n  createHoroscope(input: $input) {\n    success\n    message\n    horoscope {\n      _id\n      sign\n      status\n      locale\n      horoscopeDate\n      horoscopeText\n      user {\n        id\n        handle\n        name\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"sign\": \"aries\",\n    \"status\": \"pending\",\n    \"locale\": \"es\",\n    \"horoscopeDate\": \"2025-10-27T00:00:00.000Z\",\n    \"horoscopeText\": \"You will have a great day!\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Create a new horoscope. Requires write scope AND admin session scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Horoscope",
+					"id": "49009646-horoscope-update",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"description": "User session token with admin scope (required)"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation UpdateHoroscope($id: ID!, $input: UpdateHoroscopeInput!) {\n  updateHoroscope(id: $id, input: $input) {\n    success\n    message\n    horoscope {\n      _id\n      sign\n      status\n      locale\n      horoscopeDate\n      horoscopeText\n      user {\n        id\n        handle\n        name\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"id\": \"68fffb336921e52051373b15\",\n  \"input\": {\n    \"status\": \"sent\",\n    \"horoscopeText\": \"Updated text\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Update an existing horoscope. Requires write scope AND admin session scope. Only provide fields you want to update."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Horoscope",
+					"id": "49009646-horoscope-delete",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation DeleteHoroscope($id: ID!) {\n  deleteHoroscope(id: $id) {\n    success\n    message\n  }\n}",
+								"variables": "{\n  \"id\": \"68fffb336921e52051373b15\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Delete a horoscope by ID. Requires write scope AND admin session scope."
+					},
+					"response": []
+				}
+			],
+			"id": "49009646-horoscopes-section",
+			"description": "Complete CRUD operations for horoscopes. Create/Update/Delete require admin session scope."
 		}
 	],
 	"auth": {
