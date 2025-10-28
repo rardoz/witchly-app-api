@@ -303,7 +303,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation CompleteLogin($input: CompleteLoginInput!) {   \n        completeLogin(input: $input) {\n            success\n            message\n            sessionToken\n            refreshToken\n            expiresIn\n            expiresAt\n            userId\n        }\n    }",
-								"variables": "{\n    \"input\": {\n        \"email\": \"witchlyapp@gmail.com\",     \n        \"verificationCode\": \"709749\",       \n        \"keepMeLoggedIn\": true   \n    }\n}"
+								"variables": "{\n    \"input\": {\n        \"email\": \"witchlyapp@gmail.com\",     \n        \"verificationCode\": \"732535\",       \n        \"keepMeLoggedIn\": true   \n    }\n}"
 							}
 						},
 						"url": {
@@ -1457,8 +1457,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetTarotDecks($status: String!, $limit: Int, $offset: Int) {\n    tarotDecks(status: $status, limit: $limit, offset: $offset) {\n        id\n        name\n        primaryImageUrl\n        cardBackgroundUrl\n        primaryColor\n        description\n        author\n        meta\n        layoutType\n        layoutCount\n        status\n        createdAt\n        updatedAt\n    }\n}",
-								"variables": "{\n    \"status\": \"active\",\n    \"limit\": 10,\n    \"offset\": 0\n}"
+								"query": "query GetTarotDecks($status: String!, $limit: Int, $offset: Int) {\n    tarotDecks(status: $status, limit: $limit, offset: $offset) {\n        _id\n        name\n        locale\n        user {\n            id\n            handle\n        }\n        primaryAsset {\n            s3Key\n        }\n        cardBackgroundAsset {\n            s3Key\n        }\n        primaryColor\n        description\n        author\n        meta\n        layoutType\n        layoutCount\n        status\n        createdAt\n        updatedAt\n    }\n}",
+								"variables": "{\n    \"status\": \"active\",\n    \"locale\": null,\n    \"limit\": 10,\n    \"offset\": 0\n}"
 							}
 						},
 						"url": {
@@ -1495,8 +1495,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetTarotDeck($id: ID!) {\n    tarotDeck(id: $id) {\n        id\n        name\n        primaryImageUrl\n        cardBackgroundUrl\n        primaryColor\n        description\n        author\n        meta\n        layoutType\n        layoutCount\n        status\n        createdAt\n        updatedAt\n    }\n}",
-								"variables": "{\n    \"id\": \"68eb328199dcfa82327d86ed\"\n}"
+								"query": "query GetTarotDeck($id: ID!) {\n    tarotDeck(id: $id) {\n        _id\n        name\n        locale\n        user {\n            id\n            handle\n        }\n        primaryAsset {\n            s3Key\n        }\n        cardBackgroundAsset {\n            s3Key\n        }\n        primaryColor\n        description\n        author\n        meta\n        layoutType\n        layoutCount\n        status\n        createdAt\n        updatedAt\n    }\n}",
+								"variables": "{\n    \"id\": \"690026b334abcd28512e690b\"\n}"
 							}
 						},
 						"url": {
@@ -1539,8 +1539,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation CreateTarotDeck($input: CreateTarotDeckInput!) {\n    createTarotDeck(input: $input) {\n        success\n        message\n        id\n        name\n        primaryImageUrl\n        cardBackgroundUrl\n        primaryColor\n        description\n        author\n        meta\n        layoutType\n        layoutCount\n        status\n        createdAt\n        updatedAt\n    }\n}",
-								"variables": "{\n    \"input\": {\n        \"name\": \"Mystic Dreams Tarot 2\",\n        \"primaryImageUrl\": \"https://example.com/mystic-dreams.jpg\",\n        \"cardBackgroundUrl\": \"https://example.com/card-back.jpg\",\n        \"primaryColor\": \"#6B46C1\",\n        \"description\": \"A beautiful tarot deck inspired by mystical dreams and celestial energies. Perfect for beginners and experienced readers alike.\",\n        \"author\": \"Luna Starweaver\",\n        \"meta\": [\"mystical\", \"dreams\", \"celestial\", \"beginner-friendly\"],\n        \"layoutType\": \"classic\",\n        \"layoutCount\": 3,\n        \"status\": \"active\"\n    }\n}"
+								"query": "mutation CreateTarotDeck($input: CreateTarotDeckInput!) {\n    createTarotDeck(input: $input) {\n        success\n        message\n        deck {\n            _id\n            name\n            locale\n            user {\n                id\n                handle\n            }\n            primaryAsset {\n                s3Key\n            }\n            cardBackgroundAsset {\n                s3Key\n            }\n            primaryColor\n            description\n            author\n            meta\n            layoutType\n            layoutCount\n            status\n            createdAt\n            updatedAt\n        }\n    }\n}",
+								"variables": "{\n    \"input\": {\n        \"name\": \"Mystic Dreams Tarot 19s1.0ssss\",\n        \"locale\": \"en_US\",\n        \"primaryAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n        \"cardBackgroundAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n        \"primaryColor\": \"#6B46C1\",\n        \"description\": \"A beautiful tarot deck inspired by mystical dreams and celestial energies. Perfect for beginners and experienced readers alike.\",\n        \"author\": \"Luna Starweaver\",\n        \"meta\": [\"mystical\", \"dreams\", \"celestial\", \"beginner-friendly\"],\n        \"layoutType\": \"classic\",\n        \"layoutCount\": 3,\n        \"status\": \"active\"\n    }\n}"
 							}
 						},
 						"url": {
@@ -1578,8 +1578,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation UpdateTarotDeck($id: ID!, $input: UpdateTarotDeckInput!) {\n    updateTarotDeck(id: $id, input: $input) {\n        success\n        message\n        id\n        name\n        primaryImageUrl\n        cardBackgroundUrl\n        primaryColor\n        description\n        author\n        meta\n        layoutType\n        layoutCount\n        status\n        createdAt\n        updatedAt\n    }\n}",
-								"variables": "{\n    \"id\": \"68eb31111a80560b29339d3d\",\n    \"input\": {\n        \"name\": \"Updated Deck Name 222\",\n        \"description\": \"Updated description with new insights and expanded guidance.\",\n        \"primaryColor\": \"#8B5CF6\",\n        \"status\": \"active\"\n    }\n}"
+								"query": "mutation UpdateTarotDeck($id: ID!, $input: UpdateTarotDeckInput!) {\n    updateTarotDeck(id: $id, input: $input) {\n        success\n        message\n        deck {\n            _id\n            name\n            locale\n            user {\n                id\n                handle\n            }\n            primaryAsset {\n                s3Key\n            }\n            cardBackgroundAsset {\n                s3Key\n            }\n            primaryColor\n            description\n            author\n            meta\n            layoutType\n            layoutCount\n            status\n            createdAt\n            updatedAt\n        }\n    }\n}",
+								"variables": "{\n    \"id\": \"690026b334abcd28512e690b\",\n    \"input\": {\n        \"name\": \"Updated Deck Name 2223333\",\n        \"locale\": \"en\",\n        \"description\": \"Updated description with new insights and expanded guidance.\",\n        \"primaryColor\": \"#8B5CF6\",\n        \"status\": \"active\"\n    }\n}"
 							}
 						},
 						"url": {
@@ -1617,7 +1617,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation DeleteTarotDeck($id: ID!, $hardDelete: Boolean) {\n    deleteTarotDeck(id: $id, hardDelete: $hardDelete) {\n        success\n        message\n    }\n}",
-								"variables": "{\n    \"id\": \"68eb328199dcfa82327d86ed\",\n    \"hardDelete\": false\n}"
+								"variables": "{\n    \"id\": \"690026b334abcd28512e690b\",\n    \"hardDelete\": false\n}"
 							}
 						},
 						"url": {
@@ -1655,7 +1655,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation DeleteTarotDeck($id: ID!, $hardDelete: Boolean) {\n    deleteTarotDeck(id: $id, hardDelete: $hardDelete) {\n        success\n        message\n    }\n}",
-								"variables": "{\n    \"id\": \"68e9a8a738af61fcb45f7a33\",\n    \"hardDelete\": true\n}"
+								"variables": "{\n    \"id\": \"69001f190a9ce53d9b0c9fa5\",\n    \"hardDelete\": true\n}"
 							}
 						},
 						"url": {
@@ -2032,61 +2032,14 @@
 		},
 		{
 			"key": "sessionToken",
-			"value": "",
-			"description": "User session token for session-based authentication"
-		},
-		{
-			"key": "refreshToken",
-			"value": "",
-			"description": "Refresh token for long-term sessions (keepMeLoggedIn: true)"
+			"value": ""
 		},
 		{
 			"key": "userId",
-			"value": "",
-			"description": "Current user ID from login/session"
+			"value": ""
 		},
 		{
-			"key": "uploadId",
-			"value": "",
-			"description": "Upload session ID for chunked uploads"
-		},
-		{
-			"key": "chunkSize",
-			"value": "",
-			"description": "Recommended chunk size for chunked uploads"
-		},
-		{
-			"key": "lastUploadedAssetId",
-			"value": "",
-			"description": "ID of the most recently uploaded asset"
-		},
-		{
-			"key": "TEST_FILE_NAME",
-			"value": "",
-			"description": "Name of the test file for chunked upload (e.g., 'my-video.mp4')"
-		},
-		{
-			"key": "TEST_FILE_MIME_TYPE",
-			"value": "",
-			"description": "MIME type of the test file (e.g., 'video/mp4', 'image/jpeg')"
-		},
-		{
-			"key": "TEST_FILE_SIZE",
-			"value": "",
-			"description": "Size of the test file in bytes (e.g., 10485760 for 10MB)"
-		},
-		{
-			"key": "CHUNK_SIZE",
-			"value": "5242880",
-			"description": "Chunk size for uploads in bytes (default: 5MB)"
-		},
-		{
-			"key": "currentChunkIndex",
-			"value": "0",
-			"description": "Current chunk index for multi-chunk uploads"
-		},
-		{
-			"key": "chunkCalculatorScript",
+			"key": "refreshToken",
 			"value": ""
 		}
 	]
