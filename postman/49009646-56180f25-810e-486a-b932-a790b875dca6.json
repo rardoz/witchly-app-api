@@ -1495,8 +1495,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetTarotDeck($id: ID!) {\n    tarotDeck(id: $id) {\n        id\n        name\n        primaryImageUrl\n        cardBackgroundUrl\n        primaryColor\n        description\n        author\n        meta\n        layoutType\n        layoutCount\n        status\n        createdAt\n        updatedAt\n    }\n}",
-								"variables": "{\n    \"id\": \"68eb328199dcfa82327d86ed\"\n}"
+								"query": "query GetTarotDeck($id: ID!) {\n    tarotDeck(id: $id) {\n        _id\n        name\n        user {\n            id\n            handle\n        }\n        primaryAsset {\n            s3Key\n        }\n        cardBackgroundAsset {\n            s3Key\n        }\n        primaryColor\n        description\n        author\n        meta\n        layoutType\n        layoutCount\n        status\n        createdAt\n        updatedAt\n    }\n}",
+								"variables": "{\n    \"id\": \"68e9a90838af61fcb45f7a56\"\n}"
 							}
 						},
 						"url": {
