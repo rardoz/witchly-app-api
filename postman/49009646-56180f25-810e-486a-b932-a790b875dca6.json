@@ -2463,6 +2463,286 @@
 			],
 			"id": "49009646-moonphases-section",
 			"description": "Complete CRUD operations for moon phases. Create/Update/Delete require admin session scope."
+		},
+		{
+			"name": "🎱 Magic Eight Ball (GraphQL)",
+			"item": [
+				{
+					"name": "Get All Magic Eight Ball Sides",
+					"id": "49009646-magiceightball-get-all",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetMagicEightBallSides($locale: String, $status: String, $limit: Int, $offset: Int) {\n  magicEightBallSides(locale: $locale, status: $status, limit: $limit, offset: $offset) {\n    _id\n    name\n    locale\n    description\n    diceNumber\n    primaryColor\n    status\n    primaryAsset {\n      id\n      s3Key\n    }\n    backgroundAsset {\n      id\n      s3Key\n    }\n    user {\n      id\n      handle\n      name\n    }\n    createdAt\n    updatedAt\n  }\n}",
+								"variables": "{\n  \"locale\": \"en_US\",\n  \"status\": null,\n  \"limit\": 10,\n  \"offset\": 0\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get paginated list of magic eight ball sides filtered by locale/status. Requires read scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Magic Eight Ball Side by ID",
+					"id": "49009646-magiceightball-get-by-id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetMagicEightBallSide($id: ID) {\n  magicEightBallSide(id: $id) {\n    _id\n    name\n    locale\n    description\n    diceNumber\n    primaryColor\n    status\n    primaryAsset {\n      id\n      s3Key\n    }\n    backgroundAsset {\n      id\n      s3Key\n    }\n    user {\n      id\n      handle\n      name\n    }\n    createdAt\n    updatedAt\n  }\n}",
+								"variables": "{\n  \"id\": \"673623de5b48e36b2c91c003\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get a single magic eight ball side by ID. Requires read scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Magic Eight Ball Side by Dice Number",
+					"id": "49009646-magiceightball-get-by-dice",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetMagicEightBallSide($diceNumber: Int, $locale: String) {\n  magicEightBallSide(diceNumber: $diceNumber, locale: $locale) {\n    _id\n    name\n    locale\n    description\n    diceNumber\n    primaryColor\n    status\n    primaryAsset {\n      id\n      s3Key\n    }\n    backgroundAsset {\n      id\n      s3Key\n    }\n    user {\n      id\n      handle\n      name\n    }\n    createdAt\n    updatedAt\n  }\n}",
+								"variables": "{\n  \"diceNumber\": 1,\n  \"locale\": \"en_US\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get a single magic eight ball side by dice number and locale. Requires read scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Magic Eight Ball Side",
+					"id": "49009646-magiceightball-create",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation CreateMagicEightBallSide($input: CreateMagicEightBallInput!) {\n  createMagicEightBallSide(input: $input) {\n    success\n    message\n    side {\n      _id\n      name\n      locale\n      description\n      diceNumber\n      primaryColor\n      status\n      primaryAsset {\n        id\n        s3Key\n      }\n      backgroundAsset {\n        id\n        s3Key\n      }\n      user {\n        id\n        handle\n        name\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"name\": \"It is certain\",\n    \"locale\": \"en_US\",\n    \"description\": \"A positive affirmative response.\",\n    \"diceNumber\": 1,\n    \"primaryColor\": \"#00FF00\",\n    \"primaryAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"backgroundAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"status\": \"active\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Create a new magic eight ball side. Requires write scope AND admin session scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Magic Eight Ball Side",
+					"id": "49009646-magiceightball-update",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation UpdateMagicEightBallSide($id: ID!, $input: UpdateMagicEightBallInput!) {\n  updateMagicEightBallSide(id: $id, input: $input) {\n    success\n    message\n    side {\n      _id\n      name\n      locale\n      description\n      diceNumber\n      primaryColor\n      status\n      primaryAsset {\n        id\n        s3Key\n      }\n      backgroundAsset {\n        id\n        s3Key\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"id\": \"673623de5b48e36b2c91c003\",\n  \"input\": {\n    \"name\": \"It is certain - Updated\",\n    \"description\": \"Updated description for positive response.\",\n    \"primaryColor\": \"#00AA00\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Update an existing magic eight ball side. Requires write scope AND admin session scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Soft Delete Magic Eight Ball Side",
+					"id": "49009646-magiceightball-soft-delete",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation SoftDeleteMagicEightBallSide($id: ID!) {\n  softDeleteMagicEightBallSide(id: $id) {\n    success\n    message\n  }\n}",
+								"variables": "{\n  \"id\": \"673623de5b48e36b2c91c003\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Soft delete a magic eight ball side (sets status to 'deleted'). Requires write scope AND admin session scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Hard Delete Magic Eight Ball Side",
+					"id": "49009646-magiceightball-hard-delete",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation HardDeleteMagicEightBallSide($id: ID!) {\n  hardDeleteMagicEightBallSide(id: $id) {\n    success\n    message\n  }\n}",
+								"variables": "{\n  \"id\": \"673623de5b48e36b2c91c003\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Permanently delete a magic eight ball side from database. Requires write scope AND admin session scope."
+					},
+					"response": []
+				}
+			],
+			"id": "49009646-magiceightball-section",
+			"description": "Complete CRUD operations for magic eight ball sides. Create/Update/Delete require admin session scope."
 		}
 	],
 	"auth": {
