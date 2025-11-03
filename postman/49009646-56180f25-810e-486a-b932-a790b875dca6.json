@@ -2405,7 +2405,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation SoftDeleteMoonPhase($id: ID!) {\n  softDeleteMoonPhase(id: $id) {\n    success\n    message\n  }\n}",
-								"variables": "{\n  \"id\": \"673623de5b48e36b2c91c003\"\n}"
+								"variables": "{\n  \"id\": \"6908198a1e8eb8f70efcc461\"\n}"
 							}
 						},
 						"url": {
