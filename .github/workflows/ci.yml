@@ -51,5 +51,6 @@ jobs:
           AWS_S3_BUCKET_NAME: ${{ vars.AWS_S3_BUCKET_NAME }}
           AWS_S3_DIRECTORY_PREFIX: ${{ vars.AWS_S3_DIRECTORY_PREFIX }}
           AWS_S3_URL_EXPIRATION_MINUTES: ${{ vars.AWS_S3_URL_EXPIRATION_MINUTES }}
+          DB_NAME: ${{ vars.DB_NAME }}
       - name: Build application
         run: npm run build && rm -rf dist

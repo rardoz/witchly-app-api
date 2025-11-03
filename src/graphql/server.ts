@@ -11,6 +11,7 @@ import { AuthResolver } from './resolvers/AuthResolver';
 import { ClientResolver } from './resolvers/ClientResolver';
 import { HoroscopeResolver } from './resolvers/HoroscopeResolver';
 import { LoginResolver } from './resolvers/LoginResolver';
+import { MoonPhaseResolver } from './resolvers/MoonPhaseResolver';
 import { SessionResolver } from './resolvers/SessionResolver';
 import { SignupResolver } from './resolvers/SignupResolver';
 import { TarotCardResolver } from './resolvers/TarotCardResolver';
@@ -102,6 +103,7 @@ export const createApolloServer = async (): Promise<ApolloServer> => {
       SessionResolver,
       TarotDeckResolver,
       TarotCardResolver,
+      MoonPhaseResolver,
       AssetResolver,
       HoroscopeResolver,
     ],
