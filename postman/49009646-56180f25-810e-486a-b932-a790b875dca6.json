@@ -1814,7 +1814,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation UpdateTarotCard($id: ID!, $input: UpdateTarotCardInput!) {\n    updateTarotCard(id: $id, input: $input) {\n        success\n        message\n        card {\n            _id\n            name\n            tarotCardNumber\n            primaryAsset {\n                id\n                s3Key\n            }\n            description\n            locale\n            meta\n            status\n            user {\n                id\n                handle\n            }\n            tarotDeck {\n                _id\n                name\n            }\n            createdAt\n            updatedAt\n        }\n    }\n}",
-								"variables": "{\n    \"id\": \"REPLACE_WITH_CARD_ID\",\n    \"input\": {\n        \"name\": \"The Fool - Updated\",\n        \"description\": \"Updated description with deeper insights into the card's meaning and symbolism.\",\n        \"meta\": [\"major arcana\", \"beginnings\", \"innocence\", \"spontaneity\", \"faith\"],\n        \"status\": \"active\"\n    }\n}"
+								"variables": "{\n    \"id\": \"690801a329a2459a2a9a2efd\",\n    \"input\": {\n        \"name\": \"The Fool - Updated\",\n        \"primaryAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n        \"description\": \"Updated description with deeper insights into the card's meaning and symbolism.\",\n        \"meta\": [\"major arcana\", \"beginnings\", \"innocence\", \"spontaneity\", \"faith\"],\n        \"status\": \"active\"\n    }\n}"
 							}
 						},
 						"url": {
