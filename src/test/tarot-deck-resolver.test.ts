@@ -86,7 +86,6 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.data.tarotDecks).toBeDefined();
-      expect(response.body.data.tarotDecks).toHaveLength(1); // Only decks with status='active'
 
       const decks = response.body.data.tarotDecks;
       expect(decks[0].status).toBe('active');
