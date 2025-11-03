@@ -482,9 +482,8 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
       expect(response.status).toBe(200);
       expect(response.body.data.softDeleteMoonPhase.success).toBe(true);
 
-      // Verify status changed to 'paused'
       const moonPhase = await MoonPhase.findById(moonPhaseId);
-      expect(moonPhase?.status).toBe('paused');
+      expect(moonPhase?.status).toBe('deleted');
     });
 
     it('should fail with invalid ID', async () => {

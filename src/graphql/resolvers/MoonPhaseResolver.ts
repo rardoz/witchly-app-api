@@ -215,7 +215,7 @@ export class MoonPhaseResolver {
       throw new NotFoundError('Moon phase not found');
     }
 
-    moonPhase.status = 'paused';
+    moonPhase.status = 'deleted';
     await moonPhase.save();
 
     return {
