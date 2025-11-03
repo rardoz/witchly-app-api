@@ -2490,7 +2490,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "query GetMagicEightBallSides($locale: String, $status: String, $limit: Int, $offset: Int) {\n  magicEightBallSides(locale: $locale, status: $status, limit: $limit, offset: $offset) {\n    _id\n    name\n    locale\n    description\n    diceNumber\n    primaryColor\n    status\n    primaryAsset {\n      id\n      s3Key\n    }\n    backgroundAsset {\n      id\n      s3Key\n    }\n    user {\n      id\n      handle\n      name\n    }\n    createdAt\n    updatedAt\n  }\n}",
-								"variables": "{\n  \"locale\": \"en_US\",\n\n  \"limit\": 10,\n  \"offset\": 0\n}"
+								"variables": "{\n  \"locale\": \"en_US\",\n  \"status\": \"active\",\n  \"limit\": 10,\n  \"offset\": 0\n}"
 							}
 						},
 						"url": {
