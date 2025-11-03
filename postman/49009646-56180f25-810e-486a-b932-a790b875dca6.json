@@ -1852,7 +1852,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation SoftDeleteTarotCard($id: ID!) {\n    softDeleteTarotCard(id: $id) {\n        success\n        message\n    }\n}",
-								"variables": "{\n    \"id\": \"REPLACE_WITH_CARD_ID\"\n}"
+								"variables": "{\n    \"id\": \"690801a329a2459a2a9a2efd\"\n}"
 							}
 						},
 						"url": {
@@ -1890,7 +1890,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation HardDeleteTarotCard($id: ID!) {\n    hardDeleteTarotCard(id: $id) {\n        success\n        message\n    }\n}",
-								"variables": "{\n    \"id\": \"REPLACE_WITH_CARD_ID\"\n}"
+								"variables": "{\n    \"id\": \"690801a329a2459a2a9a2efd\"\n}"
 							}
 						},
 						"url": {
