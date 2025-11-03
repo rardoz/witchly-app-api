@@ -1670,10 +1670,245 @@
 						"description": "Permanently delete a tarot deck from the database. Requires write scope. Use with caution!"
 					},
 					"response": []
+				},
+				{
+					"name": "Get All Tarot Cards",
+					"id": "49009646-tarot-cards-get-all",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetTarotCards($deckId: ID!, $status: String, $limit: Int, $offset: Int) {\n    tarotCards(deckId: $deckId, status: $status, limit: $limit, offset: $offset) {\n        _id\n        name\n        tarotCardNumber\n        primaryAsset {\n            id\n            s3Key\n        }\n        description\n        locale\n        meta\n        status\n        user {\n            id\n            handle\n        }\n        tarotDeck {\n            _id\n            name\n        }\n        createdAt\n        updatedAt\n    }\n}",
+								"variables": "{\n    \"deckId\": \"690026b334abcd28512e690b\",\n    \"status\": \"active\",\n    \"limit\": 10,\n    \"offset\": 0\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get paginated list of tarot cards for a specific deck, optionally filtered by status. Requires read scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Tarot Card by ID",
+					"id": "49009646-tarot-card-get-by-id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetTarotCard($id: ID!) {\n    tarotCard(id: $id) {\n        _id\n        name\n        tarotCardNumber\n        primaryAsset {\n            id\n            s3Key\n        }\n        description\n        locale\n        meta\n        status\n        user {\n            id\n            handle\n        }\n        tarotDeck {\n            _id\n            name\n        }\n        createdAt\n        updatedAt\n    }\n}",
+								"variables": "{\n    \"id\": \"REPLACE_WITH_CARD_ID\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get a specific tarot card by its ID. Requires read scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Tarot Card",
+					"id": "49009646-tarot-card-create",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"description": "OAuth2 access token (required)"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"description": "User session token with admin scope (required)"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation CreateTarotCard($input: CreateTarotCardInput!) {\n    createTarotCard(input: $input) {\n        success\n        message\n        card {\n            _id\n            name\n            tarotCardNumber\n            primaryAsset {\n                id\n                s3Key\n            }\n            description\n            locale\n            meta\n            status\n            user {\n                id\n                handle\n            }\n            tarotDeck {\n                _id\n                name\n            }\n            createdAt\n            updatedAt\n        }\n    }\n}",
+								"variables": "{\n    \"input\": {\n        \"name\": \"The Fool\",\n        \"tarotCardNumber\": \"0\",\n        \"tarotDeck\": \"690026b334abcd28512e690b\",\n        \"primaryAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n        \"description\": \"The Fool represents new beginnings, having faith in the future, being inexperienced, not knowing what to expect, having beginner's luck, improvisation and believing in the universe.\",\n        \"locale\": \"en_US\",\n        \"meta\": [\"major arcana\", \"beginnings\", \"innocence\", \"spontaneity\"],\n        \"status\": \"active\"\n    }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Create a new tarot card for a specific deck. Requires write scope AND admin session scope. Name and tarotDeck are required."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Tarot Card",
+					"id": "49009646-tarot-card-update",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"description": "User session token with admin scope (required)"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation UpdateTarotCard($id: ID!, $input: UpdateTarotCardInput!) {\n    updateTarotCard(id: $id, input: $input) {\n        success\n        message\n        card {\n            _id\n            name\n            tarotCardNumber\n            primaryAsset {\n                id\n                s3Key\n            }\n            description\n            locale\n            meta\n            status\n            user {\n                id\n                handle\n            }\n            tarotDeck {\n                _id\n                name\n            }\n            createdAt\n            updatedAt\n        }\n    }\n}",
+								"variables": "{\n    \"id\": \"REPLACE_WITH_CARD_ID\",\n    \"input\": {\n        \"name\": \"The Fool - Updated\",\n        \"description\": \"Updated description with deeper insights into the card's meaning and symbolism.\",\n        \"meta\": [\"major arcana\", \"beginnings\", \"innocence\", \"spontaneity\", \"faith\"],\n        \"status\": \"active\"\n    }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Update an existing tarot card. Requires write scope AND admin session scope. Only provide fields you want to update."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Tarot Card (Soft)",
+					"id": "49009646-tarot-card-delete-soft",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation SoftDeleteTarotCard($id: ID!) {\n    softDeleteTarotCard(id: $id) {\n        success\n        message\n    }\n}",
+								"variables": "{\n    \"id\": \"REPLACE_WITH_CARD_ID\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Soft delete a tarot card (sets status to 'paused'). Requires write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Tarot Card (Hard)",
+					"id": "49009646-tarot-card-delete-hard",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation HardDeleteTarotCard($id: ID!) {\n    hardDeleteTarotCard(id: $id) {\n        success\n        message\n    }\n}",
+								"variables": "{\n    \"id\": \"REPLACE_WITH_CARD_ID\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Permanently delete a tarot card from the database. Requires write scope. Use with caution!"
+					},
+					"response": []
 				}
 			],
 			"id": "49009646-tarot-decks-section",
-			"description": "Complete CRUD operations for tarot deck management. Create/Update operations require admin session scope."
+			"description": "Complete CRUD operations for tarot deck and tarot card management. Create/Update operations require admin session scope."
 		},
 		{
 			"name": "♒ Horoscopes (GraphQL)",
