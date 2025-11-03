@@ -2222,6 +2222,217 @@
 			],
 			"id": "49009646-horoscopes-section",
 			"description": "Complete CRUD operations for horoscopes. Create/Update/Delete require admin session scope."
+		},
+		{
+			"name": "🌙 Moon Phases (GraphQL)",
+			"item": [
+				{
+					"name": "Get All Moon Phases",
+					"id": "49009646-moonphase-get-all",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetMoonPhases($locale: String, $status: String, $limit: Float, $offset: Float) {\n  moonPhases(locale: $locale, status: $status, limit: $limit, offset: $offset) {\n    _id\n    name\n    locale\n    description\n    number\n    moonSign\n    primaryColor\n    status\n    primaryAsset {\n      id\n      s3Key\n    }\n    backgroundAsset {\n      id\n      s3Key\n    }\n    user {\n      id\n      handle\n      name\n    }\n    createdAt\n    updatedAt\n  }\n}",
+								"variables": "{\n  \"locale\": \"en_US\",\n  \"status\": \"active\",\n  \"limit\": 10,\n  \"offset\": 0\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get paginated list of moon phases filtered by locale/status. Requires read scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Moon Phase by ID",
+					"id": "49009646-moonphase-get-by-id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetMoonPhase($id: ID!) {\n  moonPhase(id: $id) {\n    _id\n    name\n    locale\n    description\n    number\n    moonSign\n    primaryColor\n    status\n    primaryAsset {\n      id\n      s3Key\n    }\n    backgroundAsset {\n      id\n      s3Key\n    }\n    user {\n      id\n      handle\n      name\n    }\n    createdAt\n    updatedAt\n  }\n}",
+								"variables": "{\n  \"id\": \"673623de5b48e36b2c91c003\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get a single moon phase by ID. Requires read scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Moon Phase",
+					"id": "49009646-moonphase-create",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation CreateMoonPhase($input: CreateMoonPhaseInput!) {\n  createMoonPhase(input: $input) {\n    success\n    message\n    moonPhase {\n      _id\n      name\n      locale\n      description\n      number\n      moonSign\n      primaryColor\n      status\n      primaryAsset {\n        id\n        s3Key\n      }\n      backgroundAsset {\n        id\n        s3Key\n      }\n      user {\n        id\n        handle\n        name\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"name\": \"New Moon\",\n    \"locale\": \"en_US\",\n    \"description\": \"The new moon represents new beginnings and fresh starts.\",\n    \"number\": 1,\n    \"moonSign\": \"aries\",\n    \"primaryColor\": \"#1A1A2E\",\n    \"primaryAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"backgroundAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"status\": \"active\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Create a new moon phase. Requires write scope AND admin session scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Moon Phase",
+					"id": "49009646-moonphase-update",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation UpdateMoonPhase($id: ID!, $input: UpdateMoonPhaseInput!) {\n  updateMoonPhase(id: $id, input: $input) {\n    success\n    message\n    moonPhase {\n      _id\n      name\n      locale\n      description\n      number\n      moonSign\n      primaryColor\n      status\n      primaryAsset {\n        id\n        s3Key\n      }\n      backgroundAsset {\n        id\n        s3Key\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"id\": \"673623de5b48e36b2c91c003\",\n  \"input\": {\n    \"name\": \"New Moon - Updated\",\n    \"description\": \"Updated description for the new moon phase.\",\n    \"moonSign\": \"taurus\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Update an existing moon phase. Requires write scope AND admin session scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Soft Delete Moon Phase",
+					"id": "49009646-moonphase-soft-delete",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation SoftDeleteMoonPhase($id: ID!) {\n  softDeleteMoonPhase(id: $id) {\n    success\n    message\n  }\n}",
+								"variables": "{\n  \"id\": \"673623de5b48e36b2c91c003\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Soft delete a moon phase (sets status to 'paused'). Requires write scope AND admin session scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Hard Delete Moon Phase",
+					"id": "49009646-moonphase-hard-delete",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation HardDeleteMoonPhase($id: ID!) {\n  hardDeleteMoonPhase(id: $id) {\n    success\n    message\n  }\n}",
+								"variables": "{\n  \"id\": \"673623de5b48e36b2c91c003\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Permanently delete a moon phase from database. Requires write scope AND admin session scope."
+					},
+					"response": []
+				}
+			],
+			"id": "49009646-moonphases-section",
+			"description": "Complete CRUD operations for moon phases. Create/Update/Delete require admin session scope."
 		}
 	],
 	"auth": {
