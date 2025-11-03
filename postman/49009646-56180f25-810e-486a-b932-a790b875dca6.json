@@ -2355,13 +2355,18 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation UpdateMoonPhase($id: ID!, $input: UpdateMoonPhaseInput!) {\n  updateMoonPhase(id: $id, input: $input) {\n    success\n    message\n    moonPhase {\n      _id\n      name\n      locale\n      description\n      number\n      moonSign\n      primaryColor\n      status\n      primaryAsset {\n        id\n        s3Key\n      }\n      backgroundAsset {\n        id\n        s3Key\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
-								"variables": "{\n  \"id\": \"673623de5b48e36b2c91c003\",\n  \"input\": {\n    \"name\": \"New Moon - Updated\",\n    \"description\": \"Updated description for the new moon phase.\",\n    \"moonSign\": \"taurus\"\n  }\n}"
+								"variables": "{\n  \"id\": \"6908198a1e8eb8f70efcc461\",\n  \"input\": {\n    \"name\": \"New Moon - Updated\",\n    \"description\": \"Updated description for the new moon phase.\",\n    \"moonSign\": \"taurus\",\n    \"primaryAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"backgroundAsset\": \"6908198a1e8eb8f70efcc461\"\n  }\n}"
 							}
 						},
 						"url": {
