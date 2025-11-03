@@ -1692,8 +1692,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetTarotCards($deckId: ID!, $status: String, $limit: Int, $offset: Int) {\n    tarotCards(deckId: $deckId, status: $status, limit: $limit, offset: $offset) {\n        _id\n        name\n        tarotCardNumber\n        primaryAsset {\n            id\n            s3Key\n        }\n        description\n        locale\n        meta\n        status\n        user {\n            id\n            handle\n        }\n        tarotDeck {\n            _id\n            name\n        }\n        createdAt\n        updatedAt\n    }\n}",
-								"variables": "{\n    \"deckId\": \"690026b334abcd28512e690b\",\n    \"status\": \"active\",\n    \"limit\": 10,\n    \"offset\": 0\n}"
+								"query": "query GetTarotCards($tarotDeckId: ID!, $status: String, $limit: Int, $offset: Int) {\n    tarotCards(tarotDeckId: $tarotDeckId, status: $status, limit: $limit, offset: $offset) {\n        _id\n        name\n        tarotCardNumber\n        primaryAsset {\n            id\n            s3Key\n        }\n        description\n        locale\n        meta\n        status\n        user {\n            id\n            handle\n        }\n        tarotDeck {\n            _id\n            name\n        }\n        createdAt\n        updatedAt\n    }\n}",
+								"variables": "{\n    \"tarotDeckId\": \"6900271434abcd28512e6952\",\n    \"status\": \"active\",\n    \"limit\": 10,\n    \"offset\": 0\n}"
 							}
 						},
 						"url": {
