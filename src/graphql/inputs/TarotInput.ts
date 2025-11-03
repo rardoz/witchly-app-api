@@ -5,7 +5,6 @@ import {
   IsInt,
   IsOptional,
   IsString,
-  IsUrl,
   Max,
   MaxLength,
   Min,
@@ -24,13 +23,11 @@ export class CreateTarotDeckInput {
 
   @Field({ nullable: true })
   @IsOptional()
-  @IsUrl({}, { message: 'Primary image URL must be a valid URL' })
-  primaryImageUrl?: string;
+  primaryAsset?: string;
 
   @Field({ nullable: true })
   @IsOptional()
-  @IsUrl({}, { message: 'Card background URL must be a valid URL' })
-  cardBackgroundUrl?: string;
+  cardBackgroundAsset?: string;
 
   @Field({ nullable: true })
   @IsOptional()
@@ -83,6 +80,11 @@ export class CreateTarotDeckInput {
     message: 'Status must be either "active", "paused", or "deleted"',
   })
   status?: 'active' | 'paused' | 'deleted';
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  locale?: string;
 }
 
 @InputType()
@@ -96,13 +98,11 @@ export class UpdateTarotDeckInput {
 
   @Field({ nullable: true })
   @IsOptional()
-  @IsUrl({}, { message: 'Primary image URL must be a valid URL' })
-  primaryImageUrl?: string;
+  primaryAsset?: string;
 
   @Field({ nullable: true })
   @IsOptional()
-  @IsUrl({}, { message: 'Card background URL must be a valid URL' })
-  cardBackgroundUrl?: string;
+  cardBackgroundAsset?: string;
 
   @Field({ nullable: true })
   @IsOptional()
@@ -155,4 +155,115 @@ export class UpdateTarotDeckInput {
     message: 'Status must be either "active", "paused", or "deleted"',
   })
   status?: 'active' | 'paused' | 'deleted';
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  locale?: string;
+}
+
+@InputType()
+export class CreateTarotCardInput {
+  @Field()
+  @IsString()
+  @MinLength(1, { message: 'Name must not be empty' })
+  @MaxLength(100, { message: 'Name must not exceed 100 characters' })
+  name!: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  tarotCardNumber?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  primaryAsset?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(10000, { message: 'Description must not exceed 10000 characters' })
+  description?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  locale?: string;
+
+  @Field(() => [String], { nullable: true, defaultValue: [] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @MaxLength(50, {
+    each: true,
+    message: 'Each meta tag must not exceed 50 characters',
+  })
+  meta?: string[];
+
+  @Field({ nullable: true, defaultValue: 'active' })
+  @IsOptional()
+  @IsString()
+  @IsIn(['active', 'paused', 'deleted'], {
+    message: 'Status must be either "active", "paused", or "deleted"',
+  })
+  status?: 'active' | 'paused' | 'deleted';
+
+  @Field()
+  @IsString()
+  tarotDeck!: string;
+}
+
+@InputType()
+export class UpdateTarotCardInput {
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  @MinLength(1, { message: 'Name must not be empty' })
+  @MaxLength(100, { message: 'Name must not exceed 100 characters' })
+  name?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  tarotCardNumber?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  primaryAsset?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(10000, { message: 'Description must not exceed 10000 characters' })
+  description?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  locale?: string;
+
+  @Field(() => [String], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @MaxLength(50, {
+    each: true,
+    message: 'Each meta tag must not exceed 50 characters',
+  })
+  meta?: string[];
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  @IsIn(['active', 'paused', 'deleted'], {
+    message: 'Status must be either "active", "paused", or "deleted"',
+  })
+  status?: 'active' | 'paused' | 'deleted';
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  tarotDeck?: string;
 }

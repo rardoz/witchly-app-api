@@ -1,9 +1,10 @@
-import { type Document, model, Schema } from 'mongoose';
+import { type Document, model, Schema, Types } from 'mongoose';
 
 export interface ITarotDeck extends Document {
   name?: string;
-  primaryImageUrl?: string;
-  cardBackgroundUrl?: string;
+  primaryAsset?: Types.ObjectId;
+  cardBackgroundAsset?: Types.ObjectId;
+  user?: Types.ObjectId;
   primaryColor?: string;
   description?: string;
   author?: string;
@@ -13,6 +14,7 @@ export interface ITarotDeck extends Document {
   status: 'active' | 'paused' | 'deleted';
   createdAt: Date;
   updatedAt: Date;
+  locale?: string;
 }
 
 const tarotDeckSchema = new Schema<ITarotDeck>(
@@ -23,31 +25,13 @@ const tarotDeckSchema = new Schema<ITarotDeck>(
       trim: true,
       maxlength: 100,
     },
-    primaryImageUrl: {
+    primaryAsset: { type: Schema.Types.ObjectId, ref: 'Asset' },
+    cardBackgroundAsset: { type: Schema.Types.ObjectId, ref: 'Asset' },
+    user: { type: Schema.Types.ObjectId, ref: 'User' },
+    locale: {
       type: String,
       required: false,
       trim: true,
-      validate: {
-        validator: (v: string) => {
-          // Basic URL validation only if value is provided
-          if (!v) return true;
-          return /^https?:\/\/.+\..+/.test(v);
-        },
-        message: 'Primary image URL must be a valid HTTP/HTTPS URL',
-      },
-    },
-    cardBackgroundUrl: {
-      type: String,
-      required: false,
-      trim: true,
-      validate: {
-        validator: (v: string) => {
-          // Basic URL validation only if value is provided
-          if (!v) return true;
-          return /^https?:\/\/.+\..+/.test(v);
-        },
-        message: 'Card background URL must be a valid HTTP/HTTPS URL',
-      },
     },
     primaryColor: {
       type: String,
