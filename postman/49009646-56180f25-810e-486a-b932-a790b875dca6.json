@@ -1731,7 +1731,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "query GetTarotCard($id: ID!) {\n    tarotCard(id: $id) {\n        _id\n        name\n        tarotCardNumber\n        primaryAsset {\n            id\n            s3Key\n        }\n        description\n        locale\n        meta\n        status\n        user {\n            id\n            handle\n        }\n        tarotDeck {\n            _id\n            name\n        }\n        createdAt\n        updatedAt\n    }\n}",
-								"variables": "{\n    \"id\": \"REPLACE_WITH_CARD_ID\"\n}"
+								"variables": "{\n    \"id\": \"690801a329a2459a2a9a2efd\"\n}"
 							}
 						},
 						"url": {
