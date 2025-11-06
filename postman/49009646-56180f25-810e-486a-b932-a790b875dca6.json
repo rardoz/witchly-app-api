@@ -2743,6 +2743,442 @@
 			],
 			"id": "49009646-magiceightball-section",
 			"description": "Complete CRUD operations for magic eight ball sides. Create/Update/Delete require admin session scope."
+		},
+		{
+			"name": "📖 Spellbooks (GraphQL)",
+			"item": [
+				{
+					"name": "Get All Spellbooks",
+					"id": "49009646-spellbook-get-all",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetSpellbooks($limit: Float, $offset: Float, $status: String, $visibility: String) {\n  spellbooks(limit: $limit, offset: $offset, status: $status, visibility: $visibility) {\n    id\n    title\n    description\n    primaryAsset {\n      id\n      s3Key\n    }\n    backgroundAsset {\n      id\n      s3Key\n    }\n    user {\n      id\n      handle\n    }\n    pages\n    status\n    visibility\n    primaryColor\n    textColor\n    font\n    allowedUsers\n    meta\n    createdAt\n    updatedAt\n  }\n}",
+								"variables": "{\n  \"limit\": 10,\n  \"offset\": 0,\n  \"status\": \"active\",\n  \"visibility\": \"public\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get paginated list of spellbooks filtered by status/visibility. Requires admin access."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Spellbook by ID",
+					"id": "49009646-spellbook-get-by-id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetSpellbook($id: ID!) {\n  spellbook(id: $id) {\n    id\n    title\n    description\n    primaryAsset {\n      id\n      s3Key\n    }\n    backgroundAsset {\n      id\n      s3Key\n    }\n    user {\n      id\n      handle\n    }\n    pages\n    status\n    visibility\n    primaryColor\n    textColor\n    font\n    allowedUsers\n    meta\n    createdAt\n    updatedAt\n  }\n}",
+								"variables": "{\n  \"id\": \"6501a2b3c4d5e6f7g8h9i0j1\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get a single spellbook by ID. Requires admin access."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Spellbook Pages",
+					"id": "49009646-spellbook-get-pages",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetSpellbookPages($spellbookId: ID!, $limit: Float, $offset: Float, $status: String, $visibility: String) {\n  spellbookPages(spellbookId: $spellbookId, limit: $limit, offset: $offset, status: $status, visibility: $visibility) {\n    id\n    title\n    richText\n    shortDescription\n    primaryAsset {\n      id\n      s3Key\n    }\n    backgroundAsset {\n      id\n      s3Key\n    }\n    font\n    backgroundColor\n    textColor\n    primaryColor\n    user {\n      id\n      handle\n    }\n    spellbook\n    status\n    visibility\n    allowedUsers\n    meta\n    createdAt\n    updatedAt\n  }\n}",
+								"variables": "{\n  \"spellbookId\": \"6501a2b3c4d5e6f7g8h9i0j1\",\n  \"limit\": 10,\n  \"offset\": 0,\n  \"status\": \"active\",\n  \"visibility\": \"public\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get all pages for a specific spellbook with pagination and filters. Requires admin access."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Spellbook",
+					"id": "49009646-spellbook-create",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation CreateSpellbook($input: CreateSpellbookInput!) {\n  createSpellbook(input: $input) {\n    success\n    message\n    spellbook {\n      id\n      title\n      description\n      primaryAsset {\n        id\n        s3Key\n      }\n      backgroundAsset {\n        id\n        s3Key\n      }\n      user {\n        id\n        handle\n      }\n      pages\n      status\n      visibility\n      primaryColor\n      textColor\n      font\n      allowedUsers\n      meta\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"title\": \"My Magical Spellbook\",\n    \"description\": \"A collection of powerful spells and rituals\",\n    \"primaryAsset\": \"6501a2b3c4d5e6f7g8h9i0j1\",\n    \"backgroundAsset\": \"6501a2b3c4d5e6f7g8h9i0j2\",\n    \"primaryColor\": \"#8B4789\",\n    \"textColor\": \"#FFFFFF\",\n    \"font\": \"Cinzel\",\n    \"status\": \"active\",\n    \"visibility\": \"public\",\n    \"meta\": [\"witchcraft\", \"beginner\"],\n    \"allowedUsers\": []\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Create a new spellbook. Requires admin session scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Spellbook",
+					"id": "49009646-spellbook-update",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation UpdateSpellbook($id: ID!, $input: UpdateSpellbookInput!) {\n  updateSpellbook(id: $id, input: $input) {\n    success\n    message\n    spellbook {\n      id\n      title\n      description\n      primaryAsset {\n        id\n        s3Key\n      }\n      backgroundAsset {\n        id\n        s3Key\n      }\n      user {\n        id\n        handle\n      }\n      pages\n      status\n      visibility\n      primaryColor\n      textColor\n      font\n      allowedUsers\n      meta\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"id\": \"6501a2b3c4d5e6f7g8h9i0j1\",\n  \"input\": {\n    \"title\": \"Updated Spellbook Title\",\n    \"description\": \"Updated description\",\n    \"status\": \"active\",\n    \"visibility\": \"private\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Update an existing spellbook. Requires admin session scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Spellbook Page",
+					"id": "49009646-spellbook-page-create",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation CreateSpellbookPage($input: CreateSpellbookPageInput!) {\n  createSpellbookPage(input: $input) {\n    success\n    message\n    spellbookPage {\n      id\n      title\n      richText\n      shortDescription\n      primaryAsset {\n        id\n        s3Key\n      }\n      backgroundAsset {\n        id\n        s3Key\n      }\n      font\n      backgroundColor\n      textColor\n      primaryColor\n      user {\n        id\n        handle\n      }\n      spellbook\n      status\n      visibility\n      allowedUsers\n      meta\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"title\": \"Protection Spell\",\n    \"spellbook\": \"6501a2b3c4d5e6f7g8h9i0j1\",\n    \"richText\": \"<h2>Protection Spell</h2><p>This powerful spell creates a protective barrier...</p>\",\n    \"shortDescription\": \"A simple yet effective protection spell for daily use\",\n    \"primaryAsset\": \"6501a2b3c4d5e6f7g8h9i0j2\",\n    \"backgroundAsset\": \"6501a2b3c4d5e6f7g8h9i0j3\",\n    \"font\": \"Cinzel\",\n    \"backgroundColor\": \"#1A1A2E\",\n    \"textColor\": \"#EAEAEA\",\n    \"primaryColor\": \"#8B4789\",\n    \"status\": \"active\",\n    \"visibility\": \"public\",\n    \"meta\": [\"protection\", \"beginner\"],\n    \"allowedUsers\": []\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Create a new spellbook page. Spellbook ID is required. Requires admin session scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Spellbook Page",
+					"id": "49009646-spellbook-page-update",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation UpdateSpellbookPage($id: ID!, $input: UpdateSpellbookPageInput!) {\n  updateSpellbookPage(id: $id, input: $input) {\n    success\n    message\n    spellbookPage {\n      id\n      title\n      richText\n      shortDescription\n      primaryAsset {\n        id\n        s3Key\n      }\n      backgroundAsset {\n        id\n        s3Key\n      }\n      font\n      backgroundColor\n      textColor\n      primaryColor\n      user {\n        id\n        handle\n      }\n      spellbook\n      status\n      visibility\n      allowedUsers\n      meta\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"id\": \"6501a2b3c4d5e6f7g8h9i0j4\",\n  \"input\": {\n    \"title\": \"Updated Page Title\",\n    \"richText\": \"<h2>Updated Content</h2><p>Updated spell description...</p>\",\n    \"status\": \"active\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Update an existing spellbook page. Requires admin session scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Soft Delete Spellbook",
+					"id": "49009646-spellbook-soft-delete",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation SoftDeleteSpellbook($id: ID!) {\n  softDeleteSpellbook(id: $id) {\n    success\n    message\n  }\n}",
+								"variables": "{\n  \"id\": \"6501a2b3c4d5e6f7g8h9i0j1\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Soft delete a spellbook (sets status to 'deleted'). Requires admin session scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Hard Delete Spellbook",
+					"id": "49009646-spellbook-hard-delete",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation HardDeleteSpellbook($id: ID!) {\n  hardDeleteSpellbook(id: $id) {\n    success\n    message\n  }\n}",
+								"variables": "{\n  \"id\": \"6501a2b3c4d5e6f7g8h9i0j1\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Permanently delete a spellbook and all its pages from database. Requires admin session scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Soft Delete Spellbook Page",
+					"id": "49009646-spellbook-page-soft-delete",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation SoftDeleteSpellbookPage($id: ID!) {\n  softDeleteSpellbookPage(id: $id) {\n    success\n    message\n  }\n}",
+								"variables": "{\n  \"id\": \"6501a2b3c4d5e6f7g8h9i0j4\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Soft delete a spellbook page (sets status to 'deleted'). Requires admin session scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Hard Delete Spellbook Page",
+					"id": "49009646-spellbook-page-hard-delete",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation HardDeleteSpellbookPage($id: ID!) {\n  hardDeleteSpellbookPage(id: $id) {\n    success\n    message\n  }\n}",
+								"variables": "{\n  \"id\": \"6501a2b3c4d5e6f7g8h9i0j4\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Permanently delete a spellbook page from database and remove from spellbook. Requires admin session scope."
+					},
+					"response": []
+				}
+			],
+			"id": "49009646-spellbook-section",
+			"description": "Complete CRUD operations for spellbooks and spellbook pages. All operations require admin session scope. Pages must be associated with a spellbook."
 		}
 	],
 	"auth": {
