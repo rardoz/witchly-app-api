@@ -3160,7 +3160,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation HardDeleteSpellbookPage($id: ID!) {\n  hardDeleteSpellbookPage(id: $id) {\n    success\n    message\n  }\n}",
-								"variables": "{\n  \"id\": \"6501a2b3c4d5e6f7g8h9i0j4\"\n}"
+								"variables": "{\n  \"id\": \"690c20a23005fdfe6c44ecfb\"\n}"
 							}
 						},
 						"url": {
