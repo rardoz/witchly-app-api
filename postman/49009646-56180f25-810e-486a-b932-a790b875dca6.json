@@ -2848,7 +2848,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "query GetSpellbookPages($spellbookId: ID!, $limit: Float, $offset: Float, $status: String, $visibility: String) {\n  spellbookPages(spellbookId: $spellbookId, limit: $limit, offset: $offset, status: $status, visibility: $visibility) {\n    id\n    title\n    richText\n    shortDescription\n    primaryAsset {\n      id\n      s3Key\n    }\n    backgroundAsset {\n      id\n      s3Key\n    }\n    font\n    backgroundColor\n    textColor\n    primaryColor\n    user {\n      id\n      handle\n    }\n    spellbook\n    status\n    visibility\n    allowedUsers\n    meta\n    createdAt\n    updatedAt\n  }\n}",
-								"variables": "{\n  \"spellbookId\": \"6501a2b3c4d5e6f7g8h9i0j1\",\n  \"limit\": 10,\n  \"offset\": 0,\n  \"status\": \"active\",\n  \"visibility\": \"public\"\n}"
+								"variables": "{\n  \"spellbookId\": \"690c20253005fdfe6c44ec9c\",\n  \"limit\": 10,\n  \"offset\": 0,\n  \"status\": \"active\",\n  \"visibility\": \"public\"\n}"
 							}
 						},
 						"url": {
