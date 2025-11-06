@@ -2865,6 +2865,45 @@
 					"response": []
 				},
 				{
+					"name": "Get Spellbook Page by ID",
+					"id": "49009646-spellbook-page-get-by-id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetSpellbookPage($id: ID!) {\n  spellbookPage(id: $id) {\n    id\n    title\n    richText\n    shortDescription\n    primaryAsset {\n      id\n      s3Key\n    }\n    backgroundAsset {\n      id\n      s3Key\n    }\n    font\n    backgroundColor\n    textColor\n    primaryColor\n    user {\n      id\n      handle\n    }\n    spellbook\n    status\n    visibility\n    allowedUsers\n    meta\n    createdAt\n    updatedAt\n  }\n}",
+								"variables": "{\n  \"id\": \"6501a2b3c4d5e6f7g8h9i0j4\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get a single spellbook page by ID. Requires admin access."
+					},
+					"response": []
+				},
+				{
 					"name": "Create Spellbook",
 					"id": "49009646-spellbook-create",
 					"protocolProfileBehavior": {
