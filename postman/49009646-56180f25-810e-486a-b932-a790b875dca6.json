@@ -2809,7 +2809,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "query GetSpellbook($id: ID!) {\n  spellbook(id: $id) {\n    id\n    title\n    description\n    primaryAsset {\n      id\n      s3Key\n    }\n    backgroundAsset {\n      id\n      s3Key\n    }\n    user {\n      id\n      handle\n    }\n    pages\n    status\n    visibility\n    primaryColor\n    textColor\n    font\n    allowedUsers\n    meta\n    createdAt\n    updatedAt\n  }\n}",
-								"variables": "{\n  \"id\": \"6501a2b3c4d5e6f7g8h9i0j1\"\n}"
+								"variables": "{\n  \"id\": \"690c20253005fdfe6c44ec9c\"\n}"
 							}
 						},
 						"url": {
