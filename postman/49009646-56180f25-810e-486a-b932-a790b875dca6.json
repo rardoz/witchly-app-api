@@ -2887,7 +2887,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation CreateSpellbook($input: CreateSpellbookInput!) {\n  createSpellbook(input: $input) {\n    success\n    message\n    spellbook {\n      id\n      title\n      description\n      primaryAsset {\n        id\n        s3Key\n      }\n      backgroundAsset {\n        id\n        s3Key\n      }\n      user {\n        id\n        handle\n      }\n      pages\n      status\n      visibility\n      primaryColor\n      textColor\n      font\n      allowedUsers\n      meta\n      createdAt\n      updatedAt\n    }\n  }\n}",
-								"variables": "{\n  \"input\": {\n    \"title\": \"My Magical Spellbook\",\n    \"description\": \"A collection of powerful spells and rituals\",\n    \"primaryAsset\": \"6501a2b3c4d5e6f7g8h9i0j1\",\n    \"backgroundAsset\": \"6501a2b3c4d5e6f7g8h9i0j2\",\n    \"primaryColor\": \"#8B4789\",\n    \"textColor\": \"#FFFFFF\",\n    \"font\": \"Cinzel\",\n    \"status\": \"active\",\n    \"visibility\": \"public\",\n    \"meta\": [\"witchcraft\", \"beginner\"],\n    \"allowedUsers\": []\n  }\n}"
+								"variables": "{\n  \"input\": {\n    \"title\": \"My Magical Spellbook\",\n    \"description\": \"A collection of powerful spells and rituals\",\n    \"primaryAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"backgroundAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"primaryColor\": \"#8B4789\",\n    \"textColor\": \"#FFFFFF\",\n    \"font\": \"Cinzel\",\n    \"status\": \"active\",\n    \"visibility\": \"public\",\n    \"meta\": [\"witchcraft\", \"beginner\"],\n    \"allowedUsers\": []\n  }\n}"
 							}
 						},
 						"url": {
