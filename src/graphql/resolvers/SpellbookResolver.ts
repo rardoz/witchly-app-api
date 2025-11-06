@@ -4,7 +4,11 @@ import { Arg, Ctx, ID, Mutation, Query, Resolver } from 'type-graphql';
 import { GraphQLContext } from '../../middleware/auth.middleware';
 import { Spellbook } from '../../models/Spellbook';
 import { SpellbookPage } from '../../models/SpellbookPage';
-import { NotFoundError, ValidationError } from '../../utils/errors';
+import {
+  NotFoundError,
+  UnauthorizedError,
+  ValidationError,
+} from '../../utils/errors';
 import {
   CreateSpellbookInput,
   CreateSpellbookPageInput,
@@ -30,7 +34,7 @@ export class SpellbookResolver {
     @Arg('status', { nullable: true }) status?: string,
     @Arg('visibility', { nullable: true }) visibility?: string
   ): Promise<SpellbookType[]> {
-    context.hasUserAdminWriteAppWriteScope(context);
+    context.hasUserWriteAppWriteScope(context);
 
     // Validate pagination
     if (limit < 1 || limit > 100) {
@@ -55,6 +59,22 @@ export class SpellbookResolver {
       filter.visibility = visibility;
     }
 
+    // Check if user is admin
+    const isAdmin = context.hasUserScope('admin');
+
+    // If not admin, apply permission filters
+    if (!isAdmin && context.userId) {
+      // Non-admin users can only see:
+      // 1. Public spellbooks
+      // 2. Private spellbooks where they are the owner
+      // 3. Private spellbooks where they are in allowedUsers
+      filter.$or = [
+        { visibility: 'public' },
+        { user: new Types.ObjectId(context.userId) },
+        { allowedUsers: new Types.ObjectId(context.userId) },
+      ];
+    }
+
     const spellbooks = await Spellbook.find(filter)
       .sort({ createdAt: -1 })
       .skip(offset)
@@ -72,7 +92,7 @@ export class SpellbookResolver {
     @Ctx() context: GraphQLContext,
     @Arg('id', () => ID) id: string
   ): Promise<SpellbookType | null> {
-    context.hasUserAdminWriteAppWriteScope(context);
+    context.hasUserWriteAppWriteScope(context);
 
     const spellbook = await Spellbook.findById(id)
       .populate('user')
@@ -81,6 +101,23 @@ export class SpellbookResolver {
 
     if (!spellbook) {
       throw new NotFoundError('Spellbook not found');
+    }
+
+    // Check if user is admin
+    const isAdmin = context.hasUserScope('admin');
+
+    // If not admin, verify user has permission to view this spellbook
+    if (!isAdmin && context.userId) {
+      const userId = new Types.ObjectId(context.userId);
+      const isPublic = spellbook.visibility === 'public';
+      const isOwner = spellbook.user._id.equals(userId);
+      const isAllowedUser = spellbook.allowedUsers?.some((allowedId) =>
+        allowedId.equals(userId)
+      );
+
+      if (!isPublic && !isOwner && !isAllowedUser) {
+        throw new NotFoundError('Spellbook not found');
+      }
     }
 
     return spellbook as unknown as SpellbookType;
@@ -96,7 +133,7 @@ export class SpellbookResolver {
     @Arg('status', { nullable: true }) status?: string,
     @Arg('visibility', { nullable: true }) visibility?: string
   ): Promise<SpellbookPageType[]> {
-    context.hasUserAdminWriteAppWriteScope(context);
+    context.hasUserWriteAppWriteScope(context);
     // Validate pagination
     if (limit < 1 || limit > 100) {
       throw new ValidationError('Limit must be between 1 and 100');
@@ -106,9 +143,26 @@ export class SpellbookResolver {
     }
 
     // Verify spellbook exists
-    const spellbook = await Spellbook.findById(spellbookId);
+    const spellbook = await Spellbook.findById(spellbookId).populate('user');
     if (!spellbook) {
       throw new NotFoundError('Spellbook not found');
+    }
+
+    // Check if user is admin
+    const isAdmin = context.hasUserScope('admin');
+
+    // If not admin, verify user has permission to view this spellbook
+    if (!isAdmin && context.userId) {
+      const userId = new Types.ObjectId(context.userId);
+      const isPublic = spellbook.visibility === 'public';
+      const isOwner = spellbook.user._id.equals(userId);
+      const isAllowedUser = spellbook.allowedUsers?.some((allowedId) =>
+        allowedId.equals(userId)
+      );
+
+      if (!isPublic && !isOwner && !isAllowedUser) {
+        throw new NotFoundError('Spellbook not found');
+      }
     }
 
     // Build filter query
@@ -124,6 +178,19 @@ export class SpellbookResolver {
         throw new ValidationError('Invalid visibility value');
       }
       filter.visibility = visibility;
+    }
+
+    // If not admin, apply page-level permission filters
+    if (!isAdmin && context.userId) {
+      // Non-admin users can only see pages that are:
+      // 1. Public pages
+      // 2. Private pages where they are the owner
+      // 3. Private pages where they are in allowedUsers
+      filter.$or = [
+        { visibility: 'public' },
+        { user: new Types.ObjectId(context.userId) },
+        { allowedUsers: new Types.ObjectId(context.userId) },
+      ];
     }
 
     const pages = await SpellbookPage.find(filter)
@@ -142,7 +209,7 @@ export class SpellbookResolver {
     @Ctx() context: GraphQLContext,
     @Arg('id', () => ID) id: string
   ): Promise<SpellbookPageType | null> {
-    context.hasUserAdminWriteAppWriteScope(context);
+    context.hasUserWriteAppWriteScope(context);
 
     const page = await SpellbookPage.findById(id)
       .populate('user')
@@ -151,6 +218,42 @@ export class SpellbookResolver {
 
     if (!page) {
       throw new NotFoundError('Spellbook page not found');
+    }
+
+    // Get the parent spellbook to check permissions
+    const spellbook = await Spellbook.findById(page.spellbook).populate('user');
+    if (!spellbook) {
+      throw new NotFoundError('Spellbook page not found');
+    }
+
+    // Check if user is admin
+    const isAdmin = context.hasUserScope('admin');
+
+    // If not admin, verify user has permission to view the parent spellbook AND the page
+    if (!isAdmin && context.userId) {
+      const userId = new Types.ObjectId(context.userId);
+
+      // Check parent spellbook permissions
+      const spellbookIsPublic = spellbook.visibility === 'public';
+      const spellbookIsOwner = spellbook.user._id.equals(userId);
+      const spellbookIsAllowedUser = spellbook.allowedUsers?.some((allowedId) =>
+        allowedId.equals(userId)
+      );
+
+      if (!spellbookIsPublic && !spellbookIsOwner && !spellbookIsAllowedUser) {
+        throw new NotFoundError('Spellbook page not found');
+      }
+
+      // Check page-level permissions
+      const pageIsPublic = page.visibility === 'public';
+      const pageIsOwner = page.user._id.equals(userId);
+      const pageIsAllowedUser = page.allowedUsers?.some((allowedId) =>
+        allowedId.equals(userId)
+      );
+
+      if (!pageIsPublic && !pageIsOwner && !pageIsAllowedUser) {
+        throw new NotFoundError('Spellbook page not found');
+      }
     }
 
     return page as unknown as SpellbookPageType;
@@ -162,7 +265,7 @@ export class SpellbookResolver {
     @Ctx() context: GraphQLContext,
     @Arg('input') input: CreateSpellbookInput
   ): Promise<SpellbookResponse> {
-    context.hasUserAdminWriteAppWriteScope(context);
+    context.hasUserWriteAppWriteScope(context);
 
     try {
       const spellbook = new Spellbook({
@@ -201,11 +304,24 @@ export class SpellbookResolver {
     @Arg('id', () => ID) id: string,
     @Arg('input') input: UpdateSpellbookInput
   ): Promise<SpellbookResponse> {
-    context.hasUserAdminWriteAppWriteScope(context);
+    context.hasUserWriteAppWriteScope(context);
 
-    const spellbook = await Spellbook.findById(id);
+    const spellbook = await Spellbook.findById(id).populate('user');
     if (!spellbook) {
       throw new NotFoundError('Spellbook not found');
+    }
+
+    // Check if user is admin or owner
+    const isAdmin = context.hasUserScope('admin');
+    if (!isAdmin) {
+      const userId = new Types.ObjectId(context.userId);
+      const isOwner = spellbook.user._id.equals(userId);
+
+      if (!isOwner) {
+        throw new UnauthorizedError(
+          'You do not have permission to update this spellbook'
+        );
+      }
     }
 
     try {
@@ -239,12 +355,27 @@ export class SpellbookResolver {
     @Ctx() context: GraphQLContext,
     @Arg('input') input: CreateSpellbookPageInput
   ): Promise<SpellbookPageResponse> {
-    context.hasUserAdminWriteAppWriteScope(context);
+    context.hasUserWriteAppWriteScope(context);
 
     // Verify spellbook exists
-    const spellbook = await Spellbook.findById(input.spellbook);
+    const spellbook = await Spellbook.findById(input.spellbook).populate(
+      'user'
+    );
     if (!spellbook) {
       throw new NotFoundError('Spellbook not found');
+    }
+
+    // Check if user is admin or owner of the spellbook
+    const isAdmin = context.hasUserScope('admin');
+    if (!isAdmin) {
+      const userId = new Types.ObjectId(context.userId);
+      const isOwner = spellbook.user._id.equals(userId);
+
+      if (!isOwner) {
+        throw new UnauthorizedError(
+          'You do not have permission to add pages to this spellbook'
+        );
+      }
     }
 
     try {
@@ -291,10 +422,23 @@ export class SpellbookResolver {
     @Arg('id', () => ID) id: string,
     @Arg('input') input: UpdateSpellbookPageInput
   ): Promise<SpellbookPageResponse> {
-    context.hasUserAdminWriteAppWriteScope(context);
-    const page = await SpellbookPage.findById(id);
+    context.hasUserWriteAppWriteScope(context);
+    const page = await SpellbookPage.findById(id).populate('user');
     if (!page) {
       throw new NotFoundError('Spellbook page not found');
+    }
+
+    // Check if user is admin or owner
+    const isAdmin = context.hasUserScope('admin');
+    if (!isAdmin) {
+      const userId = new Types.ObjectId(context.userId);
+      const isOwner = page.user._id.equals(userId);
+
+      if (!isOwner) {
+        throw new UnauthorizedError(
+          'You do not have permission to update this spellbook'
+        );
+      }
     }
 
     try {
@@ -328,11 +472,24 @@ export class SpellbookResolver {
     @Ctx() context: GraphQLContext,
     @Arg('id', () => ID) id: string
   ): Promise<DeleteResponse> {
-    context.hasUserAdminWriteAppWriteScope(context);
+    context.hasUserWriteAppWriteScope(context);
 
-    const spellbook = await Spellbook.findById(id);
+    const spellbook = await Spellbook.findById(id).populate('user');
     if (!spellbook) {
       throw new NotFoundError('Spellbook not found');
+    }
+
+    // Check if user is admin or owner
+    const isAdmin = context.hasUserScope('admin');
+    if (!isAdmin) {
+      const userId = new Types.ObjectId(context.userId);
+      const isOwner = spellbook.user._id.equals(userId);
+
+      if (!isOwner) {
+        throw new UnauthorizedError(
+          'You do not have permission to update this spellbook'
+        );
+      }
     }
 
     spellbook.status = 'deleted';
@@ -350,11 +507,24 @@ export class SpellbookResolver {
     @Ctx() context: GraphQLContext,
     @Arg('id', () => ID) id: string
   ): Promise<DeleteResponse> {
-    context.hasUserAdminWriteAppWriteScope(context);
+    context.hasUserWriteAppWriteScope(context);
 
-    const spellbook = await Spellbook.findById(id);
+    const spellbook = await Spellbook.findById(id).populate('user');
     if (!spellbook) {
       throw new NotFoundError('Spellbook not found');
+    }
+
+    // Check if user is admin or owner
+    const isAdmin = context.hasUserScope('admin');
+    if (!isAdmin) {
+      const userId = new Types.ObjectId(context.userId);
+      const isOwner = spellbook.user._id.equals(userId);
+
+      if (!isOwner) {
+        throw new UnauthorizedError(
+          'You do not have permission to update this spellbook'
+        );
+      }
     }
 
     // Remove all pages associated with this spellbook
@@ -375,11 +545,24 @@ export class SpellbookResolver {
     @Ctx() context: GraphQLContext,
     @Arg('id', () => ID) id: string
   ): Promise<DeleteResponse> {
-    context.hasUserAdminWriteAppWriteScope(context);
+    context.hasUserWriteAppWriteScope(context);
 
-    const page = await SpellbookPage.findById(id);
+    const page = await SpellbookPage.findById(id).populate('user');
     if (!page) {
       throw new NotFoundError('Spellbook page not found');
+    }
+
+    // Check if user is admin or owner
+    const isAdmin = context.hasUserScope('admin');
+    if (!isAdmin) {
+      const userId = new Types.ObjectId(context.userId);
+      const isOwner = page.user._id.equals(userId);
+
+      if (!isOwner) {
+        throw new UnauthorizedError(
+          'You do not have permission to update this spellbook'
+        );
+      }
     }
 
     page.status = 'deleted';
@@ -397,11 +580,24 @@ export class SpellbookResolver {
     @Ctx() context: GraphQLContext,
     @Arg('id', () => ID) id: string
   ): Promise<DeleteResponse> {
-    context.hasUserAdminWriteAppWriteScope(context);
+    context.hasUserWriteAppWriteScope(context);
 
-    const page = await SpellbookPage.findById(id);
+    const page = await SpellbookPage.findById(id).populate('user');
     if (!page) {
       throw new NotFoundError('Spellbook page not found');
+    }
+
+    // Check if user is admin or owner
+    const isAdmin = context.hasUserScope('admin');
+    if (!isAdmin) {
+      const userId = new Types.ObjectId(context.userId);
+      const isOwner = page.user._id.equals(userId);
+
+      if (!isOwner) {
+        throw new UnauthorizedError(
+          'You do not have permission to update this spellbook'
+        );
+      }
     }
 
     // Remove page reference from spellbook
