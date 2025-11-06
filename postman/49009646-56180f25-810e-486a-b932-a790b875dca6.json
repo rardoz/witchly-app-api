@@ -303,7 +303,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation CompleteLogin($input: CompleteLoginInput!) {   \n        completeLogin(input: $input) {\n            success\n            message\n            sessionToken\n            refreshToken\n            expiresIn\n            expiresAt\n            userId\n        }\n    }",
-								"variables": "{\n    \"input\": {\n        \"email\": \"witchlyapp@gmail.com\",     \n        \"verificationCode\": \"732535\",       \n        \"keepMeLoggedIn\": true   \n    }\n}"
+								"variables": "{\n    \"input\": {\n        \"email\": \"witchlyapp@gmail.com\",     \n        \"verificationCode\": \"219201\",       \n        \"keepMeLoggedIn\": true   \n    }\n}"
 							}
 						},
 						"url": {
@@ -2848,7 +2848,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "query GetSpellbookPages($spellbookId: ID!, $limit: Float, $offset: Float, $status: String, $visibility: String) {\n  spellbookPages(spellbookId: $spellbookId, limit: $limit, offset: $offset, status: $status, visibility: $visibility) {\n    id\n    title\n    richText\n    shortDescription\n    primaryAsset {\n      id\n      s3Key\n    }\n    backgroundAsset {\n      id\n      s3Key\n    }\n    font\n    backgroundColor\n    textColor\n    primaryColor\n    user {\n      id\n      handle\n    }\n    spellbook\n    status\n    visibility\n    allowedUsers\n    meta\n    createdAt\n    updatedAt\n  }\n}",
-								"variables": "{\n  \"spellbookId\": \"690c20253005fdfe6c44ec9c\",\n  \"limit\": 10,\n  \"offset\": 0,\n  \"status\": \"active\",\n  \"visibility\": \"public\"\n}"
+								"variables": "{\n  \"spellbookId\": \"690c22c1768852a4563bfd00\",\n  \"limit\": 10,\n  \"offset\": 0,\n  \"status\": \"active\",\n  \"visibility\": \"public\"\n}"
 							}
 						},
 						"url": {
@@ -2887,7 +2887,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "query GetSpellbookPage($id: ID!) {\n  spellbookPage(id: $id) {\n    id\n    title\n    richText\n    shortDescription\n    primaryAsset {\n      id\n      s3Key\n    }\n    backgroundAsset {\n      id\n      s3Key\n    }\n    font\n    backgroundColor\n    textColor\n    primaryColor\n    user {\n      id\n      handle\n    }\n    spellbook\n    status\n    visibility\n    allowedUsers\n    meta\n    createdAt\n    updatedAt\n  }\n}",
-								"variables": "{\n  \"id\": \"6501a2b3c4d5e6f7g8h9i0j4\"\n}"
+								"variables": "{\n  \"id\": \"690c25cc079b7850a95473a1\"\n}"
 							}
 						},
 						"url": {
@@ -3004,7 +3004,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation CreateSpellbookPage($input: CreateSpellbookPageInput!) {\n  createSpellbookPage(input: $input) {\n    success\n    message\n    spellbookPage {\n      id\n      title\n      richText\n      shortDescription\n      primaryAsset {\n        id\n        s3Key\n      }\n      backgroundAsset {\n        id\n        s3Key\n      }\n      font\n      backgroundColor\n      textColor\n      primaryColor\n      user {\n        id\n        handle\n      }\n      spellbook\n      status\n      visibility\n      allowedUsers\n      meta\n      createdAt\n      updatedAt\n    }\n  }\n}",
-								"variables": "{\n  \"input\": {\n    \"title\": \"Protection Spell\",\n    \"spellbook\": \"690c20253005fdfe6c44ec9c\",\n    \"richText\": \"<h2>Protection Spell</h2><p>This powerful spell creates a protective barrier...</p>\",\n    \"shortDescription\": \"A simple yet effective protection spell for daily use\",\n    \"primaryAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"backgroundAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"font\": \"Cinzel\",\n    \"backgroundColor\": \"#1A1A2E\",\n    \"textColor\": \"#EAEAEA\",\n    \"primaryColor\": \"#8B4789\",\n    \"status\": \"active\",\n    \"visibility\": \"public\",\n    \"meta\": [\"protection\", \"beginner\"],\n    \"allowedUsers\": []\n  }\n}"
+								"variables": "{\n  \"input\": {\n    \"title\": \"Protection Spell\",\n    \"spellbook\": \"690c25c4079b7850a9547398\",\n    \"richText\": \"<h2>Protection Spell</h2><p>This powerful spell creates a protective barrier...</p>\",\n    \"shortDescription\": \"A simple yet effective protection spell for daily use\",\n    \"primaryAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"backgroundAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"font\": \"Cinzel\",\n    \"backgroundColor\": \"#1A1A2E\",\n    \"textColor\": \"#EAEAEA\",\n    \"primaryColor\": \"#8B4789\",\n    \"status\": \"active\",\n    \"visibility\": \"public\",\n    \"meta\": [\"protection\", \"beginner\"],\n    \"allowedUsers\": []\n  }\n}"
 							}
 						},
 						"url": {
@@ -3121,7 +3121,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation HardDeleteSpellbook($id: ID!) {\n  hardDeleteSpellbook(id: $id) {\n    success\n    message\n  }\n}",
-								"variables": "{\n  \"id\": \"690c20253005fdfe6c44ec9c\"\n}"
+								"variables": "{\n  \"id\": \"690c22c1768852a4563bfd00\"\n}"
 							}
 						},
 						"url": {
@@ -3160,7 +3160,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation SoftDeleteSpellbookPage($id: ID!) {\n  softDeleteSpellbookPage(id: $id) {\n    success\n    message\n  }\n}",
-								"variables": "{\n  \"id\": \"6501a2b3c4d5e6f7g8h9i0j4\"\n}"
+								"variables": "{\n  \"id\": \"690c20a23005fdfe6c44ecfb\"\n}"
 							}
 						},
 						"url": {
