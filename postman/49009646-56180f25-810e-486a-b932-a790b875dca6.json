@@ -2926,7 +2926,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation UpdateSpellbook($id: ID!, $input: UpdateSpellbookInput!) {\n  updateSpellbook(id: $id, input: $input) {\n    success\n    message\n    spellbook {\n      id\n      title\n      description\n      primaryAsset {\n        id\n        s3Key\n      }\n      backgroundAsset {\n        id\n        s3Key\n      }\n      user {\n        id\n        handle\n      }\n      pages\n      status\n      visibility\n      primaryColor\n      textColor\n      font\n      allowedUsers\n      meta\n      createdAt\n      updatedAt\n    }\n  }\n}",
-								"variables": "{\n  \"id\": \"6501a2b3c4d5e6f7g8h9i0j1\",\n  \"input\": {\n    \"title\": \"Updated Spellbook Title\",\n    \"description\": \"Updated description\",\n    \"status\": \"active\",\n    \"visibility\": \"private\"\n  }\n}"
+								"variables": "{\n  \"id\": \"690c20253005fdfe6c44ec9c\",\n  \"input\": {\n    \"title\": \"Updated Spellbook Title\",\n    \"description\": \"Updated description\",\n    \"status\": \"active\",\n    \"visibility\": \"private\"\n  }\n}"
 							}
 						},
 						"url": {
