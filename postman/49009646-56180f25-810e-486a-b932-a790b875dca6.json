@@ -3400,8 +3400,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation JoinCoven($covenId: ID!) {\n  joinCoven(covenId: $covenId) {\n    success\n    message\n    rosterEntry {\n      id\n      userRole\n      userTitle\n      coven {\n        id\n        name\n      }\n      user {\n        id\n        handle\n      }\n    }\n  }\n}",
-								"variables": "{\n  \"covenId\": \"COVEN_ID_HERE\"\n}"
+								"query": "mutation JoinCoven($covenId: ID!) {\n  joinCoven(covenId: $covenId) {\n    success\n    message\n    rosterEntry {\n      id\n      userRole\n      userTitle\n      coven\n      user {\n        id\n        handle\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"covenId\": \"6910249882d900393a93493f\"\n}"
 							}
 						},
 						"url": {
