@@ -4598,7 +4598,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation DeleteCategory($id: ID!) {\n  deleteCategory(id: $id) {\n    success\n    message\n  }\n}",
-								"variables": "{\n  \"id\": \"507f1f77bcf86cd799439015\"\n}"
+								"variables": "{\n  \"id\": \"691056f1ef96362841b24bd5\"\n}"
 							}
 						},
 						"url": {
