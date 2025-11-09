@@ -3680,8 +3680,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation CreateChatMessage($input: CreateChatInput!) {\n  createChatMessage(input: $input) {\n    success\n    message\n    chat {\n      id\n      message\n      user {\n        id\n        handle\n      }\n      entityId\n      entityType\n      likes\n      emojis {\n        emojiCode\n        userIds\n      }\n      createdAt\n    }\n  }\n}",
-								"variables": "{\n  \"input\": {\n    \"message\": \"Welcome to our coven! Looking forward to our next full moon gathering.\",\n    \"entityId\": \"COVEN_ID_HERE\",\n    \"entityType\": \"coven\"\n  }\n}"
+								"query": "mutation CreateChatMessage($input: CreateChatInput!) {\n  createChatMessage(input: $input) {\n    success\n    message\n    chat {\n      id\n      message\n      user {\n        id\n        handle\n      }\n      entityId\n      entityType\n      likes\n      emojis {\n        emojiCode\n        userIds\n      }\n      createdAt,\n      asset {\n        id,\n        s3Key\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"message\": \"Welcome to our coven! Looking forward to our next full moon gathering.\",\n    \"entityId\": \"691027fdb730c9b5532c38e9\",\n    \"entityType\": \"coven\",\n    \"asset\": \"68ff7ebe04e43ae41ca0fc59\"\n  }\n}"
 							}
 						},
 						"url": {
