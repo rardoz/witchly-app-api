@@ -4255,170 +4255,170 @@
 			"description": "Event calendar with RSVP/interested tracking, timezone support, and date range queries. Supports entity-based contexts (coven/global/private)."
 		},
 		{
-			"name": "🏪 Market & Categories",
+			"name": "Category Operations",
 			"item": [
 				{
-					"name": "Category Operations",
-					"item": [
-						{
-							"name": "Create Category",
-							"id": "49009646-create-category",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
+					"name": "Create Category",
+					"id": "49009646-create-category",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
 							},
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									},
-									{
-										"key": "X-Session-Token",
-										"value": "{{sessionToken}}",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "graphql",
-									"graphql": {
-										"query": "mutation CreateCategory($input: CreateCategoryInput!) {\n  createCategory(input: $input) {\n    success\n    message\n    category {\n      id\n      entityId\n      entityType\n      locale\n      categoryName\n      categoryShortDescription\n      primaryAsset {\n        id\n        filename\n        url\n      }\n      heroAsset {\n        id\n        filename\n        url\n      }\n      secondaryAsset {\n        id\n        filename\n        url\n      }\n      priority\n      user {\n        id\n        name\n        handle\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
-										"variables": "{\n  \"input\": {\n    \"entityId\": \"507f1f77bcf86cd799439011\",\n    \"entityType\": \"market\",\n    \"locale\": \"en-US\",\n    \"categoryName\": \"Crystals & Stones\",\n    \"categoryShortDescription\": \"Beautiful crystals and healing stones for your spiritual practice\",\n    \"primaryAsset\": \"507f1f77bcf86cd799439012\",\n    \"heroAsset\": \"507f1f77bcf86cd799439013\",\n    \"secondaryAsset\": \"507f1f77bcf86cd799439014\",\n    \"priority\": 1\n  }\n}"
-									}
-								},
-								"url": {
-									"raw": "{{baseUrl}}/graphql",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"graphql"
-									]
-								},
-								"description": "Create a new category (admin only). Requires admin user session and write scope."
-							},
-							"response": []
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation CreateCategory($input: CreateCategoryInput!) {\n  createCategory(input: $input) {\n    success\n    message\n    category {\n      id\n      entityId\n      entityType\n      locale\n      categoryName\n      categoryShortDescription\n      primaryAsset {\n        id\n        filename\n        url\n      }\n      heroAsset {\n        id\n        filename\n        url\n      }\n      secondaryAsset {\n        id\n        filename\n        url\n      }\n      priority\n      user {\n        id\n        name\n        handle\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"entityId\": \"507f1f77bcf86cd799439011\",\n    \"entityType\": \"market\",\n    \"locale\": \"en-US\",\n    \"categoryName\": \"Crystals & Stones\",\n    \"categoryShortDescription\": \"Beautiful crystals and healing stones for your spiritual practice\",\n    \"primaryAsset\": \"507f1f77bcf86cd799439012\",\n    \"heroAsset\": \"507f1f77bcf86cd799439013\",\n    \"secondaryAsset\": \"507f1f77bcf86cd799439014\",\n    \"priority\": 1\n  }\n}"
+							}
 						},
-						{
-							"name": "Update Category",
-							"id": "49009646-update-category",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									},
-									{
-										"key": "X-Session-Token",
-										"value": "{{sessionToken}}",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "graphql",
-									"graphql": {
-										"query": "mutation UpdateCategory($input: UpdateCategoryInput!) {\n  updateCategory(input: $input) {\n    success\n    message\n    category {\n      id\n      entityId\n      entityType\n      locale\n      categoryName\n      categoryShortDescription\n      primaryAsset {\n        id\n        filename\n        url\n      }\n      heroAsset {\n        id\n        filename\n        url\n      }\n      secondaryAsset {\n        id\n        filename\n        url\n      }\n      priority\n      user {\n        id\n        name\n        handle\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
-										"variables": "{\n  \"input\": {\n    \"id\": \"507f1f77bcf86cd799439015\",\n    \"categoryName\": \"Updated Crystals & Gems\",\n    \"categoryShortDescription\": \"Premium crystals and gemstones collection\",\n    \"priority\": 2,\n    \"locale\": \"en-US\",\n    \"primaryAsset\": \"507f1f77bcf86cd799439016\"\n  }\n}"
-									}
-								},
-								"url": {
-									"raw": "{{baseUrl}}/graphql",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"graphql"
-									]
-								},
-								"description": "Update an existing category (admin only). Requires admin user session and write scope."
-							},
-							"response": []
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
 						},
-						{
-							"name": "Delete Category",
-							"id": "49009646-delete-category",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									},
-									{
-										"key": "X-Session-Token",
-										"value": "{{sessionToken}}",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "graphql",
-									"graphql": {
-										"query": "mutation DeleteCategory($id: ID!) {\n  deleteCategory(id: $id) {\n    success\n    message\n  }\n}",
-										"variables": "{\n  \"id\": \"507f1f77bcf86cd799439015\"\n}"
-									}
-								},
-								"url": {
-									"raw": "{{baseUrl}}/graphql",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"graphql"
-									]
-								},
-								"description": "Hard delete a category (admin only). Requires admin user session and write scope."
-							},
-							"response": []
-						},
-						{
-							"name": "Get Categories",
-							"id": "49009646-get-categories",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									},
-									{
-										"key": "X-Session-Token",
-										"value": "{{sessionToken}}",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "graphql",
-									"graphql": {
-										"query": "query GetCategories($limit: Int, $offset: Int, $locale: String) {\n  categories(limit: $limit, offset: $offset, locale: $locale) {\n    id\n    entityId\n    entityType\n    locale\n    categoryName\n    categoryShortDescription\n    primaryAsset {\n      id\n      filename\n      url\n      mimeType\n    }\n    heroAsset {\n      id\n      filename\n      url\n      mimeType\n    }\n    secondaryAsset {\n      id\n      filename\n      url\n      mimeType\n    }\n    priority\n    user {\n      id\n      name\n      handle\n    }\n    createdAt\n    updatedAt\n  }\n}",
-										"variables": "{\n  \"limit\": 20,\n  \"offset\": 0,\n  \"locale\": \"en-US\"\n}"
-									}
-								},
-								"url": {
-									"raw": "{{baseUrl}}/graphql",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"graphql"
-									]
-								},
-								"description": "Get categories ordered by priority. Supports pagination and locale filtering. Requires read scope."
-							},
-							"response": []
-						}
-					],
-					"id": "49009646-category-section"
+						"description": "Create a new category (admin only). Requires admin user session and write scope."
+					},
+					"response": []
 				},
+				{
+					"name": "Update Category",
+					"id": "49009646-update-category",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation UpdateCategory($input: UpdateCategoryInput!) {\n  updateCategory(input: $input) {\n    success\n    message\n    category {\n      id\n      entityId\n      entityType\n      locale\n      categoryName\n      categoryShortDescription\n      primaryAsset {\n        id\n        filename\n        url\n      }\n      heroAsset {\n        id\n        filename\n        url\n      }\n      secondaryAsset {\n        id\n        filename\n        url\n      }\n      priority\n      user {\n        id\n        name\n        handle\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"id\": \"507f1f77bcf86cd799439015\",\n    \"categoryName\": \"Updated Crystals & Gems\",\n    \"categoryShortDescription\": \"Premium crystals and gemstones collection\",\n    \"priority\": 2,\n    \"locale\": \"en-US\",\n    \"primaryAsset\": \"507f1f77bcf86cd799439016\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Update an existing category (admin only). Requires admin user session and write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Category",
+					"id": "49009646-delete-category",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation DeleteCategory($id: ID!) {\n  deleteCategory(id: $id) {\n    success\n    message\n  }\n}",
+								"variables": "{\n  \"id\": \"507f1f77bcf86cd799439015\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Hard delete a category (admin only). Requires admin user session and write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Categories",
+					"id": "49009646-get-categories",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetCategories($limit: Int, $offset: Int, $locale: String) {\n  categories(limit: $limit, offset: $offset, locale: $locale) {\n    id\n    entityId\n    entityType\n    locale\n    categoryName\n    categoryShortDescription\n    primaryAsset {\n      id\n      filename\n      url\n      mimeType\n    }\n    heroAsset {\n      id\n      filename\n      url\n      mimeType\n    }\n    secondaryAsset {\n      id\n      filename\n      url\n      mimeType\n    }\n    priority\n    user {\n      id\n      name\n      handle\n    }\n    createdAt\n    updatedAt\n  }\n}",
+								"variables": "{\n  \"limit\": 20,\n  \"offset\": 0,\n  \"locale\": \"en-US\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get categories ordered by priority. Supports pagination and locale filtering. Requires read scope."
+					},
+					"response": []
+				}
+			],
+			"id": "49009646-category-section"
+		},
+		{
+			"name": "🏪 Market & Categories",
+			"item": [
 				{
 					"name": "Market Operations",
 					"item": [
