@@ -8,6 +8,7 @@ import { type GraphQLFormattedError } from 'graphql';
 import { buildSchema } from 'type-graphql';
 import { AssetResolver } from './resolvers/AssetResolver';
 import { AuthResolver } from './resolvers/AuthResolver';
+import { CategoryResolver } from './resolvers/CategoryResolver';
 import { ChatResolver } from './resolvers/ChatResolver';
 import { ClientResolver } from './resolvers/ClientResolver';
 import { CovenResolver } from './resolvers/CovenResolver';
@@ -15,6 +16,7 @@ import { EventResolver } from './resolvers/EventResolver';
 import { HoroscopeResolver } from './resolvers/HoroscopeResolver';
 import { LoginResolver } from './resolvers/LoginResolver';
 import { MagicEightBallResolver } from './resolvers/MagicEightBallResolver';
+import { MarketResolver } from './resolvers/MarketResolver';
 import { MoonPhaseResolver } from './resolvers/MoonPhaseResolver';
 import { SessionResolver } from './resolvers/SessionResolver';
 import { SignupResolver } from './resolvers/SignupResolver';
@@ -116,6 +118,8 @@ export const createApolloServer = async (): Promise<ApolloServer> => {
       CovenResolver,
       ChatResolver,
       EventResolver,
+      CategoryResolver,
+      MarketResolver,
     ],
     validate: false,
   });
@@ -129,6 +133,26 @@ export const createApolloServer = async (): Promise<ApolloServer> => {
       if (process.env.NODE_ENV !== 'test') {
         console.error('GraphQL Error:', formattedError);
         console.error('Original Error:', error);
+      }
+
+      // Handle Mongoose validation errors globally
+      // GraphQL wraps errors, so check for originalError property
+      if (error && typeof error === 'object' && 'originalError' in error) {
+        const originalError = (error as { originalError?: Error })
+          .originalError;
+        if (originalError && originalError.name === 'ValidationError') {
+          return {
+            ...formattedError,
+            message: originalError.message,
+            extensions: {
+              ...formattedError.extensions,
+              code: 'VALIDATION_ERROR',
+              http: {
+                status: 400,
+              },
+            },
+          };
+        }
       }
 
       // Return the formatted error preserving all required fields
