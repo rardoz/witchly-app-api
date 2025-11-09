@@ -4255,7 +4255,7 @@
 			"description": "Event calendar with RSVP/interested tracking, timezone support, and date range queries. Supports entity-based contexts (coven/global/private)."
 		},
 		{
-			"name": "Market",
+			"name": "🛍️ Market",
 			"item": [
 				{
 					"name": "Create Market Product",
@@ -4358,7 +4358,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation SoftDeleteMarket($id: ID!) {\n  softDeleteMarket(id: $id) {\n    success\n    message\n  }\n}",
-								"variables": "{\n  \"id\": \"507f1f77bcf86cd799439025\"\n}"
+								"variables": "{\n  \"id\": \"69105aab654805381f6f5bfe\"\n}"
 							}
 						},
 						"url": {
@@ -4397,7 +4397,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation HardDeleteMarket($id: ID!) {\n  hardDeleteMarket(id: $id) {\n    success\n    message\n  }\n}",
-								"variables": "{\n  \"id\": \"507f1f77bcf86cd799439025\"\n}"
+								"variables": "{\n  \"id\": \"69105aab654805381f6f5bfe\"\n}"
 							}
 						},
 						"url": {
