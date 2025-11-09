@@ -3323,7 +3323,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation SoftDeleteCoven($id: ID!) {\n  softDeleteCoven(id: $id) {\n    success\n    message\n  }\n}",
-								"variables": "{\n  \"id\": \"COVEN_ID_HERE\"\n}"
+								"variables": "{\n  \"id\": \"691027f3b730c9b5532c38e0\"\n}"
 							}
 						},
 						"url": {
@@ -3362,7 +3362,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation HardDeleteCoven($id: ID!) {\n  hardDeleteCoven(id: $id) {\n    success\n    message\n  }\n}",
-								"variables": "{\n  \"id\": \"COVEN_ID_HERE\"\n}"
+								"variables": "{\n  \"id\": \"691027f3b730c9b5532c38e0\"\n}"
 							}
 						},
 						"url": {
