@@ -8,7 +8,10 @@ import { type GraphQLFormattedError } from 'graphql';
 import { buildSchema } from 'type-graphql';
 import { AssetResolver } from './resolvers/AssetResolver';
 import { AuthResolver } from './resolvers/AuthResolver';
+import { ChatResolver } from './resolvers/ChatResolver';
 import { ClientResolver } from './resolvers/ClientResolver';
+import { CovenResolver } from './resolvers/CovenResolver';
+import { EventResolver } from './resolvers/EventResolver';
 import { HoroscopeResolver } from './resolvers/HoroscopeResolver';
 import { LoginResolver } from './resolvers/LoginResolver';
 import { MagicEightBallResolver } from './resolvers/MagicEightBallResolver';
@@ -110,6 +113,9 @@ export const createApolloServer = async (): Promise<ApolloServer> => {
       HoroscopeResolver,
       MagicEightBallResolver,
       SpellbookResolver,
+      CovenResolver,
+      ChatResolver,
+      EventResolver,
     ],
     validate: false,
   });
