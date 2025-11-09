@@ -4636,7 +4636,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetCategories($limit: Int, $offset: Int, $locale: String) {\n  categories(limit: $limit, offset: $offset, locale: $locale) {\n    id\n    entityId\n    entityType\n    locale\n    categoryName\n    categoryShortDescription\n    primaryAsset {\n      id\n      filename\n      url\n      mimeType\n    }\n    heroAsset {\n      id\n      filename\n      url\n      mimeType\n    }\n    secondaryAsset {\n      id\n      filename\n      url\n      mimeType\n    }\n    priority\n    user {\n      id\n      name\n      handle\n    }\n    createdAt\n    updatedAt\n  }\n}",
+								"query": "query GetCategories($limit: Int, $offset: Int, $locale: String) {\n  categories(limit: $limit, offset: $offset, locale: $locale) {\n    id\n    entityId\n    entityType\n    locale\n    categoryName\n    categoryShortDescription\n    primaryAsset {\n      id\n      s3Key\n    }\n    heroAsset {\n      id\n      s3Key\n    }\n    secondaryAsset {\n      id\n      s3Key\n    }\n    priority\n    user {\n      id\n      handle\n    }\n    createdAt\n    updatedAt\n  }\n}",
 								"variables": "{\n  \"limit\": 20,\n  \"offset\": 0,\n  \"locale\": \"en-US\"\n}"
 							}
 						},
