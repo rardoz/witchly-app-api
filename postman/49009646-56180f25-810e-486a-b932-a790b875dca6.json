@@ -3960,8 +3960,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation UpdateEvent($input: UpdateEventInput!) {\n  updateEvent(input: $input) {\n    success\n    message\n    event {\n      id\n      name\n      description\n      startDateTime\n      endDateTime\n      updatedAt\n    }\n  }\n}",
-								"variables": "{\n  \"input\": {\n    \"id\": \"EVENT_ID_HERE\",\n    \"description\": \"Updated event description with more details\",\n    \"primaryColor\": \"#9B59B6\"\n  }\n}"
+								"query": "mutation UpdateEvent($input: UpdateEventInput!) {\n  updateEvent(input: $input) {\n    success\n    message\n    event {\n   id\n      name\n      description\n      shortDescription\n      startDateTime\n      startTimezone\n      endDateTime\n      endTimezone\n      entityId\n      entityType\n      rsvpUsers\n      interestedUsers\n      primaryColor\n      webUrl\n      webUrlLabel\n      user {\n        id\n        handle\n      }\n      createdAt\n      heroAsset {\n        s3Key\n      }\n      backgroundAsset {\n        s3Key\n      }\n      primaryAsset {\n        s3Key\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"id\": \"6910335fdfe531a83918734e\",\n    \"description\": \"Updated event description with more details\",\n    \"primaryColor\": \"#9B59B6\",\n    \"shortDescription\": \"Full moon gathering\",\n    \"startDateTime\": \"2026-01-15T19:00:00Z\",\n    \"startTimezone\": \"America/New_York\",\n    \"endDateTime\": \"2026-01-15T22:00:00Z\",\n    \"endTimezone\": \"America/New_York\",\n    \"webUrl\": \"http://test.com\",\n    \"webUrlLabel\": \"test\",\n    \"heroAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"backgroundAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"primaryAsset\": \"68ff7ebe04e43ae41ca0fc59\"\n  }\n}"
 							}
 						},
 						"url": {
