@@ -4520,7 +4520,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation CreateCategory($input: CreateCategoryInput!) {\n  createCategory(input: $input) {\n    success\n    message\n    category {\n      id\n      entityId\n      entityType\n      locale\n      categoryName\n      categoryShortDescription\n      primaryAsset {\n        id\n        s3Key\n      }\n      heroAsset {\n        id\n        s3Key\n      }\n      secondaryAsset {\n        id\n        s3Key\n      }\n      priority\n      user {\n        id\n        name\n        handle\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
-								"variables": "{\n  \"input\": {\n    \"entityId\": \"507f1f77bcf86cd799439011\",\n    \"entityType\": \"market\",\n    \"locale\": \"en-US\",\n    \"categoryName\": \"Crystals & Stones\",\n    \"categoryShortDescription\": \"Beautiful crystals and healing stones for your spiritual practice\",\n    \"primaryAsset\": \"507f1f77bcf86cd799439012\",\n    \"heroAsset\": \"507f1f77bcf86cd799439013\",\n    \"secondaryAsset\": \"507f1f77bcf86cd799439014\",\n    \"priority\": 1\n  }\n}"
+								"variables": "{\n  \"input\": {\n    \"entityId\": \"market\",\n    \"entityType\": \"market\",\n    \"locale\": \"en-US\",\n    \"categoryName\": \"Crystals & Stones\",\n    \"categoryShortDescription\": \"Beautiful crystals and healing stones for your spiritual practice\",\n    \"primaryAsset\": \"507f1f77bcf86cd799439012\",\n    \"heroAsset\": \"507f1f77bcf86cd799439013\",\n    \"secondaryAsset\": \"507f1f77bcf86cd799439014\",\n    \"priority\": 1\n  }\n}"
 							}
 						},
 						"url": {
