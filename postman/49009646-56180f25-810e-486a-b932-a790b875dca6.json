@@ -4255,7 +4255,7 @@
 			"description": "Event calendar with RSVP/interested tracking, timezone support, and date range queries. Supports entity-based contexts (coven/global/private)."
 		},
 		{
-			"name": "Category Operations",
+			"name": "Categories",
 			"item": [
 				{
 					"name": "Create Category",
