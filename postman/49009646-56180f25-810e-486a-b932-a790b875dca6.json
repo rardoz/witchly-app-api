@@ -4234,7 +4234,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "query GetEventsByUser($userId: ID!, $limit: Int, $offset: Int) {\n  eventsByUser(userId: $userId, limit: $limit, offset: $offset) {\n    id\n    name\n    description\n    startDateTime\n    endDateTime\n    entityId\n    entityType\n    rsvpUsers\n    interestedUsers\n    createdAt\n  }\n}",
-								"variables": "{\n  \"userId\": \"USER_ID_HERE\",\n  \"limit\": 20,\n  \"offset\": 0\n}"
+								"variables": "{\n  \"userId\": \"68e4617a870854281db2b95d\",\n  \"limit\": 20,\n  \"offset\": 0\n}"
 							}
 						},
 						"url": {
