@@ -3556,7 +3556,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetMyCovenMemberships($limit: Int, $offset: Int) {\n  myCovenMemberships(limit: $limit, offset: $offset) {\n    id\n    name\n    description\n    privacy\n    tradition\n    meta\n    createdAt\n  }\n}",
+								"query": "query GetMyCovenMemberships($limit: Int, $offset: Int) {\n  myCovenMemberships(limit: $limit, offset: $offset) {\n id\n      name\n      description\n      privacy\n      status\n      tradition\n      structure\n      practice\n      maxMembers\n      primaryColor\n      secondaryColor\n      webUrl\n      webUrlLabel\n      font\n      locale\n      user {\n        id\n        handle\n      }\n      createdAt\n      updatedAt\n      primaryAsset {\n            id\n            s3Key\n      }\n      backgroundAsset {\n            id\n            s3Key\n      }\n      headerAsset {\n            id\n            s3Key\n      }\n      avatarAsset {\n            id\n            s3Key\n      }\n  }\n}",
 								"variables": "{\n  \"limit\": 20,\n  \"offset\": 0\n}"
 							}
 						},
