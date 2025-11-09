@@ -4253,6 +4253,415 @@
 			],
 			"id": "49009646-event-section",
 			"description": "Event calendar with RSVP/interested tracking, timezone support, and date range queries. Supports entity-based contexts (coven/global/private)."
+		},
+		{
+			"name": "🏪 Market & Categories",
+			"item": [
+				{
+					"name": "Category Operations",
+					"item": [
+						{
+							"name": "Create Category",
+							"id": "49009646-create-category",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Session-Token",
+										"value": "{{sessionToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation CreateCategory($input: CreateCategoryInput!) {\n  createCategory(input: $input) {\n    success\n    message\n    category {\n      id\n      entityId\n      entityType\n      locale\n      categoryName\n      categoryShortDescription\n      primaryAsset {\n        id\n        filename\n        url\n      }\n      heroAsset {\n        id\n        filename\n        url\n      }\n      secondaryAsset {\n        id\n        filename\n        url\n      }\n      priority\n      user {\n        id\n        name\n        handle\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
+										"variables": "{\n  \"input\": {\n    \"entityId\": \"507f1f77bcf86cd799439011\",\n    \"entityType\": \"market\",\n    \"locale\": \"en-US\",\n    \"categoryName\": \"Crystals & Stones\",\n    \"categoryShortDescription\": \"Beautiful crystals and healing stones for your spiritual practice\",\n    \"primaryAsset\": \"507f1f77bcf86cd799439012\",\n    \"heroAsset\": \"507f1f77bcf86cd799439013\",\n    \"secondaryAsset\": \"507f1f77bcf86cd799439014\",\n    \"priority\": 1\n  }\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Create a new category (admin only). Requires admin user session and write scope."
+							},
+							"response": []
+						},
+						{
+							"name": "Update Category",
+							"id": "49009646-update-category",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Session-Token",
+										"value": "{{sessionToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation UpdateCategory($input: UpdateCategoryInput!) {\n  updateCategory(input: $input) {\n    success\n    message\n    category {\n      id\n      entityId\n      entityType\n      locale\n      categoryName\n      categoryShortDescription\n      primaryAsset {\n        id\n        filename\n        url\n      }\n      heroAsset {\n        id\n        filename\n        url\n      }\n      secondaryAsset {\n        id\n        filename\n        url\n      }\n      priority\n      user {\n        id\n        name\n        handle\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
+										"variables": "{\n  \"input\": {\n    \"id\": \"507f1f77bcf86cd799439015\",\n    \"categoryName\": \"Updated Crystals & Gems\",\n    \"categoryShortDescription\": \"Premium crystals and gemstones collection\",\n    \"priority\": 2,\n    \"locale\": \"en-US\",\n    \"primaryAsset\": \"507f1f77bcf86cd799439016\"\n  }\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Update an existing category (admin only). Requires admin user session and write scope."
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Category",
+							"id": "49009646-delete-category",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Session-Token",
+										"value": "{{sessionToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation DeleteCategory($id: ID!) {\n  deleteCategory(id: $id) {\n    success\n    message\n  }\n}",
+										"variables": "{\n  \"id\": \"507f1f77bcf86cd799439015\"\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Hard delete a category (admin only). Requires admin user session and write scope."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Categories",
+							"id": "49009646-get-categories",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Session-Token",
+										"value": "{{sessionToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query GetCategories($limit: Int, $offset: Int, $locale: String) {\n  categories(limit: $limit, offset: $offset, locale: $locale) {\n    id\n    entityId\n    entityType\n    locale\n    categoryName\n    categoryShortDescription\n    primaryAsset {\n      id\n      filename\n      url\n      mimeType\n    }\n    heroAsset {\n      id\n      filename\n      url\n      mimeType\n    }\n    secondaryAsset {\n      id\n      filename\n      url\n      mimeType\n    }\n    priority\n    user {\n      id\n      name\n      handle\n    }\n    createdAt\n    updatedAt\n  }\n}",
+										"variables": "{\n  \"limit\": 20,\n  \"offset\": 0,\n  \"locale\": \"en-US\"\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Get categories ordered by priority. Supports pagination and locale filtering. Requires read scope."
+							},
+							"response": []
+						}
+					],
+					"id": "49009646-category-section"
+				},
+				{
+					"name": "Market Operations",
+					"item": [
+						{
+							"name": "Create Market Product",
+							"id": "49009646-create-market",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Session-Token",
+										"value": "{{sessionToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation CreateMarket($input: CreateMarketInput!) {\n  createMarket(input: $input) {\n    success\n    message\n    market {\n      id\n      primaryAsset {\n        id\n        filename\n        url\n      }\n      secondaryAsset {\n        id\n        filename\n        url\n      }\n      finalAsset {\n        id\n        filename\n        url\n      }\n      name\n      description\n      shortDescription\n      price\n      locale\n      currency\n      url\n      urlLabel\n      category {\n        id\n        categoryName\n      }\n      priority\n      status\n      likes\n      user {\n        id\n        name\n        handle\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
+										"variables": "{\n  \"input\": {\n    \"primaryAsset\": \"507f1f77bcf86cd799439020\",\n    \"secondaryAsset\": \"507f1f77bcf86cd799439021\",\n    \"finalAsset\": \"507f1f77bcf86cd799439022\",\n    \"name\": \"Rose Quartz Crystal\",\n    \"description\": \"Beautiful pink rose quartz crystal perfect for love and compassion work. Natural formation with excellent clarity.\",\n    \"shortDescription\": \"Natural rose quartz crystal for love work\",\n    \"price\": 24.99,\n    \"locale\": \"en-US\",\n    \"currency\": \"USD\",\n    \"url\": \"https://shop.example.com/rose-quartz-crystal\",\n    \"urlLabel\": \"Buy Now\",\n    \"category\": \"507f1f77bcf86cd799439015\",\n    \"priority\": 1,\n    \"status\": \"active\"\n  }\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Create a new market product (admin only). Requires admin user session and write scope."
+							},
+							"response": []
+						},
+						{
+							"name": "Update Market Product",
+							"id": "49009646-update-market",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Session-Token",
+										"value": "{{sessionToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation UpdateMarket($input: UpdateMarketInput!) {\n  updateMarket(input: $input) {\n    success\n    message\n    market {\n      id\n      primaryAsset {\n        id\n        filename\n        url\n      }\n      secondaryAsset {\n        id\n        filename\n        url\n      }\n      finalAsset {\n        id\n        filename\n        url\n      }\n      name\n      description\n      shortDescription\n      price\n      locale\n      currency\n      url\n      urlLabel\n      category {\n        id\n        categoryName\n      }\n      priority\n      status\n      likes\n      user {\n        id\n        name\n        handle\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
+										"variables": "{\n  \"input\": {\n    \"id\": \"507f1f77bcf86cd799439025\",\n    \"name\": \"Premium Rose Quartz Crystal\",\n    \"price\": 29.99,\n    \"status\": \"active\",\n    \"description\": \"High-quality rose quartz with exceptional clarity\",\n    \"priority\": 2,\n    \"url\": \"https://shop.example.com/premium-rose-quartz\",\n    \"urlLabel\": \"Shop Now\"\n  }\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Update an existing market product (admin only). Requires admin user session and write scope."
+							},
+							"response": []
+						},
+						{
+							"name": "Soft Delete Market Product",
+							"id": "49009646-soft-delete-market",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Session-Token",
+										"value": "{{sessionToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation SoftDeleteMarket($id: ID!) {\n  softDeleteMarket(id: $id) {\n    success\n    message\n  }\n}",
+										"variables": "{\n  \"id\": \"507f1f77bcf86cd799439025\"\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Soft delete a market product by setting status to 'deleted' (admin only). Requires admin user session and write scope."
+							},
+							"response": []
+						},
+						{
+							"name": "Hard Delete Market Product",
+							"id": "49009646-hard-delete-market",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Session-Token",
+										"value": "{{sessionToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation HardDeleteMarket($id: ID!) {\n  hardDeleteMarket(id: $id) {\n    success\n    message\n  }\n}",
+										"variables": "{\n  \"id\": \"507f1f77bcf86cd799439025\"\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Permanently delete a market product from database (admin only). Requires admin user session and write scope."
+							},
+							"response": []
+						},
+						{
+							"name": "Like/Unlike Market Product",
+							"id": "49009646-like-market",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Session-Token",
+										"value": "{{sessionToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation LikeMarket($marketId: ID!) {\n  likeMarket(marketId: $marketId) {\n    success\n    message\n    market {\n      id\n      name\n      likes\n    }\n  }\n}",
+										"variables": "{\n  \"marketId\": \"507f1f77bcf86cd799439025\"\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Toggle like on a market product. If already liked, removes like; if not liked, adds like. Requires user session and write scope."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Market Products",
+							"id": "49009646-get-markets",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Session-Token",
+										"value": "{{sessionToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query GetMarkets($limit: Int, $offset: Int, $categoryId: ID, $locale: String, $status: String) {\n  markets(limit: $limit, offset: $offset, categoryId: $categoryId, locale: $locale, status: $status) {\n    id\n    primaryAsset {\n      id\n      filename\n      url\n      mimeType\n    }\n    secondaryAsset {\n      id\n      filename\n      url\n      mimeType\n    }\n    finalAsset {\n      id\n      filename\n      url\n      mimeType\n    }\n    name\n    description\n    shortDescription\n    price\n    locale\n    currency\n    url\n    urlLabel\n    category {\n      id\n      categoryName\n      categoryShortDescription\n    }\n    priority\n    status\n    likes\n    user {\n      id\n      name\n      handle\n    }\n    createdAt\n    updatedAt\n  }\n}",
+										"variables": "{\n  \"limit\": 20,\n  \"offset\": 0,\n  \"categoryId\": \"507f1f77bcf86cd799439015\",\n  \"locale\": \"en-US\",\n  \"status\": \"active\"\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Get market products with filters. Non-admin users only see active products. Admin users can filter by status. Supports pagination, category filtering, and locale. Requires read scope."
+							},
+							"response": []
+						}
+					],
+					"id": "49009646-market-section"
+				}
+			],
+			"id": "49009646-market-category-section",
+			"description": "Market product listings and category management. Categories organize products with entity-based structure. Market products have pricing, assets, status management, and like functionality."
 		}
 	],
 	"auth": {
