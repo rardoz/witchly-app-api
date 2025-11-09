@@ -3595,7 +3595,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetCovenRoster($covenId: ID!, $limit: Int, $offset: Int) {\n  covenRoster(covenId: $covenId, limit: $limit, offset: $offset) {\n    id\n    userRole\n    userTitle\n    userCovenName\n    userCovenBio\n    lastActive\n    user {\n      id\n      handle\n    }\n    coven {\n      id\n      name\n    }\n    createdAt\n  }\n}",
+								"query": "query GetCovenRoster($covenId: ID!, $limit: Int, $offset: Int) {\n  covenRoster(covenId: $covenId, limit: $limit, offset: $offset) {\n    id\n    userRole\n    userTitle\n    userCovenName\n    userCovenBio\n    lastActive\n    user {\n      id\n      handle\n    }\n    coven\n    createdAt\n  }\n}",
 								"variables": "{\n  \"covenId\": \"691027fdb730c9b5532c38e9\",\n  \"limit\": 50,\n  \"offset\": 0\n}"
 							}
 						},
