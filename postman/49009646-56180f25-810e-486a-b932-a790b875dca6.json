@@ -4000,7 +4000,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation DeleteEvent($id: ID!) {\n  deleteEvent(id: $id) {\n    success\n    message\n  }\n}",
-								"variables": "{\n  \"id\": \"EVENT_ID_HERE\"\n}"
+								"variables": "{\n  \"id\": \"6910335fdfe531a83918734e\"\n}"
 							}
 						},
 						"url": {
