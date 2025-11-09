@@ -3478,7 +3478,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetCoven($id: ID!) {\n  coven(id: $id) {\n    id\n    name\n    description\n    shortDescription\n    privacy\n    status\n    tradition\n    structure\n    practice\n    maxMembers\n    meta\n    primaryColor\n    secondaryColor\n    font\n    webUrl\n    webUrlLabel\n    user {\n      id\n      handle\n    }\n    createdAt\n    updatedAt\n  }\n}",
+								"query": "query GetCoven($id: ID!) {\n  coven(id: $id) {\n    id\n      name\n      description\n      privacy\n      status\n      tradition\n      structure\n      practice\n      maxMembers\n      primaryColor\n      secondaryColor\n      webUrl\n      webUrlLabel\n      font\n      locale\n      user {\n        id\n        handle\n      }\n      createdAt\n      updatedAt\n      primaryAsset {\n            id\n            s3Key\n      }\n      backgroundAsset {\n            id\n            s3Key\n      }\n      headerAsset {\n            id\n            s3Key\n      }\n      avatarAsset {\n            id\n            s3Key\n      }\n  }\n}",
 								"variables": "{\n  \"id\": \"6910249882d900393a93493f\"\n}"
 							}
 						},
