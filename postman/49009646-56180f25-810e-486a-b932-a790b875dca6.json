@@ -4435,8 +4435,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation LikeMarket($marketId: ID!) {\n  likeMarket(marketId: $marketId) {\n    success\n    message\n    market {\n      id\n      name\n      likes\n    }\n  }\n}",
-								"variables": "{\n  \"marketId\": \"507f1f77bcf86cd799439025\"\n}"
+								"query": "mutation LikeMarket($marketId: ID!) {\n  likeMarket(marketId: $marketId) {\n    success\n    message\n    market {\n       id\n      primaryAsset {\n        id\n        s3Key\n      }\n      secondaryAsset {\n        id\n        s3Key\n      }\n      finalAsset {\n        id\n        s3Key\n      }\n      name\n      description\n      shortDescription\n      price\n      locale\n      currency\n      url\n      urlLabel\n      category {\n        id\n        categoryName\n      }\n      priority\n      status\n      likes\n      user {\n        id\n        name\n        handle\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"marketId\": \"69105aec654805381f6f5c47\"\n}"
 							}
 						},
 						"url": {
