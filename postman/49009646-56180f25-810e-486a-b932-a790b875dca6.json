@@ -4116,8 +4116,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetEvents($entityId: ID!, $entityType: String!, $limit: Int, $offset: Int) {\n  events(entityId: $entityId, entityType: $entityType, limit: $limit, offset: $offset) {\n    id\n    name\n    description\n    startDateTime\n    startTimezone\n    endDateTime\n    endTimezone\n    rsvpUsers\n    interestedUsers\n    primaryColor\n    user {\n      id\n      handle\n    }\n    createdAt\n  }\n}",
-								"variables": "{\n  \"entityId\": \"COVEN_ID_HERE\",\n  \"entityType\": \"coven\",\n  \"limit\": 20,\n  \"offset\": 0\n}"
+								"query": "query GetEvents($entityId: ID!, $entityType: String!, $limit: Int, $offset: Int) {\n  events(entityId: $entityId, entityType: $entityType, limit: $limit, offset: $offset) {\n   id\n      name\n      description\n      shortDescription\n      startDateTime\n      startTimezone\n      endDateTime\n      endTimezone\n      entityId\n      entityType\n      rsvpUsers\n      interestedUsers\n      primaryColor\n      webUrl\n      webUrlLabel\n      user {\n        id\n        handle\n      }\n      createdAt\n      heroAsset {\n        s3Key\n      }\n      backgroundAsset {\n        s3Key\n      }\n      primaryAsset {\n        s3Key\n      }\n  }\n}",
+								"variables": "{\n  \"entityId\": \"691027fdb730c9b5532c38e9\",\n  \"entityType\": \"coven\",\n  \"limit\": 20,\n  \"offset\": 0\n}"
 							}
 						},
 						"url": {
