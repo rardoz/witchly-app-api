@@ -3719,8 +3719,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation UpdateChatMessage($input: UpdateChatInput!) {\n  updateChatMessage(input: $input) {\n    success\n    message\n    chat {\n      id\n      message\n      updatedAt\n    }\n  }\n}",
-								"variables": "{\n  \"input\": {\n    \"id\": \"CHAT_ID_HERE\",\n    \"message\": \"Updated message content\"\n  }\n}"
+								"query": "mutation UpdateChatMessage($input: UpdateChatInput!) {\n  updateChatMessage(input: $input) {\n    success\n    message\n    chat {\n        id\n      message\n      user {\n        id\n        handle\n      }\n      entityId\n      entityType\n      likes\n      emojis {\n        emojiCode\n        userIds\n      }\n      createdAt,\n      asset {\n        id,\n        s3Key\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"id\": \"69102f81d165adb632cd0b5c\",\n    \"message\": \"Updated message content\"\n  }\n}"
 							}
 						},
 						"url": {
