@@ -4078,7 +4078,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation InterestedEvent($eventId: ID!) {\n  interestedEvent(eventId: $eventId) {\n    success\n    message\n    event {\n      id\n      name\n      description\n      shortDescription\n      startDateTime\n      startTimezone\n      endDateTime\n      endTimezone\n      entityId\n      entityType\n      rsvpUsers\n      interestedUsers\n      primaryColor\n      webUrl\n      webUrlLabel\n      user {\n        id\n        handle\n      }\n      createdAt\n      heroAsset {\n        s3Key\n      }\n      backgroundAsset {\n        s3Key\n      }\n      primaryAsset {\n        s3Key\n      }\n    }\n  }\n}",
-								"variables": "{\n  \"eventId\": \"EVENT_ID_HERE\"\n}"
+								"variables": "{\n  \"eventId\": \"69103301dfe531a83918733c\"\n}"
 							}
 						},
 						"url": {
