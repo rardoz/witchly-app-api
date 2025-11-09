@@ -3759,7 +3759,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation DeleteChatMessage($id: ID!) {\n  deleteChatMessage(id: $id) {\n    success\n    message\n  }\n}",
-								"variables": "{\n  \"id\": \"CHAT_ID_HERE\"\n}"
+								"variables": "{\n  \"id\": \"69102f81d165adb632cd0b5c\"\n}"
 							}
 						},
 						"url": {
