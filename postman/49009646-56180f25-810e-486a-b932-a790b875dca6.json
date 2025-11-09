@@ -3798,7 +3798,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation ToggleChatLike($chatId: ID!) {\n  toggleChatLike(chatId: $chatId) {\n    success\n    message\n    chat {\n      id\n      likes\n      emojis {\n        emojiCode\n        userIds\n      }\n    }\n  }\n}",
-								"variables": "{\n  \"chatId\": \"CHAT_ID_HERE\"\n}"
+								"variables": "{\n  \"chatId\": \"69102faed165adb632cd0b9d\"\n}"
 							}
 						},
 						"url": {
@@ -3837,7 +3837,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation ToggleChatEmoji($chatId: ID!, $emoji: EmojiInput!) {\n  toggleChatEmoji(chatId: $chatId, emoji: $emoji) {\n    success\n    message\n    chat {\n      id\n      emojis {\n        emojiCode\n        userIds\n      }\n    }\n  }\n}",
-								"variables": "{\n  \"chatId\": \"CHAT_ID_HERE\",\n  \"emoji\": {\n    \"emojiCode\": \"U+1F31D\"\n  }\n}"
+								"variables": "{\n  \"chatId\": \"69102faed165adb632cd0b9d\",\n  \"emoji\": {\n    \"emojiCode\": \"U+1F31D\"\n  }\n}"
 							}
 						},
 						"url": {
