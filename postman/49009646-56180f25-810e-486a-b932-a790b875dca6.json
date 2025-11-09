@@ -3875,7 +3875,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetChatMessages($entityId: ID!, $entityType: String!, $limit: Int, $offset: Int) {\n  chatMessages(entityId: $entityId, entityType: $entityType, limit: $limit, offset: $offset) {\n    id\n    message\n    user {\n      id\n      handle\n      displayName\n    }\n    entityId\n    entityType\n    likes\n    emojis {\n      emojiCode\n      userIds\n    }\n    createdAt\n    updatedAt\n  }\n}",
+								"query": "query GetChatMessages($entityId: ID!, $entityType: String!, $limit: Int, $offset: Int) {\n  chatMessages(entityId: $entityId, entityType: $entityType, limit: $limit, offset: $offset) {\n    id\n    message\n    user {\n      id\n      handle\n    }\n    entityId\n    entityType\n    likes\n    emojis {\n      emojiCode\n      userIds\n    }\n    createdAt\n    updatedAt\n  }\n}",
 								"variables": "{\n  \"entityId\": \"COVEN_ID_HERE\",\n  \"entityType\": \"coven\",\n  \"limit\": 50,\n  \"offset\": 0\n}"
 							}
 						},
