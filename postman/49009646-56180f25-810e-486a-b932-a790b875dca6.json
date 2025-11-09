@@ -3283,8 +3283,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation UpdateCoven($input: UpdateCovenInput!) {\n  updateCoven(input: $input) {\n    success\n    message\n    coven {\n      id\n      name\n      description\n      status\n      privacy\n      maxMembers\n      updatedAt\n    }\n  }\n}",
-								"variables": "{\n  \"input\": {\n    \"id\": \"COVEN_ID_HERE\",\n    \"description\": \"Updated description for the coven\",\n    \"maxMembers\": 20,\n    \"status\": \"active\"\n  }\n}"
+								"query": "mutation UpdateCoven($input: UpdateCovenInput!) {\n  updateCoven(input: $input) {\n    success\n    message\n    coven {\n      id\n      name\n      description\n      privacy\n      status\n      tradition\n      structure\n      practice\n      maxMembers\n      primaryColor\n      secondaryColor\n      webUrl\n      user {\n        id\n        handle\n      }\n      createdAt\n      updatedAt\n    \n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"id\": \"6910249882d900393a93493f\",\n \"name\": \"Moonlight Circle\",\n    \"description\": \"A coven dedicated to lunar magic and nature worship\",\n    \"shortDescription\": \"Lunar magic practitioners\",\n    \"privacy\": \"public\",\n    \"tradition\": \"Wiccan\",\n    \"structure\": \"Hierarchical\",\n    \"practice\": \"Traditional\",\n    \"maxMembers\": 13,\n    \"primaryColor\": \"#6B46C1\",\n    \"secondaryColor\": \"#E6F7FF\",\n    \"meta\": [\"moon\", \"nature\", \"beginner-friendly\"]\n  }\n}"
 							}
 						},
 						"url": {
