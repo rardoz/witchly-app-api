@@ -3218,6 +3218,911 @@
 			],
 			"id": "49009646-spellbook-section",
 			"description": "Complete CRUD operations for spellbooks and spellbook pages. All operations require admin session scope. Pages must be associated with a spellbook."
+		},
+		{
+			"name": "🌙 Covens",
+			"item": [
+				{
+					"name": "Create Coven",
+					"id": "49009646-coven-create",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation CreateCoven($input: CreateCovenInput!) {\n  createCoven(input: $input) {\n    success\n    message\n    coven {\n      id\n      name\n      description\n      privacy\n      status\n      tradition\n      structure\n      practice\n      maxMembers\n      primaryColor\n      secondaryColor\n      webUrl\n      user {\n        id\n        handle\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"name\": \"Moonlight Circle\",\n    \"description\": \"A coven dedicated to lunar magic and nature worship\",\n    \"shortDescription\": \"Lunar magic practitioners\",\n    \"privacy\": \"public\",\n    \"tradition\": \"Wiccan\",\n    \"structure\": \"Hierarchical\",\n    \"practice\": \"Traditional\",\n    \"maxMembers\": 13,\n    \"primaryColor\": \"#6B46C1\",\n    \"secondaryColor\": \"#E6F7FF\",\n    \"meta\": [\"moon\", \"nature\", \"beginner-friendly\"]\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Create a new coven. Automatically creates owner roster entry. Requires write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Coven",
+					"id": "49009646-coven-update",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation UpdateCoven($input: UpdateCovenInput!) {\n  updateCoven(input: $input) {\n    success\n    message\n    coven {\n      id\n      name\n      description\n      status\n      privacy\n      maxMembers\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"id\": \"COVEN_ID_HERE\",\n    \"description\": \"Updated description for the coven\",\n    \"maxMembers\": 20,\n    \"status\": \"active\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Update coven details. Only owner or admin can update. Requires write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Soft Delete Coven",
+					"id": "49009646-coven-soft-delete",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation SoftDeleteCoven($id: ID!) {\n  softDeleteCoven(id: $id) {\n    success\n    message\n  }\n}",
+								"variables": "{\n  \"id\": \"COVEN_ID_HERE\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Soft delete coven (sets status to 'deleted'). Only owner or admin. Requires write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Hard Delete Coven",
+					"id": "49009646-coven-hard-delete",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation HardDeleteCoven($id: ID!) {\n  hardDeleteCoven(id: $id) {\n    success\n    message\n  }\n}",
+								"variables": "{\n  \"id\": \"COVEN_ID_HERE\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Permanently delete coven and all roster entries. Only owner or admin. Requires admin scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Join Coven",
+					"id": "49009646-coven-join",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation JoinCoven($covenId: ID!) {\n  joinCoven(covenId: $covenId) {\n    success\n    message\n    rosterEntry {\n      id\n      userRole\n      userTitle\n      coven {\n        id\n        name\n      }\n      user {\n        id\n        handle\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"covenId\": \"COVEN_ID_HERE\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Join a coven with basic role. Checks maxMembers limit and prevents duplicates. Requires write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Leave Coven",
+					"id": "49009646-coven-leave",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation LeaveCoven($covenId: ID!) {\n  leaveCoven(covenId: $covenId) {\n    success\n    message\n  }\n}",
+								"variables": "{\n  \"covenId\": \"COVEN_ID_HERE\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Leave a coven. Owners cannot leave. Requires write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Coven",
+					"id": "49009646-coven-get",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetCoven($id: ID!) {\n  coven(id: $id) {\n    id\n    name\n    description\n    shortDescription\n    privacy\n    status\n    tradition\n    structure\n    practice\n    maxMembers\n    meta\n    primaryColor\n    secondaryColor\n    font\n    webUrl\n    webUrlLabel\n    user {\n      id\n      handle\n      displayName\n    }\n    createdAt\n    updatedAt\n  }\n}",
+								"variables": "{\n  \"id\": \"COVEN_ID_HERE\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get single coven by ID. Requires read scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Covens",
+					"id": "49009646-coven-list",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetCovens($tradition: String, $structure: String, $practice: String, $privacy: String, $userId: ID, $limit: Int, $offset: Int) {\n  covens(tradition: $tradition, structure: $structure, practice: $practice, privacy: $privacy, userId: $userId, limit: $limit, offset: $offset) {\n    id\n    name\n    shortDescription\n    privacy\n    tradition\n    structure\n    practice\n    maxMembers\n    meta\n    primaryColor\n    user {\n      id\n      handle\n    }\n    createdAt\n  }\n}",
+								"variables": "{\n  \"privacy\": \"public\",\n  \"limit\": 20,\n  \"offset\": 0\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get covens with optional filters (tradition, structure, practice, privacy, userId). Pagination 1-100. Requires read scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Coven Memberships",
+					"id": "49009646-coven-my-memberships",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetMyCovenMemberships($limit: Int, $offset: Int) {\n  myCovenMemberships(limit: $limit, offset: $offset) {\n    id\n    name\n    description\n    privacy\n    tradition\n    meta\n    createdAt\n  }\n}",
+								"variables": "{\n  \"limit\": 20,\n  \"offset\": 0\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get covens current user is a member of. Requires read scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Coven Roster",
+					"id": "49009646-coven-roster",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetCovenRoster($covenId: ID!, $limit: Int, $offset: Int) {\n  covenRoster(covenId: $covenId, limit: $limit, offset: $offset) {\n    id\n    userRole\n    userTitle\n    userCovenName\n    userCovenBio\n    lastActive\n    user {\n      id\n      handle\n      displayName\n    }\n    coven {\n      id\n      name\n    }\n    createdAt\n  }\n}",
+								"variables": "{\n  \"covenId\": \"COVEN_ID_HERE\",\n  \"limit\": 50,\n  \"offset\": 0\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get coven roster/members. Pagination 1-100. Requires read scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Coven Roster",
+					"id": "49009646-coven-roster-update",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation UpdateCovenRoster($input: UpdateCovenRosterInput!) {\n  updateCovenRoster(input: $input) {\n    success\n    message\n    rosterEntry {\n      id\n      userRole\n      userTitle\n      userCovenName\n      userCovenBio\n      lastActive\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"covenId\": \"COVEN_ID_HERE\",\n    \"userId\": \"USER_ID_HERE\",\n    \"userRole\": \"editor\",\n    \"userTitle\": \"Ritual Coordinator\",\n    \"userCovenName\": \"Luna\",\n    \"userCovenBio\": \"Specializing in moon rituals\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Update roster entry. Role-based permissions: admin/owner can change roles, co-owner can update basic/editor, users can update own profile. Requires write scope."
+					},
+					"response": []
+				}
+			],
+			"id": "49009646-coven-section",
+			"description": "Coven management: create, join, manage covens and roster. Supports traditions, structures, privacy levels, and member roles (owner/co-owner/editor/basic)."
+		},
+		{
+			"name": "💬 Chat",
+			"item": [
+				{
+					"name": "Create Chat Message",
+					"id": "49009646-chat-create",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation CreateChatMessage($input: CreateChatInput!) {\n  createChatMessage(input: $input) {\n    success\n    message\n    chat {\n      id\n      message\n      user {\n        id\n        handle\n      }\n      entityId\n      entityType\n      likes\n      emojis {\n        emojiCode\n        userIds\n      }\n      createdAt\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"message\": \"Welcome to our coven! Looking forward to our next full moon gathering.\",\n    \"entityId\": \"COVEN_ID_HERE\",\n    \"entityType\": \"coven\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Create chat message. Max 5000 chars. Can be linked to coven/global/private entities. Requires write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Chat Message",
+					"id": "49009646-chat-update",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation UpdateChatMessage($input: UpdateChatInput!) {\n  updateChatMessage(input: $input) {\n    success\n    message\n    chat {\n      id\n      message\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"id\": \"CHAT_ID_HERE\",\n    \"message\": \"Updated message content\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Update chat message. Only owner or admin can update. Requires write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Chat Message",
+					"id": "49009646-chat-delete",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation DeleteChatMessage($id: ID!) {\n  deleteChatMessage(id: $id) {\n    success\n    message\n  }\n}",
+								"variables": "{\n  \"id\": \"CHAT_ID_HERE\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Delete chat message (hard delete). Only owner or admin. Requires write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Chat Like",
+					"id": "49009646-chat-like",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation ToggleChatLike($chatId: ID!) {\n  toggleChatLike(chatId: $chatId) {\n    success\n    message\n    chat {\n      id\n      likes\n      emojis {\n        emojiCode\n        userIds\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"chatId\": \"CHAT_ID_HERE\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Toggle like on chat message (add/remove). Requires write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Chat Emoji",
+					"id": "49009646-chat-emoji",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation ToggleChatEmoji($chatId: ID!, $emoji: EmojiInput!) {\n  toggleChatEmoji(chatId: $chatId, emoji: $emoji) {\n    success\n    message\n    chat {\n      id\n      emojis {\n        emojiCode\n        userIds\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"chatId\": \"CHAT_ID_HERE\",\n  \"emoji\": {\n    \"emojiCode\": \"U+1F31D\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Toggle emoji reaction on chat message (add/remove). Use Unicode format (U+1F31D). Requires write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Chat Messages",
+					"id": "49009646-chat-list",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetChatMessages($entityId: ID!, $entityType: String!, $limit: Int, $offset: Int) {\n  chatMessages(entityId: $entityId, entityType: $entityType, limit: $limit, offset: $offset) {\n    id\n    message\n    user {\n      id\n      handle\n      displayName\n    }\n    entityId\n    entityType\n    likes\n    emojis {\n      emojiCode\n      userIds\n    }\n    createdAt\n    updatedAt\n  }\n}",
+								"variables": "{\n  \"entityId\": \"COVEN_ID_HERE\",\n  \"entityType\": \"coven\",\n  \"limit\": 50,\n  \"offset\": 0\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get chat messages by entity (coven/global/private). Sorted by createdAt DESC. Pagination 1-100. Requires read scope."
+					},
+					"response": []
+				}
+			],
+			"id": "49009646-chat-section",
+			"description": "Chat messaging system with likes and emoji reactions. Supports entity-based contexts (coven/global/private). Unicode emoji format (U+XXXXX)."
+		},
+		{
+			"name": "📅 Events",
+			"item": [
+				{
+					"name": "Create Event",
+					"id": "49009646-event-create",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation CreateEvent($input: CreateEventInput!) {\n  createEvent(input: $input) {\n    success\n    message\n    event {\n      id\n      name\n      description\n      startDateTime\n      startTimezone\n      endDateTime\n      endTimezone\n      entityId\n      entityType\n      rsvpUsers\n      interestedUsers\n      primaryColor\n      webUrl\n      user {\n        id\n        handle\n      }\n      createdAt\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"name\": \"Full Moon Ritual\",\n    \"description\": \"Monthly full moon gathering and celebration\",\n    \"shortDescription\": \"Full moon gathering\",\n    \"startDateTime\": \"2026-01-15T19:00:00Z\",\n    \"startTimezone\": \"America/New_York\",\n    \"endDateTime\": \"2026-01-15T22:00:00Z\",\n    \"endTimezone\": \"America/New_York\",\n    \"entityId\": \"COVEN_ID_HERE\",\n    \"entityType\": \"coven\",\n    \"primaryColor\": \"#E6F7FF\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Create event with timezone support. Validates endDate > startDate. Can link to coven/global/private entities. Requires write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Event",
+					"id": "49009646-event-update",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation UpdateEvent($input: UpdateEventInput!) {\n  updateEvent(input: $input) {\n    success\n    message\n    event {\n      id\n      name\n      description\n      startDateTime\n      endDateTime\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"id\": \"EVENT_ID_HERE\",\n    \"description\": \"Updated event description with more details\",\n    \"primaryColor\": \"#9B59B6\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Update event. Only owner or admin. Validates dates if both provided. Requires write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Event",
+					"id": "49009646-event-delete",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation DeleteEvent($id: ID!) {\n  deleteEvent(id: $id) {\n    success\n    message\n  }\n}",
+								"variables": "{\n  \"id\": \"EVENT_ID_HERE\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Delete event (hard delete). Only owner or admin. Requires write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "RSVP to Event",
+					"id": "49009646-event-rsvp",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation RsvpEvent($eventId: ID!) {\n  rsvpEvent(eventId: $eventId) {\n    success\n    message\n    event {\n      id\n      name\n      rsvpUsers\n      interestedUsers\n    }\n  }\n}",
+								"variables": "{\n  \"eventId\": \"EVENT_ID_HERE\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Toggle RSVP to event (add/remove). Auto-removes from interested when RSVPing. Requires write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Mark Interested in Event",
+					"id": "49009646-event-interested",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation InterestedEvent($eventId: ID!) {\n  interestedEvent(eventId: $eventId) {\n    success\n    message\n    event {\n      id\n      name\n      rsvpUsers\n      interestedUsers\n    }\n  }\n}",
+								"variables": "{\n  \"eventId\": \"EVENT_ID_HERE\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Toggle interested status (add/remove). Doesn't affect RSVP. Requires write scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Events by Entity",
+					"id": "49009646-event-by-entity",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetEvents($entityId: ID!, $entityType: String!, $limit: Int, $offset: Int) {\n  events(entityId: $entityId, entityType: $entityType, limit: $limit, offset: $offset) {\n    id\n    name\n    description\n    startDateTime\n    startTimezone\n    endDateTime\n    endTimezone\n    rsvpUsers\n    interestedUsers\n    primaryColor\n    user {\n      id\n      handle\n    }\n    createdAt\n  }\n}",
+								"variables": "{\n  \"entityId\": \"COVEN_ID_HERE\",\n  \"entityType\": \"coven\",\n  \"limit\": 20,\n  \"offset\": 0\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get events by entity (coven/global/private). Optional date range filters. Pagination 1-100. Requires read scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Events by Date Range",
+					"id": "49009646-event-date-range",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\n  events(\n    entityId: \"COVEN_ID_HERE\"\n    entityType: \"coven\"\n    startDate: \"2026-01-01T00:00:00.000Z\"\n    endDate: \"2026-01-31T23:59:59.999Z\"\n    limit: 50\n  ) {\n    id\n    name\n    startDateTime\n    endDateTime\n    rsvpUsers\n    interestedUsers\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get events filtered by date range. Pass dates as ISO strings inline. Requires read scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Events",
+					"id": "49009646-event-my-events",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetMyEvents($limit: Int, $offset: Int) {\n  myEvents(limit: $limit, offset: $offset) {\n    id\n    name\n    description\n    startDateTime\n    endDateTime\n    entityId\n    entityType\n    rsvpUsers\n    interestedUsers\n    user {\n      id\n      handle\n    }\n  }\n}",
+								"variables": "{\n  \"limit\": 20,\n  \"offset\": 0\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get events where user is creator, RSVP'd, or interested. Optional date filters. Requires read scope."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Events by User",
+					"id": "49009646-event-by-user",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetEventsByUser($userId: ID!, $limit: Int, $offset: Int) {\n  eventsByUser(userId: $userId, limit: $limit, offset: $offset) {\n    id\n    name\n    description\n    startDateTime\n    endDateTime\n    entityId\n    entityType\n    rsvpUsers\n    interestedUsers\n    createdAt\n  }\n}",
+								"variables": "{\n  \"userId\": \"USER_ID_HERE\",\n  \"limit\": 20,\n  \"offset\": 0\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get events created by specific user. Optional date filters. Requires read scope."
+					},
+					"response": []
+				}
+			],
+			"id": "49009646-event-section",
+			"description": "Event calendar with RSVP/interested tracking, timezone support, and date range queries. Supports entity-based contexts (coven/global/private)."
 		}
 	],
 	"auth": {
