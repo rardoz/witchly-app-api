@@ -4558,8 +4558,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation UpdateCategory($input: UpdateCategoryInput!) {\n  updateCategory(input: $input) {\n    success\n    message\n    category {\n      id\n      entityId\n      entityType\n      locale\n      categoryName\n      categoryShortDescription\n      primaryAsset {\n        id\n        filename\n        url\n      }\n      heroAsset {\n        id\n        filename\n        url\n      }\n      secondaryAsset {\n        id\n        filename\n        url\n      }\n      priority\n      user {\n        id\n        name\n        handle\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
-								"variables": "{\n  \"input\": {\n    \"id\": \"507f1f77bcf86cd799439015\",\n    \"categoryName\": \"Updated Crystals & Gems\",\n    \"categoryShortDescription\": \"Premium crystals and gemstones collection\",\n    \"priority\": 2,\n    \"locale\": \"en-US\",\n    \"primaryAsset\": \"507f1f77bcf86cd799439016\"\n  }\n}"
+								"query": "mutation UpdateCategory($input: UpdateCategoryInput!) {\n  updateCategory(input: $input) {\n    success\n    message\n    category {\n      id\n      entityId\n      entityType\n      locale\n      categoryName\n      categoryShortDescription\n      primaryAsset {\n        id\n        s3Key\n      }\n      heroAsset {\n        id\n        s3Key\n      }\n      secondaryAsset {\n        id\n        s3Key\n      }\n      priority\n      user {\n        id\n        name\n        handle\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"id\": \"691056f1ef96362841b24bd5\",\n    \"categoryName\": \"Updated Crystals & Gems\",\n    \"categoryShortDescription\": \"Premium crystals and gemstones collection\",\n    \"priority\": 2,\n    \"locale\": \"en-US\",\n\"primaryAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"heroAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"secondaryAsset\": \"68ff7ebe04e43ae41ca0fc59\"\n  }\n}"
 							}
 						},
 						"url": {
