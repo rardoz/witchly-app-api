@@ -4155,7 +4155,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetEvents($entityId: ID!, $entityType: String!, $limit: Int, $offset: Int, $startDate: DateTimeISO, $endDate: DateTimeISO ) {\n    \n  events(\n    entityId: $entityId\n    entityType: $entityType\n    startDate: $startDate\n    endDate: $endDate\n    limit: $limit\n    offset: $offset\n  ) {\n    id\n    name\n    startDateTime\n    endDateTime\n    rsvpUsers\n    interestedUsers\n  }\n}",
+								"query": "query GetEvents($entityId: ID!, $entityType: String!, $limit: Int, $offset: Int, $startDate: DateTimeISO, $endDate: DateTimeISO ) {\n    \n  events(\n    entityId: $entityId\n    entityType: $entityType\n    startDate: $startDate\n    endDate: $endDate\n    limit: $limit\n    offset: $offset\n  ) {\n     id\n      name\n      description\n      shortDescription\n      startDateTime\n      startTimezone\n      endDateTime\n      endTimezone\n      entityId\n      entityType\n      rsvpUsers\n      interestedUsers\n      primaryColor\n      webUrl\n      webUrlLabel\n      user {\n        id\n        handle\n      }\n      createdAt\n      heroAsset {\n        s3Key\n      }\n      backgroundAsset {\n        s3Key\n      }\n      primaryAsset {\n        s3Key\n      }\n  }\n}",
 								"variables": "  {  \n    \"entityId\": \"691027fdb730c9b5532c38e9\",\n    \"entityType\": \"coven\",\n    \"startDate\": \"2026-01-01T00:00:00.000Z\",\n    \"endDate\": \"2026-01-31T23:59:59.999Z\",\n    \"limit\": 50,\n    \"offset\": 0\n  }"
 							}
 						},
@@ -4194,7 +4194,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetMyEvents($limit: Int, $offset: Int) {\n  myEvents(limit: $limit, offset: $offset) {\n    id\n    name\n    description\n    startDateTime\n    endDateTime\n    entityId\n    entityType\n    rsvpUsers\n    interestedUsers\n    user {\n      id\n      handle\n    }\n  }\n}",
+								"query": "query GetMyEvents($limit: Int, $offset: Int) {\n  myEvents(limit: $limit, offset: $offset) {\n     id\n      name\n      description\n      shortDescription\n      startDateTime\n      startTimezone\n      endDateTime\n      endTimezone\n      entityId\n      entityType\n      rsvpUsers\n      interestedUsers\n      primaryColor\n      webUrl\n      webUrlLabel\n      user {\n        id\n        handle\n      }\n      createdAt\n      heroAsset {\n        s3Key\n      }\n      backgroundAsset {\n        s3Key\n      }\n      primaryAsset {\n        s3Key\n      }\n  }\n}",
 								"variables": "{\n  \"limit\": 20,\n  \"offset\": 0\n}"
 							}
 						},
