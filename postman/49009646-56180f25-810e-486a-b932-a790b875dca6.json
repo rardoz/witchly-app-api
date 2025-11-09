@@ -3244,8 +3244,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation CreateCoven($input: CreateCovenInput!) {\n  createCoven(input: $input) {\n    success\n    message\n    coven {\n      id\n      name\n      description\n      privacy\n      status\n      tradition\n      structure\n      practice\n      maxMembers\n      primaryColor\n      secondaryColor\n      webUrl\n      user {\n        id\n        handle\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
-								"variables": "{\n  \"input\": {\n    \"name\": \"Moonlight Circle\",\n    \"description\": \"A coven dedicated to lunar magic and nature worship\",\n    \"shortDescription\": \"Lunar magic practitioners\",\n    \"privacy\": \"public\",\n    \"tradition\": \"Wiccan\",\n    \"structure\": \"Hierarchical\",\n    \"practice\": \"Traditional\",\n    \"maxMembers\": 13,\n    \"primaryColor\": \"#6B46C1\",\n    \"secondaryColor\": \"#E6F7FF\",\n    \"meta\": [\"moon\", \"nature\", \"beginner-friendly\"]\n  }\n}"
+								"query": "mutation CreateCoven($input: CreateCovenInput!) {\n  createCoven(input: $input) {\n    success\n    message\n    coven {\n      id\n      name\n      description\n      privacy\n      status\n      tradition\n      structure\n      practice\n      maxMembers\n      primaryColor\n      secondaryColor\n      webUrl\n      webUrlLabel\n      font\n      locale\n      user {\n        id\n        handle\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"name\": \"Moonlight Circle\",\n    \"description\": \"A coven dedicated to lunar magic and nature worship\",\n    \"shortDescription\": \"Lunar magic practitioners\",\n    \"privacy\": \"public\",\n    \"status\": \"active\",\n    \"tradition\": \"Wiccan\",\n    \"structure\": \"Hierarchical\",\n    \"practice\": \"Traditional\",\n    \"maxMembers\": 13,\n    \"primaryColor\": \"#6B46C1\",\n    \"secondaryColor\": \"#E6F7FF\",\n    \"meta\": [\"moon\", \"nature\", \"beginner-friendly\"],\n        \"webUrl\": \"http://test.com\",\n    \"webUrlLabel\": \"test\",\n    \"font\": \"Arial\",\n    \"locale\": \"en-US\"\n  }\n}"
 							}
 						},
 						"url": {
@@ -3283,8 +3283,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation UpdateCoven($input: UpdateCovenInput!) {\n  updateCoven(input: $input) {\n    success\n    message\n    coven {\n      id\n      name\n      description\n      status\n      privacy\n      maxMembers\n      updatedAt\n    }\n  }\n}",
-								"variables": "{\n  \"input\": {\n    \"id\": \"COVEN_ID_HERE\",\n    \"description\": \"Updated description for the coven\",\n    \"maxMembers\": 20,\n    \"status\": \"active\"\n  }\n}"
+								"query": "mutation UpdateCoven($input: UpdateCovenInput!) {\n  updateCoven(input: $input) {\n    success\n    message\n    coven {\n      id\n      name\n      description\n      privacy\n      status\n      tradition\n      structure\n      practice\n      maxMembers\n      primaryColor\n      secondaryColor\n      webUrl\n      webUrlLabel\n      font\n      locale\n      user {\n        id\n        handle\n      }\n      createdAt\n      updatedAt\n      primaryAsset {\n            id\n            s3Key\n      }\n      backgroundAsset {\n            id\n            s3Key\n      }\n      headerAsset {\n            id\n            s3Key\n      }\n      avatarAsset {\n            id\n            s3Key\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"id\": \"6910249882d900393a93493f\",\n    \"name\": \"Moonlight Circle\",\n    \"description\": \"A coven dedicated to lunar magic and nature worship\",\n    \"shortDescription\": \"Lunar magic practitioners\",\n    \"privacy\": \"public\",\n    \"tradition\": \"Wiccan\",\n    \"structure\": \"Hierarchical\",\n    \"practice\": \"Traditional\",\n    \"maxMembers\": 13,\n    \"primaryColor\": \"#6B46C1\",\n    \"secondaryColor\": \"#E6F7FF\",\n    \"meta\": [\"moon\", \"nature\", \"beginner-friendly\"],\n    \"primaryAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"backgroundAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"headerAsset\":\n    \"68ff7ebe04e43ae41ca0fc59\",\n    \"avatarAsset\":\n    \"68ff7ebe04e43ae41ca0fc59\",\n    \"webUrl\": \"http://test.com\",\n    \"webUrlLabel\": \"test\",\n    \"font\": \"Arial\",\n    \"status\": \"active\",\n    \"locale\": \"en-US\"\n  }\n}"
 							}
 						},
 						"url": {
@@ -3323,7 +3323,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation SoftDeleteCoven($id: ID!) {\n  softDeleteCoven(id: $id) {\n    success\n    message\n  }\n}",
-								"variables": "{\n  \"id\": \"COVEN_ID_HERE\"\n}"
+								"variables": "{\n  \"id\": \"6910249882d900393a93493f\"\n}"
 							}
 						},
 						"url": {
@@ -3362,7 +3362,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation HardDeleteCoven($id: ID!) {\n  hardDeleteCoven(id: $id) {\n    success\n    message\n  }\n}",
-								"variables": "{\n  \"id\": \"COVEN_ID_HERE\"\n}"
+								"variables": "{\n  \"id\": \"69102764b730c9b5532c3877\"\n}"
 							}
 						},
 						"url": {
@@ -3400,8 +3400,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation JoinCoven($covenId: ID!) {\n  joinCoven(covenId: $covenId) {\n    success\n    message\n    rosterEntry {\n      id\n      userRole\n      userTitle\n      coven {\n        id\n        name\n      }\n      user {\n        id\n        handle\n      }\n    }\n  }\n}",
-								"variables": "{\n  \"covenId\": \"COVEN_ID_HERE\"\n}"
+								"query": "mutation JoinCoven($covenId: ID!) {\n  joinCoven(covenId: $covenId) {\n    success\n    message\n    rosterEntry {\n      id\n      userRole\n      userTitle\n      coven\n      user {\n        id\n        handle\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"covenId\": \"691027fdb730c9b5532c38e9\"\n}"
 							}
 						},
 						"url": {
@@ -3440,7 +3440,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation LeaveCoven($covenId: ID!) {\n  leaveCoven(covenId: $covenId) {\n    success\n    message\n  }\n}",
-								"variables": "{\n  \"covenId\": \"COVEN_ID_HERE\"\n}"
+								"variables": "{\n  \"covenId\": \"691027fdb730c9b5532c38e9\"\n}"
 							}
 						},
 						"url": {
@@ -3478,8 +3478,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetCoven($id: ID!) {\n  coven(id: $id) {\n    id\n    name\n    description\n    shortDescription\n    privacy\n    status\n    tradition\n    structure\n    practice\n    maxMembers\n    meta\n    primaryColor\n    secondaryColor\n    font\n    webUrl\n    webUrlLabel\n    user {\n      id\n      handle\n      displayName\n    }\n    createdAt\n    updatedAt\n  }\n}",
-								"variables": "{\n  \"id\": \"COVEN_ID_HERE\"\n}"
+								"query": "query GetCoven($id: ID!) {\n  coven(id: $id) {\n    id\n      name\n      description\n      privacy\n      status\n      tradition\n      structure\n      practice\n      maxMembers\n      primaryColor\n      secondaryColor\n      webUrl\n      webUrlLabel\n      font\n      locale\n      user {\n        id\n        handle\n      }\n      createdAt\n      updatedAt\n      primaryAsset {\n            id\n            s3Key\n      }\n      backgroundAsset {\n            id\n            s3Key\n      }\n      headerAsset {\n            id\n            s3Key\n      }\n      avatarAsset {\n            id\n            s3Key\n      }\n  }\n}",
+								"variables": "{\n  \"id\": \"6910249882d900393a93493f\"\n}"
 							}
 						},
 						"url": {
@@ -3517,7 +3517,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetCovens($tradition: String, $structure: String, $practice: String, $privacy: String, $userId: ID, $limit: Int, $offset: Int) {\n  covens(tradition: $tradition, structure: $structure, practice: $practice, privacy: $privacy, userId: $userId, limit: $limit, offset: $offset) {\n    id\n    name\n    shortDescription\n    privacy\n    tradition\n    structure\n    practice\n    maxMembers\n    meta\n    primaryColor\n    user {\n      id\n      handle\n    }\n    createdAt\n  }\n}",
+								"query": "query GetCovens($tradition: String, $structure: String, $practice: String, $privacy: String, $userId: ID, $limit: Int, $offset: Int) {\n  covens(tradition: $tradition, structure: $structure, practice: $practice, privacy: $privacy, userId: $userId, limit: $limit, offset: $offset) {\n    id\n      name\n      description\n      privacy\n      status\n      tradition\n      structure\n      practice\n      maxMembers\n      primaryColor\n      secondaryColor\n      webUrl\n      webUrlLabel\n      font\n      locale\n      user {\n        id\n        handle\n      }\n      createdAt\n      updatedAt\n      primaryAsset {\n            id\n            s3Key\n      }\n      backgroundAsset {\n            id\n            s3Key\n      }\n      headerAsset {\n            id\n            s3Key\n      }\n      avatarAsset {\n            id\n            s3Key\n      }\n  }\n}",
 								"variables": "{\n  \"privacy\": \"public\",\n  \"limit\": 20,\n  \"offset\": 0\n}"
 							}
 						},
@@ -3556,7 +3556,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetMyCovenMemberships($limit: Int, $offset: Int) {\n  myCovenMemberships(limit: $limit, offset: $offset) {\n    id\n    name\n    description\n    privacy\n    tradition\n    meta\n    createdAt\n  }\n}",
+								"query": "query GetMyCovenMemberships($limit: Int, $offset: Int) {\n  myCovenMemberships(limit: $limit, offset: $offset) {\n id\n      name\n      description\n      privacy\n      status\n      tradition\n      structure\n      practice\n      maxMembers\n      primaryColor\n      secondaryColor\n      webUrl\n      webUrlLabel\n      font\n      locale\n      user {\n        id\n        handle\n      }\n      createdAt\n      updatedAt\n      primaryAsset {\n            id\n            s3Key\n      }\n      backgroundAsset {\n            id\n            s3Key\n      }\n      headerAsset {\n            id\n            s3Key\n      }\n      avatarAsset {\n            id\n            s3Key\n      }\n  }\n}",
 								"variables": "{\n  \"limit\": 20,\n  \"offset\": 0\n}"
 							}
 						},
@@ -3595,8 +3595,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetCovenRoster($covenId: ID!, $limit: Int, $offset: Int) {\n  covenRoster(covenId: $covenId, limit: $limit, offset: $offset) {\n    id\n    userRole\n    userTitle\n    userCovenName\n    userCovenBio\n    lastActive\n    user {\n      id\n      handle\n      displayName\n    }\n    coven {\n      id\n      name\n    }\n    createdAt\n  }\n}",
-								"variables": "{\n  \"covenId\": \"COVEN_ID_HERE\",\n  \"limit\": 50,\n  \"offset\": 0\n}"
+								"query": "query GetCovenRoster($covenId: ID!, $limit: Int, $offset: Int) {\n  covenRoster(covenId: $covenId, limit: $limit, offset: $offset) {\n    id\n    userRole\n    userTitle\n    userCovenName\n    userCovenBio\n    lastActive\n    user {\n      id\n      handle\n    }\n    coven\n    createdAt\n  }\n}",
+								"variables": "{\n  \"covenId\": \"691027fdb730c9b5532c38e9\",\n  \"limit\": 50,\n  \"offset\": 0\n}"
 							}
 						},
 						"url": {
@@ -3635,7 +3635,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation UpdateCovenRoster($input: UpdateCovenRosterInput!) {\n  updateCovenRoster(input: $input) {\n    success\n    message\n    rosterEntry {\n      id\n      userRole\n      userTitle\n      userCovenName\n      userCovenBio\n      lastActive\n    }\n  }\n}",
-								"variables": "{\n  \"input\": {\n    \"covenId\": \"COVEN_ID_HERE\",\n    \"userId\": \"USER_ID_HERE\",\n    \"userRole\": \"editor\",\n    \"userTitle\": \"Ritual Coordinator\",\n    \"userCovenName\": \"Luna\",\n    \"userCovenBio\": \"Specializing in moon rituals\"\n  }\n}"
+								"variables": "{\n  \"input\": {\n    \"covenId\": \"691027fdb730c9b5532c38e9\",\n    \"userId\": \"68eb4abec9f3fda244bfbb8d\",\n    \"userRole\": \"editor\",\n    \"userTitle\": \"Ritual Coordinator\",\n    \"userCovenName\": \"Luna\",\n    \"userCovenBio\": \"Specializing in moon rituals\"\n  }\n}"
 							}
 						},
 						"url": {
@@ -3680,8 +3680,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation CreateChatMessage($input: CreateChatInput!) {\n  createChatMessage(input: $input) {\n    success\n    message\n    chat {\n      id\n      message\n      user {\n        id\n        handle\n      }\n      entityId\n      entityType\n      likes\n      emojis {\n        emojiCode\n        userIds\n      }\n      createdAt\n    }\n  }\n}",
-								"variables": "{\n  \"input\": {\n    \"message\": \"Welcome to our coven! Looking forward to our next full moon gathering.\",\n    \"entityId\": \"COVEN_ID_HERE\",\n    \"entityType\": \"coven\"\n  }\n}"
+								"query": "mutation CreateChatMessage($input: CreateChatInput!) {\n  createChatMessage(input: $input) {\n    success\n    message\n    chat {\n      id\n      message\n      user {\n        id\n        handle\n      }\n      entityId\n      entityType\n      likes\n      emojis {\n        emojiCode\n        userIds\n      }\n      createdAt,\n      asset {\n        id,\n        s3Key\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"message\": \"Welcome to our coven! Looking forward to our next full moon gathering.\",\n    \"entityId\": \"691027fdb730c9b5532c38e9\",\n    \"entityType\": \"coven\",\n    \"asset\": \"68ff7ebe04e43ae41ca0fc59\"\n  }\n}"
 							}
 						},
 						"url": {
@@ -3719,8 +3719,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation UpdateChatMessage($input: UpdateChatInput!) {\n  updateChatMessage(input: $input) {\n    success\n    message\n    chat {\n      id\n      message\n      updatedAt\n    }\n  }\n}",
-								"variables": "{\n  \"input\": {\n    \"id\": \"CHAT_ID_HERE\",\n    \"message\": \"Updated message content\"\n  }\n}"
+								"query": "mutation UpdateChatMessage($input: UpdateChatInput!) {\n  updateChatMessage(input: $input) {\n    success\n    message\n    chat {\n        id\n      message\n      user {\n        id\n        handle\n      }\n      entityId\n      entityType\n      likes\n      emojis {\n        emojiCode\n        userIds\n      }\n      createdAt,\n      asset {\n        id,\n        s3Key\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"id\": \"69102f81d165adb632cd0b5c\",\n    \"message\": \"Updated message content\"\n  }\n}"
 							}
 						},
 						"url": {
@@ -3759,7 +3759,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation DeleteChatMessage($id: ID!) {\n  deleteChatMessage(id: $id) {\n    success\n    message\n  }\n}",
-								"variables": "{\n  \"id\": \"CHAT_ID_HERE\"\n}"
+								"variables": "{\n  \"id\": \"69102f81d165adb632cd0b5c\"\n}"
 							}
 						},
 						"url": {
@@ -3798,7 +3798,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation ToggleChatLike($chatId: ID!) {\n  toggleChatLike(chatId: $chatId) {\n    success\n    message\n    chat {\n      id\n      likes\n      emojis {\n        emojiCode\n        userIds\n      }\n    }\n  }\n}",
-								"variables": "{\n  \"chatId\": \"CHAT_ID_HERE\"\n}"
+								"variables": "{\n  \"chatId\": \"69102faed165adb632cd0b9d\"\n}"
 							}
 						},
 						"url": {
@@ -3837,7 +3837,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation ToggleChatEmoji($chatId: ID!, $emoji: EmojiInput!) {\n  toggleChatEmoji(chatId: $chatId, emoji: $emoji) {\n    success\n    message\n    chat {\n      id\n      emojis {\n        emojiCode\n        userIds\n      }\n    }\n  }\n}",
-								"variables": "{\n  \"chatId\": \"CHAT_ID_HERE\",\n  \"emoji\": {\n    \"emojiCode\": \"U+1F31D\"\n  }\n}"
+								"variables": "{\n  \"chatId\": \"69102faed165adb632cd0b9d\",\n  \"emoji\": {\n    \"emojiCode\": \"U+1F31D\"\n  }\n}"
 							}
 						},
 						"url": {
@@ -3875,8 +3875,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetChatMessages($entityId: ID!, $entityType: String!, $limit: Int, $offset: Int) {\n  chatMessages(entityId: $entityId, entityType: $entityType, limit: $limit, offset: $offset) {\n    id\n    message\n    user {\n      id\n      handle\n      displayName\n    }\n    entityId\n    entityType\n    likes\n    emojis {\n      emojiCode\n      userIds\n    }\n    createdAt\n    updatedAt\n  }\n}",
-								"variables": "{\n  \"entityId\": \"COVEN_ID_HERE\",\n  \"entityType\": \"coven\",\n  \"limit\": 50,\n  \"offset\": 0\n}"
+								"query": "query GetChatMessages($entityId: ID!, $entityType: String!, $limit: Int, $offset: Int) {\n  chatMessages(entityId: $entityId, entityType: $entityType, limit: $limit, offset: $offset) {\n    id\n    message\n    user {\n      id\n      handle\n    }\n    entityId\n    entityType\n    likes\n    emojis {\n      emojiCode\n      userIds\n    }\n    createdAt\n    updatedAt\n  }\n}",
+								"variables": "{\n  \"entityId\": \"691027fdb730c9b5532c38e9\",\n  \"entityType\": \"coven\",\n  \"limit\": 50,\n  \"offset\": 0\n}"
 							}
 						},
 						"url": {
@@ -3921,8 +3921,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation CreateEvent($input: CreateEventInput!) {\n  createEvent(input: $input) {\n    success\n    message\n    event {\n      id\n      name\n      description\n      startDateTime\n      startTimezone\n      endDateTime\n      endTimezone\n      entityId\n      entityType\n      rsvpUsers\n      interestedUsers\n      primaryColor\n      webUrl\n      user {\n        id\n        handle\n      }\n      createdAt\n    }\n  }\n}",
-								"variables": "{\n  \"input\": {\n    \"name\": \"Full Moon Ritual\",\n    \"description\": \"Monthly full moon gathering and celebration\",\n    \"shortDescription\": \"Full moon gathering\",\n    \"startDateTime\": \"2026-01-15T19:00:00Z\",\n    \"startTimezone\": \"America/New_York\",\n    \"endDateTime\": \"2026-01-15T22:00:00Z\",\n    \"endTimezone\": \"America/New_York\",\n    \"entityId\": \"COVEN_ID_HERE\",\n    \"entityType\": \"coven\",\n    \"primaryColor\": \"#E6F7FF\"\n  }\n}"
+								"query": "mutation CreateEvent($input: CreateEventInput!) {\n  createEvent(input: $input) {\n    success\n    message\n    event {\n      id\n      name\n      description\n      shortDescription\n      startDateTime\n      startTimezone\n      endDateTime\n      endTimezone\n      entityId\n      entityType\n      rsvpUsers\n      interestedUsers\n      primaryColor\n      webUrl\n      webUrlLabel\n      user {\n        id\n        handle\n      }\n      createdAt\n      heroAsset {\n        s3Key\n      }\n      backgroundAsset {\n        s3Key\n      }\n      primaryAsset {\n        s3Key\n      }\n\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"name\": \"Full Moon Ritual\",\n    \"description\": \"Monthly full moon gathering and celebration\",\n    \"shortDescription\": \"Full moon gathering\",\n    \"startDateTime\": \"2026-01-15T19:00:00Z\",\n    \"startTimezone\": \"America/New_York\",\n    \"endDateTime\": \"2026-01-15T22:00:00Z\",\n    \"endTimezone\": \"America/New_York\",\n    \"entityId\": \"691027fdb730c9b5532c38e9\",\n    \"entityType\": \"coven\",\n    \"primaryColor\": \"#E6F7FF\",\n    \"webUrl\": \"http://test.com\",\n    \"webUrlLabel\": \"test\",\n    \"heroAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"backgroundAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"primaryAsset\": \"68ff7ebe04e43ae41ca0fc59\"\n  }\n}"
 							}
 						},
 						"url": {
@@ -3960,8 +3960,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation UpdateEvent($input: UpdateEventInput!) {\n  updateEvent(input: $input) {\n    success\n    message\n    event {\n      id\n      name\n      description\n      startDateTime\n      endDateTime\n      updatedAt\n    }\n  }\n}",
-								"variables": "{\n  \"input\": {\n    \"id\": \"EVENT_ID_HERE\",\n    \"description\": \"Updated event description with more details\",\n    \"primaryColor\": \"#9B59B6\"\n  }\n}"
+								"query": "mutation UpdateEvent($input: UpdateEventInput!) {\n  updateEvent(input: $input) {\n    success\n    message\n    event {\n   id\n      name\n      description\n      shortDescription\n      startDateTime\n      startTimezone\n      endDateTime\n      endTimezone\n      entityId\n      entityType\n      rsvpUsers\n      interestedUsers\n      primaryColor\n      webUrl\n      webUrlLabel\n      user {\n        id\n        handle\n      }\n      createdAt\n      heroAsset {\n        s3Key\n      }\n      backgroundAsset {\n        s3Key\n      }\n      primaryAsset {\n        s3Key\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"id\": \"6910335fdfe531a83918734e\",\n    \"description\": \"Updated event description with more details\",\n    \"primaryColor\": \"#9B59B6\",\n    \"shortDescription\": \"Full moon gathering\",\n    \"startDateTime\": \"2026-01-15T19:00:00Z\",\n    \"startTimezone\": \"America/New_York\",\n    \"endDateTime\": \"2026-01-15T22:00:00Z\",\n    \"endTimezone\": \"America/New_York\",\n    \"webUrl\": \"http://test.com\",\n    \"webUrlLabel\": \"test\",\n    \"heroAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"backgroundAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"primaryAsset\": \"68ff7ebe04e43ae41ca0fc59\"\n  }\n}"
 							}
 						},
 						"url": {
@@ -4000,7 +4000,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation DeleteEvent($id: ID!) {\n  deleteEvent(id: $id) {\n    success\n    message\n  }\n}",
-								"variables": "{\n  \"id\": \"EVENT_ID_HERE\"\n}"
+								"variables": "{\n  \"id\": \"6910335fdfe531a83918734e\"\n}"
 							}
 						},
 						"url": {
@@ -4038,8 +4038,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation RsvpEvent($eventId: ID!) {\n  rsvpEvent(eventId: $eventId) {\n    success\n    message\n    event {\n      id\n      name\n      rsvpUsers\n      interestedUsers\n    }\n  }\n}",
-								"variables": "{\n  \"eventId\": \"EVENT_ID_HERE\"\n}"
+								"query": "mutation RsvpEvent($eventId: ID!) {\n  rsvpEvent(eventId: $eventId) {\n    success\n    message\n    event {\n id\n      name\n      description\n      shortDescription\n      startDateTime\n      startTimezone\n      endDateTime\n      endTimezone\n      entityId\n      entityType\n      rsvpUsers\n      interestedUsers\n      primaryColor\n      webUrl\n      webUrlLabel\n      user {\n        id\n        handle\n      }\n      createdAt\n      heroAsset {\n        s3Key\n      }\n      backgroundAsset {\n        s3Key\n      }\n      primaryAsset {\n        s3Key\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"eventId\": \"69103301dfe531a83918733c\"\n}"
 							}
 						},
 						"url": {
@@ -4077,8 +4077,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation InterestedEvent($eventId: ID!) {\n  interestedEvent(eventId: $eventId) {\n    success\n    message\n    event {\n      id\n      name\n      rsvpUsers\n      interestedUsers\n    }\n  }\n}",
-								"variables": "{\n  \"eventId\": \"EVENT_ID_HERE\"\n}"
+								"query": "mutation InterestedEvent($eventId: ID!) {\n  interestedEvent(eventId: $eventId) {\n    success\n    message\n    event {\n      id\n      name\n      description\n      shortDescription\n      startDateTime\n      startTimezone\n      endDateTime\n      endTimezone\n      entityId\n      entityType\n      rsvpUsers\n      interestedUsers\n      primaryColor\n      webUrl\n      webUrlLabel\n      user {\n        id\n        handle\n      }\n      createdAt\n      heroAsset {\n        s3Key\n      }\n      backgroundAsset {\n        s3Key\n      }\n      primaryAsset {\n        s3Key\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"eventId\": \"69103301dfe531a83918733c\"\n}"
 							}
 						},
 						"url": {
@@ -4116,8 +4116,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetEvents($entityId: ID!, $entityType: String!, $limit: Int, $offset: Int) {\n  events(entityId: $entityId, entityType: $entityType, limit: $limit, offset: $offset) {\n    id\n    name\n    description\n    startDateTime\n    startTimezone\n    endDateTime\n    endTimezone\n    rsvpUsers\n    interestedUsers\n    primaryColor\n    user {\n      id\n      handle\n    }\n    createdAt\n  }\n}",
-								"variables": "{\n  \"entityId\": \"COVEN_ID_HERE\",\n  \"entityType\": \"coven\",\n  \"limit\": 20,\n  \"offset\": 0\n}"
+								"query": "query GetEvents($entityId: ID!, $entityType: String!, $limit: Int, $offset: Int) {\n  events(entityId: $entityId, entityType: $entityType, limit: $limit, offset: $offset) {\n   id\n      name\n      description\n      shortDescription\n      startDateTime\n      startTimezone\n      endDateTime\n      endTimezone\n      entityId\n      entityType\n      rsvpUsers\n      interestedUsers\n      primaryColor\n      webUrl\n      webUrlLabel\n      user {\n        id\n        handle\n      }\n      createdAt\n      heroAsset {\n        s3Key\n      }\n      backgroundAsset {\n        s3Key\n      }\n      primaryAsset {\n        s3Key\n      }\n  }\n}",
+								"variables": "{\n  \"entityId\": \"691027fdb730c9b5532c38e9\",\n  \"entityType\": \"coven\",\n  \"limit\": 20,\n  \"offset\": 0\n}"
 							}
 						},
 						"url": {
@@ -4155,8 +4155,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query {\n  events(\n    entityId: \"COVEN_ID_HERE\"\n    entityType: \"coven\"\n    startDate: \"2026-01-01T00:00:00.000Z\"\n    endDate: \"2026-01-31T23:59:59.999Z\"\n    limit: 50\n  ) {\n    id\n    name\n    startDateTime\n    endDateTime\n    rsvpUsers\n    interestedUsers\n  }\n}",
-								"variables": ""
+								"query": "query GetEvents($entityId: ID!, $entityType: String!, $limit: Int, $offset: Int, $startDate: DateTimeISO, $endDate: DateTimeISO ) {\n    \n  events(\n    entityId: $entityId\n    entityType: $entityType\n    startDate: $startDate\n    endDate: $endDate\n    limit: $limit\n    offset: $offset\n  ) {\n     id\n      name\n      description\n      shortDescription\n      startDateTime\n      startTimezone\n      endDateTime\n      endTimezone\n      entityId\n      entityType\n      rsvpUsers\n      interestedUsers\n      primaryColor\n      webUrl\n      webUrlLabel\n      user {\n        id\n        handle\n      }\n      createdAt\n      heroAsset {\n        s3Key\n      }\n      backgroundAsset {\n        s3Key\n      }\n      primaryAsset {\n        s3Key\n      }\n  }\n}",
+								"variables": "  {  \n    \"entityId\": \"691027fdb730c9b5532c38e9\",\n    \"entityType\": \"coven\",\n    \"startDate\": \"2026-01-01T00:00:00.000Z\",\n    \"endDate\": \"2026-01-31T23:59:59.999Z\",\n    \"limit\": 50,\n    \"offset\": 0\n  }"
 							}
 						},
 						"url": {
@@ -4194,7 +4194,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetMyEvents($limit: Int, $offset: Int) {\n  myEvents(limit: $limit, offset: $offset) {\n    id\n    name\n    description\n    startDateTime\n    endDateTime\n    entityId\n    entityType\n    rsvpUsers\n    interestedUsers\n    user {\n      id\n      handle\n    }\n  }\n}",
+								"query": "query GetMyEvents($limit: Int, $offset: Int) {\n  myEvents(limit: $limit, offset: $offset) {\n     id\n      name\n      description\n      shortDescription\n      startDateTime\n      startTimezone\n      endDateTime\n      endTimezone\n      entityId\n      entityType\n      rsvpUsers\n      interestedUsers\n      primaryColor\n      webUrl\n      webUrlLabel\n      user {\n        id\n        handle\n      }\n      createdAt\n      heroAsset {\n        s3Key\n      }\n      backgroundAsset {\n        s3Key\n      }\n      primaryAsset {\n        s3Key\n      }\n  }\n}",
 								"variables": "{\n  \"limit\": 20,\n  \"offset\": 0\n}"
 							}
 						},
@@ -4234,7 +4234,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "query GetEventsByUser($userId: ID!, $limit: Int, $offset: Int) {\n  eventsByUser(userId: $userId, limit: $limit, offset: $offset) {\n    id\n    name\n    description\n    startDateTime\n    endDateTime\n    entityId\n    entityType\n    rsvpUsers\n    interestedUsers\n    createdAt\n  }\n}",
-								"variables": "{\n  \"userId\": \"USER_ID_HERE\",\n  \"limit\": 20,\n  \"offset\": 0\n}"
+								"variables": "{\n  \"userId\": \"68e4617a870854281db2b95d\",\n  \"limit\": 20,\n  \"offset\": 0\n}"
 							}
 						},
 						"url": {
