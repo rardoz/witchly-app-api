@@ -3635,7 +3635,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation UpdateCovenRoster($input: UpdateCovenRosterInput!) {\n  updateCovenRoster(input: $input) {\n    success\n    message\n    rosterEntry {\n      id\n      userRole\n      userTitle\n      userCovenName\n      userCovenBio\n      lastActive\n    }\n  }\n}",
-								"variables": "{\n  \"input\": {\n    \"covenId\": \"COVEN_ID_HERE\",\n    \"userId\": \"USER_ID_HERE\",\n    \"userRole\": \"editor\",\n    \"userTitle\": \"Ritual Coordinator\",\n    \"userCovenName\": \"Luna\",\n    \"userCovenBio\": \"Specializing in moon rituals\"\n  }\n}"
+								"variables": "{\n  \"input\": {\n    \"covenId\": \"691027fdb730c9b5532c38e9\",\n    \"userId\": \"68eb4abec9f3fda244bfbb8d\",\n    \"userRole\": \"editor\",\n    \"userTitle\": \"Ritual Coordinator\",\n    \"userCovenName\": \"Luna\",\n    \"userCovenBio\": \"Specializing in moon rituals\"\n  }\n}"
 							}
 						},
 						"url": {
