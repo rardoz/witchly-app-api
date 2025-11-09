@@ -4474,8 +4474,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetMarkets($limit: Int, $offset: Int, $categoryId: ID, $locale: String, $status: String) {\n  markets(limit: $limit, offset: $offset, categoryId: $categoryId, locale: $locale, status: $status) {\n    id\n    primaryAsset {\n      id\n      filename\n      url\n      mimeType\n    }\n    secondaryAsset {\n      id\n      filename\n      url\n      mimeType\n    }\n    finalAsset {\n      id\n      filename\n      url\n      mimeType\n    }\n    name\n    description\n    shortDescription\n    price\n    locale\n    currency\n    url\n    urlLabel\n    category {\n      id\n      categoryName\n      categoryShortDescription\n    }\n    priority\n    status\n    likes\n    user {\n      id\n      name\n      handle\n    }\n    createdAt\n    updatedAt\n  }\n}",
-								"variables": "{\n  \"limit\": 20,\n  \"offset\": 0,\n  \"categoryId\": \"507f1f77bcf86cd799439015\",\n  \"locale\": \"en-US\",\n  \"status\": \"active\"\n}"
+								"query": "query GetMarkets($limit: Int, $offset: Int, $categoryId: ID, $locale: String, $status: String) {\n  markets(limit: $limit, offset: $offset, categoryId: $categoryId, locale: $locale, status: $status) {\n    id\n    primaryAsset {\n      id\n      s3Key\n    }\n    secondaryAsset {\n      id\n      s3Key\n    }\n    finalAsset {\n      id\n      s3Key\n    }\n    name\n    description\n    shortDescription\n    price\n    locale\n    currency\n    url\n    urlLabel\n    category {\n      id\n      categoryName\n      categoryShortDescription\n    }\n    priority\n    status\n    likes\n    user {\n      id\n      name\n      handle\n    }\n    createdAt\n    updatedAt\n  }\n}",
+								"variables": "{\n  \"limit\": 20,\n  \"offset\": 0,\n  \"categoryId\": \"69105a1581fd78a57e4da8f9\",\n  \"locale\": \"en-US\",\n  \"status\": \"active\"\n}"
 							}
 						},
 						"url": {
