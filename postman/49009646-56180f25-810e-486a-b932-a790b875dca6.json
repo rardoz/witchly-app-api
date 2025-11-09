@@ -3323,7 +3323,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation SoftDeleteCoven($id: ID!) {\n  softDeleteCoven(id: $id) {\n    success\n    message\n  }\n}",
-								"variables": "{\n  \"id\": \"691027f3b730c9b5532c38e0\"\n}"
+								"variables": "{\n  \"id\": \"6910249882d900393a93493f\"\n}"
 							}
 						},
 						"url": {
@@ -3362,7 +3362,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation HardDeleteCoven($id: ID!) {\n  hardDeleteCoven(id: $id) {\n    success\n    message\n  }\n}",
-								"variables": "{\n  \"id\": \"691027f3b730c9b5532c38e0\"\n}"
+								"variables": "{\n  \"id\": \"69102764b730c9b5532c3877\"\n}"
 							}
 						},
 						"url": {
@@ -3478,8 +3478,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetCoven($id: ID!) {\n  coven(id: $id) {\n    id\n    name\n    description\n    shortDescription\n    privacy\n    status\n    tradition\n    structure\n    practice\n    maxMembers\n    meta\n    primaryColor\n    secondaryColor\n    font\n    webUrl\n    webUrlLabel\n    user {\n      id\n      handle\n      displayName\n    }\n    createdAt\n    updatedAt\n  }\n}",
-								"variables": "{\n  \"id\": \"COVEN_ID_HERE\"\n}"
+								"query": "query GetCoven($id: ID!) {\n  coven(id: $id) {\n    id\n    name\n    description\n    shortDescription\n    privacy\n    status\n    tradition\n    structure\n    practice\n    maxMembers\n    meta\n    primaryColor\n    secondaryColor\n    font\n    webUrl\n    webUrlLabel\n    user {\n      id\n      handle\n    }\n    createdAt\n    updatedAt\n  }\n}",
+								"variables": "{\n  \"id\": \"6910249882d900393a93493f\"\n}"
 							}
 						},
 						"url": {
