@@ -302,7 +302,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation CompleteLogin($input: CompleteLoginInput!) {   \n        completeLogin(input: $input) {\n            success\n            message\n            sessionToken\n            refreshToken\n            expiresIn\n            expiresAt\n            userId\n            scopes\n        }\n    }",
+								"query": "mutation CompleteLogin($input: CompleteLoginInput!) {   \n        completeLogin(input: $input) {\n            success\n            message\n            sessionToken\n            refreshToken\n            expiresIn\n            expiresAt\n            userId\n            scopes\n            user {\n                handle\n                profileAsset {\n                    s3Key\n                }\n            }\n        }\n    }",
 								"variables": "{\n    \"input\": {\n        \"email\": \"witchlyapp@gmail.com\",     \n        \"verificationCode\": \"867004\",       \n        \"keepMeLoggedIn\": true   \n    }\n}"
 							}
 						},
