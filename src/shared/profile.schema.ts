@@ -1,5 +1,7 @@
 import { IsIn, IsOptional, IsUrl, Length, Matches } from 'class-validator';
+import { Schema } from 'mongoose';
 import { Field, InputType, ObjectType } from 'type-graphql';
+import { Asset } from '../graphql/types/AssetTypes';
 
 // Validation constants - single source of truth
 export const VALIDATION_CONSTANTS = {
@@ -46,8 +48,8 @@ export interface IProfileFields {
   name?: string;
   bio?: string;
   shortBio?: string;
-  profileImageUrl?: string;
-  backdropImageUrl?: string;
+  profileAsset?: Asset;
+  backdropAsset?: Asset;
   instagramHandle?: string;
   tikTokHandle?: string;
   twitterHandle?: string;
@@ -87,16 +89,6 @@ export class BaseProfileFields implements IProfileFields {
     message: `Short bio must be between ${PROFILE_VALIDATION.SHORT_BIO.min} and ${PROFILE_VALIDATION.SHORT_BIO.max} characters`,
   })
   shortBio?: string;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsUrl({}, { message: 'Profile image URL must be a valid URL' })
-  profileImageUrl?: string;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsUrl({}, { message: 'Backdrop image URL must be a valid URL' })
-  backdropImageUrl?: string;
 
   @Field({ nullable: true })
   @IsOptional()
@@ -226,10 +218,10 @@ export class BaseProfileObjectType implements IProfileFields {
   shortBio?: string;
 
   @Field({ nullable: true })
-  profileImageUrl?: string;
+  profileAsset?: Asset;
 
   @Field({ nullable: true })
-  backdropImageUrl?: string;
+  backdropAsset?: Asset;
 
   @Field({ nullable: true })
   instagramHandle?: string;
@@ -291,13 +283,15 @@ export const createProfileFieldsSchema = () => ({
     trim: true,
     maxlength: PROFILE_VALIDATION.SHORT_BIO.max,
   },
-  profileImageUrl: {
-    type: String,
-    trim: true,
+  profileAsset: {
+    type: Schema.Types.ObjectId,
+    ref: 'Asset',
+    required: false,
   },
-  backdropImageUrl: {
-    type: String,
-    trim: true,
+  backdropAsset: {
+    type: Schema.Types.ObjectId,
+    ref: 'Asset',
+    required: false,
   },
   instagramHandle: {
     type: String,

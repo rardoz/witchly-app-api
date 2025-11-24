@@ -3,7 +3,7 @@ import { emailService } from '../../config/email';
 import { GraphQLContext } from '../../middleware/auth.middleware';
 import { SessionService } from '../../services/session.service';
 import { VerificationService } from '../../services/verification.service';
-import { NotFoundError, ValidationError } from '../../utils/errors';
+import { NotFoundError } from '../../utils/errors';
 import { InitiateLoginInput } from '../inputs/LoginInput';
 import {
   CompleteLoginInput,
@@ -31,12 +31,6 @@ export class LoginResolver {
     if (!existingUser) {
       throw new NotFoundError(
         'No account found with this email address. Please sign up first.'
-      );
-    }
-
-    if (!existingUser.emailVerified) {
-      throw new ValidationError(
-        'Email address not verified. Please complete the signup process first.'
       );
     }
 
@@ -100,9 +94,8 @@ export class LoginResolver {
     }
 
     if (!user.emailVerified) {
-      throw new ValidationError(
-        'Email address not verified. Please complete the signup process first.'
-      );
+      user.emailVerified = true;
+      await user.save();
     }
 
     // Find and validate verification code
@@ -124,14 +117,18 @@ export class LoginResolver {
       context.request
     );
 
+    await user.populate('profileAsset backdropAsset');
+
     return {
       success: true,
       message: `Welcome back, ${user.name || user.handle}!`,
+      user: user,
       sessionToken: sessionResponse.sessionToken,
       refreshToken: sessionResponse.refreshToken,
       expiresIn: sessionResponse.expiresIn,
       expiresAt: sessionResponse.expiresAt,
       userId: user._id as string,
+      scopes: user.allowedScopes as string[],
     };
   }
 }

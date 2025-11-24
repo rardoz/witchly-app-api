@@ -36,7 +36,8 @@ export class UserResolver {
     const users = await UserModel.find()
       .skip(offset)
       .limit(limit)
-      .sort({ createdAt: -1 }); // Sort by newest first
+      .sort({ createdAt: -1 })
+      .populate('profileAsset backdropAsset');
 
     return users as UserType[];
   }
@@ -48,7 +49,9 @@ export class UserResolver {
   ): Promise<UserType | null> {
     context.hasUserReadAppReadScope(context);
 
-    const user = await UserModel.findById(id);
+    const user = await UserModel.findById(id).populate(
+      'profileAsset backdropAsset'
+    );
     if (!user) {
       throw new NotFoundError('User not found');
     }
@@ -66,6 +69,7 @@ export class UserResolver {
 
     try {
       const user = await UserModel.create(input);
+      await user.populate('profileAsset backdropAsset');
       return user as UserType;
     } catch (error: unknown) {
       if (isMongoError(error) && error.code === 11000) {
@@ -94,7 +98,9 @@ export class UserResolver {
       throw new UnauthorizedError('Users can only update their own accounts');
     }
 
-    const user = await UserModel.findByIdAndUpdate(id, input, { new: true });
+    const user = await UserModel.findByIdAndUpdate(id, input, {
+      new: true,
+    }).populate('profileAsset backdropAsset');
     if (!user) {
       throw new NotFoundError('User not found');
     }

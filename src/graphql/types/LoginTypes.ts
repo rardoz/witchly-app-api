@@ -1,4 +1,5 @@
 import { Field, InputType, ObjectType } from 'type-graphql';
+import { User } from './User';
 
 @ObjectType()
 export class InitiateLoginResponse {
@@ -46,4 +47,10 @@ export class CompleteLoginResponse {
 
   @Field()
   userId!: string;
+
+  @Field(() => [String])
+  scopes!: string[];
+
+  @Field(() => User)
+  user!: User;
 }

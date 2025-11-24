@@ -12,6 +12,12 @@ export class CreateUserInput extends BaseProfileFields {
 
   @Field({ nullable: true })
   handle?: string;
+
+  @Field({ nullable: true })
+  profileAsset?: string;
+
+  @Field({ nullable: true })
+  backdropAsset?: string;
 }
 
 @InputType()
@@ -22,4 +28,10 @@ export class UpdateUserInput extends BaseProfileFields {
 
   @Field({ nullable: true })
   handle?: string;
+
+  @Field({ nullable: true })
+  profileAsset?: string;
+
+  @Field({ nullable: true })
+  backdropAsset?: string;
 }

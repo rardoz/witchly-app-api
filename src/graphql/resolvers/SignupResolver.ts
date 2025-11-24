@@ -19,6 +19,7 @@ import {
 } from '../inputs/SignupInput';
 import { CompleteLoginResponse } from '../types/LoginTypes';
 import { InitiateSignupResponse } from '../types/SignupTypes';
+import { User as UserType } from '../types/User';
 
 @Resolver()
 export class SignupResolver {
@@ -156,7 +157,7 @@ export class SignupResolver {
       });
 
       await user.save();
-
+      await user.populate('profileAsset backdropAsset');
       // Clean up verification and pending signup
       await VerificationService.completeVerification(emailFormatted);
       await Signup.deleteOne({ email: emailFormatted });
@@ -176,6 +177,8 @@ export class SignupResolver {
         expiresIn: sessionResponse.expiresIn,
         expiresAt: sessionResponse.expiresAt,
         userId: user._id as string,
+        user: user as unknown as UserType,
+        scopes: user.allowedScopes as string[],
       };
     } catch (error) {
       // Re-throw specific errors from VerificationService
