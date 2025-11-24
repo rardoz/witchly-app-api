@@ -199,8 +199,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation CompleteSignup($input: CompleteSignupInput!) {\n    completeSignup(input: $input) {\n        success\n        message\n        sessionToken\n        refreshToken\n        expiresIn\n        expiresAt\n        userId\n    }\n}",
-								"variables": "{\n    \"input\": {\n        \"email\": \"witchlyapp@gmail.com\",\n        \"verificationCode\": \"852863\"\n    }\n}"
+								"query": "mutation CompleteSignup($input: CompleteSignupInput!) {\n    completeSignup(input: $input) {\n        success\n        message\n        sessionToken\n        refreshToken\n        expiresIn\n        expiresAt\n        userId\n        scopes\n        user {\n            handle\n            profileAsset {\n                s3Key\n            }\n        }\n    }\n}",
+								"variables": "{\n    \"input\": {\n        \"email\": \"witchlyapp@gmail.com\",\n        \"verificationCode\": \"366009\"\n    }\n}"
 							}
 						},
 						"url": {
@@ -302,8 +302,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation CompleteLogin($input: CompleteLoginInput!) {   \n        completeLogin(input: $input) {\n            success\n            message\n            sessionToken\n            refreshToken\n            expiresIn\n            expiresAt\n            userId\n        }\n    }",
-								"variables": "{\n    \"input\": {\n        \"email\": \"witchlyapp@gmail.com\",     \n        \"verificationCode\": \"541803\",       \n        \"keepMeLoggedIn\": true   \n    }\n}"
+								"query": "mutation CompleteLogin($input: CompleteLoginInput!) {   \n        completeLogin(input: $input) {\n            success\n            message\n            sessionToken\n            refreshToken\n            expiresIn\n            expiresAt\n            userId\n            scopes\n            user {\n                handle\n                profileAsset {\n                    s3Key\n                }\n            }\n        }\n    }",
+								"variables": "{\n    \"input\": {\n        \"email\": \"witchlyapp@gmail.com\",     \n        \"verificationCode\": \"270745\",       \n        \"keepMeLoggedIn\": true   \n    }\n}"
 							}
 						},
 						"url": {
@@ -529,7 +529,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetUsers($limit: Float, $offset: Float){\n    users(limit: $limit, offset: $offset) {\n        id\n        name\n        email\n        handle\n        allowedScopes\n        emailVerified\n        lastLoginAt\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }\n}",
+								"query": "query GetUsers($limit: Float, $offset: Float){\n    users(limit: $limit, offset: $offset) {\n        id\n        name\n        email\n        handle\n        allowedScopes\n        emailVerified\n        lastLoginAt\n        createdAt\n        updatedAt\n        profileAsset { id, s3Key }\n        bio\n        shortBio\n        backdropAsset  { id, s3Key }\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }\n}",
 								"variables": "{\n    \"limit\": 10,\n    \"offset\": 0\n}"
 							}
 						},
@@ -568,7 +568,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetUser($id: ID!) {\n    user(id: $id) {\n        id\n        name\n        email\n        handle\n        allowedScopes\n        emailVerified\n        lastLoginAt\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }\n }",
+								"query": "query GetUser($id: ID!) {\n    user(id: $id) {\n        id\n        name\n        email\n        handle\n        allowedScopes\n        emailVerified\n        lastLoginAt\n        createdAt\n        updatedAt\n        profileAsset { id, s3Key }\n        bio\n        shortBio\n        backdropAsset { id, s3Key }\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }\n }",
 								"variables": "{\n    \"id\": \"68e4617a870854281db2b95d\"\n}"
 							}
 						},
@@ -607,8 +607,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation CreateUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n     id\n        name\n        email\n        handle\n        allowedScopes\n        emailVerified\n        lastLoginAt\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }  \n}",
-								"variables": "{\n    \"input\": {\n        \"name\": \"John Doe\",\n        \"email\": \"john.does@example.com\",\n        \"allowedScopes\": [\"read\", \"write\", \"basic\"],\n        \"profileImageUrl\": \"https://test.com\",\n        \"bio\": \"This is a bio\",\n        \"shortBio\": \"this is a short bio\",\n        \"handle\": \"handle\",\n        \"backdropImageUrl\": \"https://handle.com\",\n        \"instagramHandle\": \"instagram\",\n        \"tikTokHandle\": \"tik\",\n        \"twitterHandle\": \"twit\",\n        \"websiteUrl\": \"https://test.com\",\n        \"facebookUrl\": \"fb\",\n        \"snapchatHandle\": \"snap\",\n        \"primaryColor\": \"#FF5733\",\n        \"sign\": \"aries\",\n        \"sex\": \"male\",\n        \"location\": \"location\",\n        \"birthDate\": \"1990-01-01T00:00:00.000Z\",\n        \"pronouns\": \"he/him\"\n    }\n}"
+								"query": "mutation CreateUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n     id\n        name\n        email\n        handle\n        allowedScopes\n        emailVerified\n        lastLoginAt\n        createdAt\n        updatedAt\n        profileAsset { id, s3Key }\n        bio\n        shortBio\n        backdropAsset { id, s3Key }\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }  \n}",
+								"variables": "{\n    \"input\": {\n        \"name\": \"John Doe\",\n        \"email\": \"john.doesssss@example.com\",\n        \"allowedScopes\": [\"read\", \"write\", \"basic\"],\n        \"profileAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n        \"bio\": \"This is a bio\",\n        \"shortBio\": \"this is a short bio\",\n        \"handle\": \"handlesssss\",\n        \"backdropAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n        \"instagramHandle\": \"instagram\",\n        \"tikTokHandle\": \"tik\",\n        \"twitterHandle\": \"twit\",\n        \"websiteUrl\": \"https://test.com\",\n        \"facebookUrl\": \"fb\",\n        \"snapchatHandle\": \"snap\",\n        \"primaryColor\": \"#FF5733\",\n        \"sign\": \"aries\",\n        \"sex\": \"male\",\n        \"location\": \"location\",\n        \"birthDate\": \"1990-01-01T00:00:00.000Z\",\n        \"pronouns\": \"he/him\"\n    }\n}"
 							}
 						},
 						"url": {
@@ -646,8 +646,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation CreateUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n     id\n        name\n        email\n        handle\n        allowedScopes\n        emailVerified\n        lastLoginAt\n        createdAt\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }  \n}",
-								"variables": "{\n    \"input\": {\n        \"name\": \"John Doe\",\n        \"email\": \"john.does.admin@example.com\",\n        \"allowedScopes\": [\"read\", \"write\", \"admin\"],\n        \"profileImageUrl\": \"https://test.com\",\n        \"bio\": \"This is a bio\",\n        \"shortBio\": \"this is a short bio\",\n        \"handle\": \"handle_joe_admin\",\n        \"backdropImageUrl\": \"https://handle.com\",\n        \"instagramHandle\": \"instagram\",\n        \"tikTokHandle\": \"tik\",\n        \"twitterHandle\": \"twit\",\n        \"websiteUrl\": \"https://test.com\",\n        \"facebookUrl\": \"fb\",\n        \"snapchatHandle\": \"snap\",\n        \"primaryColor\": \"#FF5733\",\n        \"sign\": \"aries\",\n        \"sex\": \"male\",\n        \"location\": \"location\",\n        \"birthDate\": \"1990-01-01T00:00:00.000Z\",\n        \"pronouns\": \"he/him\"\n    }\n}"
+								"query": "mutation CreateUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n     id\n        name\n        email\n        handle\n        allowedScopes\n        emailVerified\n        lastLoginAt\n        createdAt\n        updatedAt\n        profileAsset { id, s3Key }\n        bio\n        shortBio\n        backdropAsset { id, s3Key }\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }  \n}",
+								"variables": "{\n    \"input\": {\n        \"name\": \"John Doe\",\n        \"email\": \"john1ss.does.admin@example.com\",\n        \"allowedScopes\": [\"read\", \"write\", \"admin\"],\n        \"profileAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n        \"bio\": \"This is a bio\",\n        \"shortBio\": \"this is a short bio\",\n        \"handle\": \"has1ndles_joe_admin\",\n        \"backdropAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n        \"instagramHandle\": \"instagram\",\n        \"tikTokHandle\": \"tik\",\n        \"twitterHandle\": \"twit\",\n        \"websiteUrl\": \"https://test.com\",\n        \"facebookUrl\": \"fb\",\n        \"snapchatHandle\": \"snap\",\n        \"primaryColor\": \"#FF5733\",\n        \"sign\": \"aries\",\n        \"sex\": \"male\",\n        \"location\": \"location\",\n        \"birthDate\": \"1990-01-01T00:00:00.000Z\",\n        \"pronouns\": \"he/him\"\n    }\n}"
 							}
 						},
 						"url": {
@@ -685,8 +685,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {\n    updateUser(id: $id, input: $input) {\n        id\n        name\n        email\n        handle\n        allowedScopes\n        emailVerified\n        updatedAt\n        profileImageUrl\n        bio\n        shortBio\n        backdropImageUrl\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }\n}",
-								"variables": "{\n    \"id\": \"68eb2b3be279fa2be6a093b1\",\n    \"input\": {\n        \"name\": \"John Doe\",\n        \"email\": \"johnzz.doe@example.com\",\n        \"allowedScopes\": [\"read\", \"write\", \"admin\"],\n        \"profileImageUrl\": \"https://test.com\",\n        \"bio\": \"This is a bio\",\n        \"shortBio\": \"this is a short bio\",\n        \"handle\": \"handlez\",\n        \"backdropImageUrl\": \"https://handle.com\",\n        \"instagramHandle\": \"instagram\",\n        \"tikTokHandle\": \"tik\",\n        \"twitterHandle\": \"twit\",\n        \"websiteUrl\": \"https://test.com\",\n        \"facebookUrl\": \"fb\",\n        \"snapchatHandle\": \"snap\",\n        \"primaryColor\": \"red\",\n        \"sign\": \"leo\",\n        \"sex\": \"male\",\n        \"location\": \"San Francisco, CA\",\n        \"birthDate\": \"1985-10-12T00:00:00.000Z\",\n        \"pronouns\": \"they/them\"\n    }\n  }"
+								"query": "mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {\n    updateUser(id: $id, input: $input) {\n        id\n        name\n        email\n        handle\n        allowedScopes\n        emailVerified\n        updatedAt\n        profileAsset { id, s3Key }\n        bio\n        shortBio\n        backdropAsset { id, s3Key }\n        instagramHandle\n        tikTokHandle\n        twitterHandle\n        websiteUrl\n        facebookUrl\n        snapchatHandle\n        primaryColor\n        sign\n        sex\n        location\n        birthDate\n        pronouns\n    }\n}",
+								"variables": "{\n    \"id\": \"68e4617a870854281db2b95d\",\n    \"input\": {\n        \"name\": \"Witchly Admin\",\n        \"email\": \"witchlyapp@gmail.com\",\n        \"allowedScopes\": [\"read\", \"write\", \"admin\"],\n        \"profileAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n        \"bio\": \"Witchly admin bio\",\n        \"shortBio\": \"Witchly admin short bio\",\n        \"handle\": \"witchly_admin\",\n        \"backdropAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n        \"instagramHandle\": \"witchlyapp\",\n        \"tikTokHandle\": \"witchlyapp\",\n        \"twitterHandle\": \"witchlyapp\",\n        \"websiteUrl\": \"https://witchlyapp.com\",\n        \"facebookUrl\": \"https://fb.com/witchlyapp\",\n        \"snapchatHandle\": \"witchlyapp\",\n        \"primaryColor\": \"#ffffff\",\n        \"sign\": \"leo\",\n        \"sex\": \"male\",\n        \"location\": \"Loveland, CO\",\n        \"birthDate\": \"1988-09-02T00:00:00.000Z\",\n        \"pronouns\": \"they/them\"\n    }\n  }"
 							}
 						},
 						"url": {
@@ -725,7 +725,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation DeleteUser( $id: ID! ) {\n        deleteUser(id: $id)\n }",
-								"variables": "{\n    \"id\": \"68eb2b3be279fa2be6a093b1\"\n}"
+								"variables": "{\n    \"id\": \"6923d2e88b48fcd91a21ccaf\"\n}"
 							}
 						},
 						"url": {
