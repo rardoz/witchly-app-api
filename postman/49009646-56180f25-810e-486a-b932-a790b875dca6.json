@@ -200,7 +200,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "mutation CompleteSignup($input: CompleteSignupInput!) {\n    completeSignup(input: $input) {\n        success\n        message\n        sessionToken\n        refreshToken\n        expiresIn\n        expiresAt\n        userId\n        scopes\n        user {\n            handle\n            profileAsset {\n                s3Key\n            }\n        }\n    }\n}",
-								"variables": "{\n    \"input\": {\n        \"email\": \"witchlyapp@gmail.com\",\n        \"verificationCode\": \"458146\"\n    }\n}"
+								"variables": "{\n    \"input\": {\n        \"email\": \"witchlyapp@gmail.com\",\n        \"verificationCode\": \"366009\"\n    }\n}"
 							}
 						},
 						"url": {
