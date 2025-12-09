@@ -1188,7 +1188,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation InitializeChunkedUpload($input: ChunkUploadInitInput!) {\n  initializeChunkedUpload(input: $input) {\n    uploadId\n    chunkSize\n    asset {\n        id\n        publicUrl\n    }\n  }\n}",
+								"query": "mutation InitializeChunkedUpload($input: ChunkUploadInitInput!) {\n  initializeChunkedUpload(input: $input) {\n    uploadId\n    chunkSize\n  }\n}",
 								"variables": "{\n  \"input\": {\n    \"fileName\": \"{{TEST_FILE_NAME}}\",\n    \"mimeType\": \"{{TEST_FILE_MIME_TYPE}}\",\n    \"totalSize\": {{TEST_FILE_SIZE}},\n    \"chunkSize\": {{CHUNK_SIZE}}\n  }\n}"
 							}
 						},
