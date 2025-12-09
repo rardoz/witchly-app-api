@@ -1089,7 +1089,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetAsset($id: ID!, $signedUrl: Boolean) {\n  asset(id: $id, signedUrl: $signedUrl) {\n    id\n    fileName\n    hashedFileName\n    mimeType\n    fileSize\n    s3Key\n    s3Url\n    signedUrl\n    assetType\n    uploadedBy\n    createdAt\n    updatedAt\n  }\n}",
+								"query": "query GetAsset($id: ID!, $signedUrl: Boolean) {\n  asset(id: $id, signedUrl: $signedUrl) {\n    id\n    fileName\n    hashedFileName\n    mimeType\n    fileSize\n    s3Key\n    s3Url\n    signedUrl\n    publicUrl\n    assetType\n    uploadedBy\n    createdAt\n    updatedAt\n  }\n}",
 								"variables": "{\n  \"id\": \"68ff7ebe04e43ae41ca0fc59\",\n  \"signedUrl\": true\n}"
 							}
 						},
