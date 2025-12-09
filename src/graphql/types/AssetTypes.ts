@@ -1,5 +1,6 @@
 import {
   Field,
+  Float,
   ID,
   InputType,
   Int,
@@ -56,6 +57,9 @@ export class Asset {
   @Field()
   s3Url: string;
 
+  @Field()
+  publicUrl: string;
+
   @Field({ nullable: true })
   signedUrl?: string; // This will be generated on-demand when requested
 
@@ -102,6 +106,9 @@ export class UploadProgress {
 
   @Field()
   lastUpdated: Date;
+
+  @Field(() => Asset, { nullable: true })
+  asset?: Asset;
 }
 
 @ObjectType()
@@ -130,7 +137,7 @@ export class ChunkUploadInitInput {
   @Field(() => Int)
   totalSize: number;
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => Float, { nullable: true })
   chunkSize?: number;
 }
 
@@ -139,7 +146,7 @@ export class InitializeUploadResponse {
   @Field(() => ID)
   uploadId: string;
 
-  @Field(() => Int)
+  @Field(() => Float)
   chunkSize: number;
 }
 

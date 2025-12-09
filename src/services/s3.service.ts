@@ -143,7 +143,8 @@ export class S3Service {
   async uploadAsset(
     uploadData: AssetUploadData,
     userId: string,
-    generateSignedUrl = false
+    generateSignedUrl = false,
+    sessionS3Key?: string
   ): Promise<UploadResult> {
     // Validate file type
     if (!this.validateFileType(uploadData.mimeType, uploadData.assetType)) {
@@ -157,7 +158,8 @@ export class S3Service {
       uploadData.fileName,
       userId
     );
-    const s3Key = this.generateS3Key(hashedFileName, uploadData.assetType);
+    const s3Key =
+      sessionS3Key || this.generateS3Key(hashedFileName, uploadData.assetType);
 
     // Prepare upload parameters
     const uploadParams: PutObjectCommandInput = {

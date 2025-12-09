@@ -140,18 +140,37 @@ export const createApolloServer = async (): Promise<ApolloServer> => {
       if (error && typeof error === 'object' && 'originalError' in error) {
         const originalError = (error as { originalError?: Error })
           .originalError;
-        if (originalError && originalError.name === 'ValidationError') {
-          return {
-            ...formattedError,
-            message: originalError.message,
-            extensions: {
-              ...formattedError.extensions,
-              code: 'VALIDATION_ERROR',
-              http: {
-                status: 400,
+
+        if (originalError) {
+          // Handle Mongoose ValidationError (invalid field values)
+          if (originalError.name === 'ValidationError') {
+            return {
+              ...formattedError,
+              message: originalError.message,
+              extensions: {
+                ...formattedError.extensions,
+                code: 'VALIDATION_ERROR',
+                http: {
+                  status: 400,
+                },
               },
-            },
-          };
+            };
+          }
+
+          // Handle Mongoose CastError (invalid ObjectId, type casting failures)
+          if (originalError.name === 'CastError') {
+            return {
+              ...formattedError,
+              message: originalError.message,
+              extensions: {
+                ...formattedError.extensions,
+                code: 'BAD_REQUEST',
+                http: {
+                  status: 400,
+                },
+              },
+            };
+          }
         }
       }
 

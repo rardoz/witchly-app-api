@@ -12,6 +12,7 @@ export interface IAsset extends Document {
   uploadedBy: Types.ObjectId; // Reference to User document
   createdAt: Date;
   updatedAt: Date;
+  publicUrl: string;
 }
 
 const assetSchema = new Schema<IAsset>(
@@ -61,8 +62,15 @@ const assetSchema = new Schema<IAsset>(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true }, // Include virtuals when converting to JSON
+    toObject: { virtuals: true }, // Include virtuals when converting to Object
   }
 );
+
+assetSchema.virtual('publicUrl').get(function (this: IAsset) {
+  const baseUrl = process.env.PUBLIC_ASSET_URL || 'https://assets.witchly.app';
+  return `${baseUrl}/${this.s3Key}`;
+});
 
 // Performance indexes
 assetSchema.index({ uploadedBy: 1, createdAt: -1 });

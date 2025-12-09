@@ -156,6 +156,14 @@ describe('Asset Upload API Tests', () => {
                 chunksUploaded
                 totalChunks
                 progress
+                asset {
+                  id
+                  fileName
+                  mimeType
+                  fileSize
+                  s3Url
+                  publicUrl
+                }
               }
             }
           `,
@@ -174,6 +182,28 @@ describe('Asset Upload API Tests', () => {
       expect(finalProgressResponse.body.data.uploadProgress.status).toBe(
         'completed'
       );
+      // Verify asset object is present when completed
+      expect(
+        finalProgressResponse.body.data.uploadProgress.asset
+      ).toBeDefined();
+      expect(
+        finalProgressResponse.body.data.uploadProgress.asset.id
+      ).toBeDefined();
+      expect(
+        finalProgressResponse.body.data.uploadProgress.asset.fileName
+      ).toBe(smallFile.name);
+      expect(
+        finalProgressResponse.body.data.uploadProgress.asset.mimeType
+      ).toBe(smallFile.mimeType);
+      expect(
+        finalProgressResponse.body.data.uploadProgress.asset.fileSize
+      ).toBe(smallFile.buffer.length);
+      expect(
+        finalProgressResponse.body.data.uploadProgress.asset.s3Url
+      ).toBeDefined();
+      expect(
+        finalProgressResponse.body.data.uploadProgress.asset.publicUrl
+      ).toBeDefined();
     });
 
     it('should get upload progress', async () => {
@@ -318,6 +348,14 @@ describe('Asset Upload API Tests', () => {
                   chunksUploaded
                   totalChunks
                   progress
+                  asset {
+                    id
+                    fileName
+                    mimeType
+                    fileSize
+                    s3Url
+                    publicUrl
+                  }
                 }
               }
             `,
@@ -344,10 +382,32 @@ describe('Asset Upload API Tests', () => {
             'completed'
           );
           expect(progressResponse.body.data.uploadProgress.progress).toBe(100);
+          // Verify asset object is present when completed
+          expect(progressResponse.body.data.uploadProgress.asset).toBeDefined();
+          expect(
+            progressResponse.body.data.uploadProgress.asset.id
+          ).toBeDefined();
+          expect(progressResponse.body.data.uploadProgress.asset.fileName).toBe(
+            largeFile.name
+          );
+          expect(progressResponse.body.data.uploadProgress.asset.mimeType).toBe(
+            largeFile.mimeType
+          );
+          expect(progressResponse.body.data.uploadProgress.asset.fileSize).toBe(
+            largeFile.buffer.length
+          );
+          expect(
+            progressResponse.body.data.uploadProgress.asset.s3Url
+          ).toBeDefined();
+          expect(
+            progressResponse.body.data.uploadProgress.asset.publicUrl
+          ).toBeDefined();
         } else {
           expect(progressResponse.body.data.uploadProgress.status).toBe(
             'uploading'
           );
+          // Asset should not be present while uploading
+          expect(progressResponse.body.data.uploadProgress.asset).toBeNull();
         }
       }
     });

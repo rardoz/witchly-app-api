@@ -8,6 +8,6 @@ npm run type-check
 
 # Run tests
 echo "🧪 Running tests..."
-#npm test
+npm test
 
 echo "✅ All checks passed! Proceeding with commit..."

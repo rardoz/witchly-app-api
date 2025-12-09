@@ -52,6 +52,7 @@ export interface UploadProgress {
   status: 'initializing' | 'uploading' | 'completed' | 'failed';
   createdAt: Date;
   lastUpdated: Date;
+  asset?: AssetCreationResult['asset'] | undefined;
 }
 
 export interface UploadedFile {
@@ -74,6 +75,7 @@ export interface AssetCreationResult {
     fileSize: number;
     s3Key: string;
     s3Url: string;
+    publicUrl: string;
     signedUrl?: string;
     assetType: 'image' | 'video';
     uploadedBy: string;
@@ -141,7 +143,6 @@ function generateS3Key(
 
   return keyPath;
 }
-
 /**
  * Create multer middleware for streaming uploads directly to S3
  */
@@ -287,6 +288,7 @@ export async function processStreamedFileUpload(
         fileSize: asset.fileSize,
         s3Key: asset.s3Key,
         s3Url: asset.s3Url,
+        publicUrl: asset.publicUrl,
         assetType: asset.assetType,
         uploadedBy: asset.uploadedBy.toString(),
         createdAt: asset.createdAt,
@@ -451,7 +453,9 @@ export async function uploadChunk(
           buffer: chunkData.chunkData,
           assetType: getAssetType(session.mimeType),
         },
-        session.userId.toString()
+        session.userId.toString(),
+        false, //todo finish signed url
+        session.s3Key
       );
 
       // Mark as completed
@@ -536,7 +540,28 @@ export async function getUploadProgress(
   const progress = Math.round(
     (session.uploadedChunks.length / session.totalChunks) * 100
   );
-
+  let asset: AssetCreationResult['asset'] | undefined;
+  if (session.status === 'completed') {
+    const response = await Asset.findOne({
+      s3Key: session.s3Key,
+      uploadedBy: session.userId,
+    });
+    if (response)
+      asset = {
+        id: response._id.toString(),
+        fileName: response.fileName,
+        hashedFileName: response.hashedFileName,
+        mimeType: response.mimeType,
+        fileSize: response.fileSize,
+        s3Key: response.s3Key,
+        s3Url: response.s3Url,
+        publicUrl: response.publicUrl,
+        assetType: response.assetType,
+        uploadedBy: response.uploadedBy.toString(),
+        createdAt: response.createdAt,
+        updatedAt: response.updatedAt,
+      };
+  }
   return {
     uploadId: session.uploadId,
     fileName: session.fileName,
@@ -548,6 +573,7 @@ export async function getUploadProgress(
     status: session.status,
     createdAt: session.createdAt,
     lastUpdated: session.updatedAt,
+    asset,
   };
 }
 
