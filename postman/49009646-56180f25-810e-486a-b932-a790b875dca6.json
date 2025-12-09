@@ -1051,7 +1051,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "query GetAssets($limit: Int, $offset: Int, $assetType: AssetTypeEnum, $signedUrl: Boolean) {\n  assets(limit: $limit, offset: $offset, assetType: $assetType, signedUrl: $signedUrl) {\n    assets {\n      id\n      fileName\n      hashedFileName\n      mimeType\n      fileSize\n      s3Key\n      s3Url\n      signedUrl\n      publicUrl\n      assetType\n      uploadedBy\n      createdAt\n      updatedAt\n    }\n    total\n    limit\n    offset\n  }\n}",
-								"variables": "{\n  \"limit\": 20,\n  \"offset\": 0,\n  \"assetType\": null,\n  \"signedUrl\": true\n}"
+								"variables": "{\n  \"limit\": 20,\n  \"offset\": 0,\n  \"assetType\": null,\n  \"signedUrl\": false\n}"
 							}
 						},
 						"url": {
