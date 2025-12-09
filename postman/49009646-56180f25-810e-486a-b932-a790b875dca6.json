@@ -1227,7 +1227,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetUploadProgress($uploadId: ID!) {\n  uploadProgress(uploadId: $uploadId) {\n    uploadId\n    fileName\n    totalSize\n    uploadedSize\n    chunksUploaded\n    totalChunks\n    progress\n    status\n    createdAt\n    lastUpdated\n  }\n}",
+								"query": "query GetUploadProgress($uploadId: ID!) {\n  uploadProgress(uploadId: $uploadId) {\n    uploadId\n    fileName\n    totalSize\n    uploadedSize\n    chunksUploaded\n    totalChunks\n    progress\n    status\n    createdAt\n    lastUpdated\n    asset {\n        id\n        publicUrl\n    }\n  }\n}",
 								"variables": "{\n  \"uploadId\": \"{{uploadId}}\"\n}"
 							}
 						},
