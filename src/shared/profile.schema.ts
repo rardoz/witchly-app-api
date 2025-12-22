@@ -33,6 +33,7 @@ export const VALIDATION_CONSTANTS = {
       TWITTER: /^[a-zA-Z0-9_]+$/,
       SNAPCHAT: /^[a-zA-Z0-9._-]+$/,
       HEX_COLOR: /^#[0-9A-F]{6}$/i,
+      BIRTHDATE: /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/,
     },
   },
 } as const;
@@ -60,7 +61,7 @@ export interface IProfileFields {
   sign?: string;
   sex?: SexType;
   location?: string;
-  birthDate?: Date;
+  birthDate?: string;
   pronouns?: string;
   allowedScopes?: string[];
   emailVerified?: boolean;
@@ -189,7 +190,10 @@ export class BaseProfileFields implements IProfileFields {
 
   @Field({ nullable: true })
   @IsOptional()
-  birthDate?: Date;
+  @Matches(PROFILE_VALIDATION.PATTERNS.BIRTHDATE, {
+    message: 'Birth date must be in yyyy-mm-dd format (e.g., 1988-02-09)',
+  })
+  birthDate?: string;
 
   @Field({ nullable: true })
   @IsOptional()
@@ -254,7 +258,7 @@ export class BaseProfileObjectType implements IProfileFields {
   location?: string;
 
   @Field({ nullable: true })
-  birthDate?: Date;
+  birthDate?: string;
 
   @Field({ nullable: true })
   pronouns?: string;
@@ -342,7 +346,7 @@ export const createProfileFieldsSchema = () => ({
     maxlength: PROFILE_VALIDATION.LOCATION.max,
   },
   birthDate: {
-    type: Date,
+    type: String,
   },
   pronouns: {
     type: String,
