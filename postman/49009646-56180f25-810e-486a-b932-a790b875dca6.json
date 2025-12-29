@@ -529,8 +529,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": " query GetUsers($limit: Float, $offset: Float) {\n    users(limit: $limit, offset: $offset) {\n        records {\n            id\n            name\n            email\n            handle\n            allowedScopes\n            emailVerified\n            lastLoginAt\n            createdAt\n            updatedAt\n            profileAsset { id, s3Key }\n            bio\n            shortBio\n            backdropAsset  { id, s3Key }\n            instagramHandle\n            tikTokHandle\n            twitterHandle\n            websiteUrl\n            facebookUrl\n            snapchatHandle\n            primaryColor\n            sign\n            sex\n            location\n            birthDate\n            pronouns\n        }\n        totalCount\n        limit\n        offset\n    }\n}",
-								"variables": "{\n    \"limit\": 10,\n    \"offset\": 0\n}"
+								"query": "query GetUsers($limit: Float, $offset: Float, $email: String, $name: String, $handle: String) {\n  users(limit: $limit, offset: $offset, email: $email, name: $name, handle: $handle) {\n        records {\n            id\n            name\n            email\n            handle\n            allowedScopes\n            emailVerified\n            lastLoginAt\n            createdAt\n            updatedAt\n            profileAsset { id, s3Key }\n            bio\n            shortBio\n            backdropAsset  { id, s3Key }\n            instagramHandle\n            tikTokHandle\n            twitterHandle\n            websiteUrl\n            facebookUrl\n            snapchatHandle\n            primaryColor\n            sign\n            sex\n            location\n            birthDate\n            pronouns\n        }\n        totalCount\n        limit\n        offset\n    }\n}",
+								"variables": "{\n    \"limit\": 10,\n    \"offset\": 0,\n    \"email\": \"\",\n    \"name\": \"\",\n    \"handle\": \"\"\n}"
 							}
 						},
 						"url": {
