@@ -27,7 +27,9 @@ export class UserResolver {
     @Arg('name', () => String, { nullable: true })
     name?: string,
     @Arg('handle', () => String, { nullable: true })
-    handle?: string
+    handle?: string,
+    @Arg('access', () => String, { nullable: true })
+    access?: string
   ): Promise<UsersResponse> {
     context.hasUserReadAppReadScope(context);
 
@@ -55,6 +57,17 @@ export class UserResolver {
     if (handle) {
       // Case-insensitive partial match for handle
       filter.handle = { $regex: handle, $options: 'i' };
+    }
+
+    if (access) {
+      // Case-insensitive partial match for access
+      if (access === 'denied') {
+        filter.allowedScopes = {
+          $not: { $regex: 'admin|basic', $options: 'i' },
+        };
+      } else {
+        filter.allowedScopes = { $regex: access, $options: 'i' };
+      }
     }
 
     const [users, totalCount] = await Promise.all([
