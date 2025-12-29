@@ -26,7 +26,14 @@ export const VALIDATION_CONSTANTS = {
     SIGN: { min: 1, max: 20 },
     LOCATION: { min: 1, max: 100 },
     PRONOUNS: { min: 1, max: 50 },
-    SEX_VALUES: ['male', 'female', 'non-binary', 'prefer-not-to-say'] as const,
+    SEX_VALUES: [
+      'male',
+      'female',
+      'non-binary',
+      'prefer-not-to-say',
+      'other',
+      '',
+    ] as const,
     PATTERNS: {
       INSTAGRAM: /^[a-zA-Z0-9._]+$/,
       TIKTOK: /^[a-zA-Z0-9._]+$/,

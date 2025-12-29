@@ -21,3 +21,18 @@ export class User extends BaseProfileObjectType {
   @Field()
   updatedAt: Date;
 }
+
+@ObjectType()
+export class UsersResponse {
+  @Field(() => [User])
+  records: User[];
+
+  @Field(() => Number)
+  totalCount: number;
+
+  @Field(() => Number)
+  limit: number;
+
+  @Field(() => Number)
+  offset: number;
+}

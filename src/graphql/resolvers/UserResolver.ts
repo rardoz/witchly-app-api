@@ -9,20 +9,26 @@ import {
   ValidationError,
 } from '../../utils/errors';
 import { CreateUserInput, UpdateUserInput } from '../inputs/UserInput';
-import { User as UserType } from '../types/User';
+import { UsersResponse, User as UserType } from '../types/User';
 
 // Type guard for MongoDB duplicate key errors
 
-@Resolver(() => UserType)
+@Resolver(() => UsersResponse)
 export class UserResolver {
-  @Query(() => [UserType])
+  @Query(() => UsersResponse)
   async users(
     @Ctx() context: GraphQLContext,
     @Arg('limit', () => Number, { nullable: true, defaultValue: 10 })
     limit: number,
     @Arg('offset', () => Number, { nullable: true, defaultValue: 0 })
-    offset: number
-  ): Promise<UserType[]> {
+    offset: number,
+    @Arg('email', () => String, { nullable: true })
+    email?: string,
+    @Arg('name', () => String, { nullable: true })
+    name?: string,
+    @Arg('handle', () => String, { nullable: true })
+    handle?: string
+  ): Promise<UsersResponse> {
     context.hasUserReadAppReadScope(context);
 
     // Validate pagination parameters
@@ -33,13 +39,33 @@ export class UserResolver {
       throw new ValidationError('Offset must be non-negative');
     }
 
-    const users = await UserModel.find()
-      .skip(offset)
-      .limit(limit)
-      .sort({ createdAt: -1 })
-      .populate('profileAsset backdropAsset');
+    // Build filter query
+    const filter: Record<string, unknown> = {};
 
-    return users as UserType[];
+    if (email) {
+      // Case-insensitive partial match for email
+      filter.email = { $regex: email, $options: 'i' };
+    }
+
+    if (name) {
+      // Case-insensitive partial match for name
+      filter.name = { $regex: name, $options: 'i' };
+    }
+
+    if (handle) {
+      // Case-insensitive partial match for handle
+      filter.handle = { $regex: handle, $options: 'i' };
+    }
+
+    const [users, totalCount] = await Promise.all([
+      UserModel.find(filter)
+        .skip(offset)
+        .limit(limit)
+        .sort({ createdAt: -1 })
+        .populate('profileAsset backdropAsset'),
+      UserModel.countDocuments(filter),
+    ]);
+    return { records: users as UserType[], totalCount, limit, offset };
   }
 
   @Query(() => UserType, { nullable: true })

@@ -35,14 +35,17 @@ describe('UserResolver GraphQL Endpoints', () => {
   describe('Query: users', () => {
     it('should return list of users with authentication when admin', async () => {
       const query = `
-        query {
-          users {
-            id
-            name
-            email
-            allowedScopes
-            createdAt
-            updatedAt
+        query GetUsers($limit: Float, $offset: Float) {
+          users(limit: $limit, offset: $offset) {
+            records {
+              id
+              name
+              email
+              allowedScopes
+            }
+            totalCount
+            limit
+            offset
           }
         }
       `;
@@ -52,39 +55,52 @@ describe('UserResolver GraphQL Endpoints', () => {
         .send({ query });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.users.length).toBeGreaterThanOrEqual(4);
-      expect(response.body.data.users[0]).toHaveProperty('id');
-      expect(response.body.data.users[0]).toHaveProperty('name');
-      expect(response.body.data.users[0]).toHaveProperty('email');
-      expect(response.body.data.users[0]).toHaveProperty('allowedScopes');
+      expect(response.body.data.users.records.length).toBeGreaterThanOrEqual(4);
+      expect(response.body.data.users.records[0]).toHaveProperty('id');
+      expect(response.body.data.users.records[0]).toHaveProperty('name');
+      expect(response.body.data.users.records[0]).toHaveProperty('email');
+      expect(response.body.data.users.records[0]).toHaveProperty(
+        'allowedScopes'
+      );
     });
 
     it('should return paginated users with limit and offset when basic', async () => {
       const query = `
         query GetUsers($limit: Float, $offset: Float) {
           users(limit: $limit, offset: $offset) {
-            id
-            name
-            email
+            records {
+              id
+              name
+              email
+            }
+            totalCount
+            limit
+            offset
           }
         }
       `;
-
       const response = await global.basicUserBasicAppTestRequest().send({
         query,
         variables: { limit: 2, offset: 1 },
       });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.users).toHaveLength(2);
+      expect(response.body.data.users.records).toHaveLength(2);
     });
 
     it('should return 401 without authentication', async () => {
       const query = `
-        query {
-          users {
-            id
-            name
+        query GetUsers($limit: Float, $offset: Float) {
+          users(limit: $limit, offset: $offset) {
+            records {
+              id
+              name
+              email
+              allowedScopes
+            }
+            totalCount
+            limit
+            offset
           }
         }
       `;
@@ -97,10 +113,17 @@ describe('UserResolver GraphQL Endpoints', () => {
 
     it('should return validation error for invalid limit', async () => {
       const query = `
-        query GetUsers($limit: Float) {
-          users(limit: $limit) {
-            id
-            name
+        query GetUsers($limit: Float, $offset: Float) {
+          users(limit: $limit, offset: $offset) {
+            records {
+              id
+              name
+              email
+              allowedScopes
+            }
+            totalCount
+            limit
+            offset
           }
         }
       `;
@@ -119,10 +142,17 @@ describe('UserResolver GraphQL Endpoints', () => {
 
     it('should return validation error for negative offset', async () => {
       const query = `
-        query GetUsers($offset: Float) {
-          users(offset: $offset) {
-            id
-            name
+        query GetUsers($limit: Float, $offset: Float) {
+          users(limit: $limit, offset: $offset) {
+            records {
+              id
+              name
+              email
+              allowedScopes
+            }
+            totalCount
+            limit
+            offset
           }
         }
       `;
