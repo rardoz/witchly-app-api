@@ -10,13 +10,14 @@ import {
 import {
   CreateTarotCardResponse,
   DeleteTarotCardResponse,
+  TarotCardsResponse,
   TarotCardType,
   UpdateTarotCardResponse,
 } from '../types/TarotTypes';
 
 @Resolver(() => TarotCardType)
 export class TarotCardResolver {
-  @Query(() => [TarotCardType])
+  @Query(() => TarotCardsResponse)
   async tarotCards(
     @Ctx() context: GraphQLContext,
     @Arg('tarotDeckId', () => ID) tarotDeckId: string,
@@ -25,7 +26,7 @@ export class TarotCardResolver {
     limit: number = 10,
     @Arg('offset', () => Int, { nullable: true, defaultValue: 0 })
     offset: number = 0
-  ): Promise<TarotCardType[]> {
+  ): Promise<TarotCardsResponse> {
     context.hasUserReadAppReadScope(context);
 
     // Validate pagination parameters
@@ -52,15 +53,23 @@ export class TarotCardResolver {
       filter.status = status;
     }
 
-    const cards = await TarotCard.find(filter)
-      .sort({ createdAt: -1 })
-      .skip(offset)
-      .limit(limit)
-      .populate('primaryAsset')
-      .populate('user')
-      .populate('tarotDeck');
+    const [cards, totalCount] = await Promise.all([
+      TarotCard.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(offset)
+        .limit(limit)
+        .populate('primaryAsset')
+        .populate('user')
+        .populate('tarotDeck'),
+      TarotCard.countDocuments(filter),
+    ]);
 
-    return cards as unknown as TarotCardType[];
+    return {
+      records: cards as unknown as TarotCardType[],
+      totalCount,
+      limit,
+      offset,
+    };
   }
 
   @Query(() => TarotCardType)

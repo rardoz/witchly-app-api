@@ -72,164 +72,130 @@ describe('TarotCardResolver GraphQL Endpoints', () => {
   });
 
   describe('Query: tarotCards', () => {
-    it('should return all tarot cards for a deck without status filter', async () => {
-      const query = `
-        query {
-          tarotCards(tarotDeckId: "${testDeckId}") {
-            _id
-            name
-            tarotCardNumber
-            primaryAsset {
-              s3Key
-            }
-            description
-            locale
-            meta
-            status
-            user {
-              id
-              handle
-            }
-            tarotDeck {
-                _id
-            }
+    const query = `
+        query GetTarotCards($tarotDeckId: ID!, $status: String, $limit: Int, $offset: Int) {
+          tarotCards(tarotDeckId: $tarotDeckId, status: $status, limit: $limit, offset: $offset) {
+              records {
+                  _id
+                  name
+                  tarotCardNumber
+                  primaryAsset {
+                      id
+                      s3Key
+                  }
+                  description
+                  locale
+                  meta
+                  status
+                  user {
+                      id
+                      handle
+                  }
+                  tarotDeck {
+                      _id
+                      name
+                  }
+                  createdAt
+                  updatedAt
+              }
+              totalCount
+              limit
+              offset
           }
-        }
+      }
       `;
 
+    it('should return all tarot cards for a deck without status filter', async () => {
       const response = await global
         .adminUserAdminAppTestRequest()
-        .send({ query });
+        .send({ query, variables: { tarotDeckId: testDeckId } });
 
       expect(response.status).toBe(200);
       expect(response.body.data.tarotCards).toBeDefined();
-      expect(response.body.data.tarotCards.length).toBeGreaterThanOrEqual(4); // All cards regardless of status
+      expect(
+        response.body.data.tarotCards.records.length
+      ).toBeGreaterThanOrEqual(4); // All cards regardless of status
 
-      const cards = response.body.data.tarotCards;
+      const cards = response.body.data.tarotCards.records;
       expect(cards[0]).toHaveProperty('name');
       expect(cards[0]).toHaveProperty('tarotCardNumber');
       expect(cards[0]).toHaveProperty('description');
       expect(cards[0]).toHaveProperty('status');
+      expect(response.body.data.tarotCards.totalCount).toBeGreaterThan(1);
+      expect(response.body.data.tarotCards.limit).toBe(10);
+      expect(response.body.data.tarotCards.offset).toBe(0);
     });
 
     it('should return only active tarot cards when status filter is applied', async () => {
-      const query = `
-        query {
-          tarotCards(tarotDeckId: "${testDeckId}", status: "active") {
-            _id
-            name
-            tarotCardNumber
-            status
-          }
-        }
-      `;
+      const variables = { tarotDeckId: testDeckId, status: 'active' };
 
       const response = await global
         .adminUserAdminAppTestRequest()
-        .send({ query });
-
+        .send({ query, variables });
       expect(response.status).toBe(200);
       expect(response.body.data.tarotCards).toBeDefined();
-      expect(response.body.data.tarotCards).toHaveLength(2); // Only active cards
+      expect(response.body.data.tarotCards.records).toHaveLength(2); // Only active cards
 
-      const cards = response.body.data.tarotCards;
+      const cards = response.body.data.tarotCards.records;
       cards.forEach((card: { status: string }) => {
         expect(card.status).toBe('active');
       });
     });
 
     it('should return paused cards when status filter is paused', async () => {
-      const query = `
-        query {
-          tarotCards(tarotDeckId: "${testDeckId}", status: "paused") {
-            _id
-            name
-            status
-          }
-        }
-      `;
+      const variables = { tarotDeckId: testDeckId, status: 'paused' };
 
       const response = await global
         .adminUserAdminAppTestRequest()
-        .send({ query });
-
+        .send({ query, variables });
       expect(response.status).toBe(200);
-      expect(response.body.data.tarotCards).toHaveLength(1);
-      expect(response.body.data.tarotCards[0].status).toBe('paused');
-      expect(response.body.data.tarotCards[0].name).toBe('The High Priestess');
+      expect(response.body.data.tarotCards.records).toHaveLength(1);
+      expect(response.body.data.tarotCards.records[0].status).toBe('paused');
+      expect(response.body.data.tarotCards.records[0].name).toBe(
+        'The High Priestess'
+      );
     });
 
     it('should return deleted cards when status filter is deleted', async () => {
-      const query = `
-        query {
-          tarotCards(tarotDeckId: "${testDeckId}", status: "deleted") {
-            _id
-            name
-            status
-          }
-        }
-      `;
+      const variables = { tarotDeckId: testDeckId, status: 'deleted' };
 
       const response = await global
         .adminUserAdminAppTestRequest()
-        .send({ query });
-
+        .send({ query, variables });
       expect(response.status).toBe(200);
-      expect(response.body.data.tarotCards).toHaveLength(1);
-      expect(response.body.data.tarotCards[0].status).toBe('deleted');
-      expect(response.body.data.tarotCards[0].name).toBe('The Empress');
+      expect(response.body.data.tarotCards.records).toHaveLength(1);
+      expect(response.body.data.tarotCards.records[0].status).toBe('deleted');
+      expect(response.body.data.tarotCards.records[0].name).toBe('The Empress');
     });
 
     it('should respect pagination parameters', async () => {
-      const query = `
-        query {
-          tarotCards(tarotDeckId: "${testDeckId}", limit: 2, offset: 0) {
-            _id
-            name
-          }
-        }
-      `;
+      const variables = { tarotDeckId: testDeckId, limit: 2, offset: 0 };
 
       const response = await global
         .adminUserAdminAppTestRequest()
-        .send({ query });
-
+        .send({ query, variables });
       expect(response.status).toBe(200);
-      expect(response.body.data.tarotCards).toHaveLength(2);
+      expect(response.body.data.tarotCards.records).toHaveLength(2);
     });
 
     it('should handle offset pagination', async () => {
-      const query = `
-        query {
-          tarotCards(tarotDeckId: "${testDeckId}", limit: 2, offset: 2) {
-            _id
-            name
-          }
-        }
-      `;
+      const variables = { tarotDeckId: testDeckId, limit: 2, offset: 2 };
 
       const response = await global
         .adminUserAdminAppTestRequest()
-        .send({ query });
-
+        .send({ query, variables });
       expect(response.status).toBe(200);
-      expect(response.body.data.tarotCards.length).toBeLessThanOrEqual(2);
+      expect(response.body.data.tarotCards.records.length).toBeLessThanOrEqual(
+        2
+      );
     });
 
     it('should reject invalid limit values', async () => {
-      const query = `
-        query {
-          tarotCards(tarotDeckId: "${testDeckId}", limit: 101) {
-            _id
-            name
-          }
-        }
-      `;
+      const variables = { tarotDeckId: testDeckId, limit: 101 };
 
       const response = await global
         .adminUserAdminAppTestRequest()
-        .send({ query });
-
+        .send({ query, variables });
       expect(response.status).toBe(400);
       expect(response.body.errors[0].extensions.code).toBe('VALIDATION_ERROR');
       expect(response.body.errors[0].message).toContain(
@@ -238,19 +204,11 @@ describe('TarotCardResolver GraphQL Endpoints', () => {
     });
 
     it('should reject negative offset values', async () => {
-      const query = `
-        query {
-          tarotCards(tarotDeckId: "${testDeckId}", offset: -1) {
-            _id
-            name
-          }
-        }
-      `;
+      const variables = { tarotDeckId: testDeckId, offset: -1 };
 
       const response = await global
         .adminUserAdminAppTestRequest()
-        .send({ query });
-
+        .send({ query, variables });
       expect(response.status).toBe(400);
       expect(response.body.errors[0].extensions.code).toBe('VALIDATION_ERROR');
       expect(response.body.errors[0].message).toContain(
@@ -259,16 +217,11 @@ describe('TarotCardResolver GraphQL Endpoints', () => {
     });
 
     it('should reject unauthorized requests', async () => {
-      const query = `
-        query {
-          tarotCards(tarotDeckId: "${testDeckId}") {
-            _id
-            name
-          }
-        }
-      `;
+      const variables = { tarotDeckId: testDeckId };
 
-      const response = await testRequest.post('/graphql').send({ query });
+      const response = await testRequest
+        .post('/graphql')
+        .send({ query, variables });
 
       expect(response.status).toBe(401);
       expect(response.body.errors[0].extensions.code).toBe('UNAUTHORIZED');

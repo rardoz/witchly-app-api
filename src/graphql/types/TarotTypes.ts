@@ -169,3 +169,18 @@ export class TarotDecksResponse {
   @Field(() => Number)
   offset: number;
 }
+
+@ObjectType()
+export class TarotCardsResponse {
+  @Field(() => [TarotCardType])
+  records: TarotCardType[];
+
+  @Field(() => Number)
+  totalCount: number;
+
+  @Field(() => Number)
+  limit: number;
+
+  @Field(() => Number)
+  offset: number;
+}
