@@ -1733,7 +1733,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "query GetTarotCard($id: ID!) {\n    tarotCard(id: $id) {\n        _id\n        name\n        tarotCardNumber\n        primaryAsset {\n            id\n            s3Key\n        }\n        description\n        locale\n        meta\n        status\n        user {\n            id\n            handle\n        }\n        tarotDeck {\n             _id\n                    name\n                    locale\n                    user {\n                        id\n                        handle\n                        name\n                    }\n                    primaryAsset { id, publicUrl }\n                    cardBackgroundAsset { id, publicUrl }\n                    primaryColor\n                    description\n                    author\n                    meta\n                    layoutType\n                    layoutCount\n                    status\n                    createdAt\n                    updatedAt\n        }\n        createdAt\n        updatedAt\n    }\n}",
-								"variables": "{\n    \"id\": \"6958295213f54601f3d307f4\"\n}"
+								"variables": "{\n    \"id\": \"69582d71269b24a6a95268e3\"\n}"
 							}
 						},
 						"url": {
