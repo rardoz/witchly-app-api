@@ -1460,7 +1460,7 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "query GetTarotDecks($status: String, $limit: Int, $offset: Int) {\n    tarotDecks(status: $status, limit: $limit, offset: $offset) {\n        records {\n            _id\n            name\n            locale\n            user {\n                id\n                handle\n            }\n            primaryAsset { id, publicUrl }\n            cardBackgroundAsset { id, publicUrl }\n            primaryColor\n            description\n            author\n            meta\n            layoutType\n            layoutCount\n            status\n            createdAt\n            updatedAt\n        }\n        totalCount\n        limit\n        offset\n    }\n}",
-								"variables": "{\n    \n    \"limit\": 10,\n    \"offset\": 0\n}"
+								"variables": "{\n    \"status\": \"active\",\n    \"locale\": null,\n    \"limit\": 10,\n    \"offset\": 0\n}"
 							}
 						},
 						"url": {
