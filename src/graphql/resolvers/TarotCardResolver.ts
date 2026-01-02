@@ -60,7 +60,23 @@ export class TarotCardResolver {
         .limit(limit)
         .populate('primaryAsset')
         .populate('user')
-        .populate('tarotDeck'),
+        .populate({
+          path: 'tarotDeck',
+          populate: [
+            {
+              path: 'user',
+              model: 'User',
+            },
+            {
+              path: 'primaryAsset',
+              model: 'Asset',
+            },
+            {
+              path: 'cardBackgroundAsset',
+              model: 'Asset',
+            },
+          ],
+        }),
       TarotCard.countDocuments(filter),
     ]);
 
@@ -82,7 +98,23 @@ export class TarotCardResolver {
     const card = await TarotCard.findById(id)
       .populate('primaryAsset')
       .populate('user')
-      .populate('tarotDeck');
+      .populate({
+        path: 'tarotDeck',
+        populate: [
+          {
+            path: 'user',
+            model: 'User',
+          },
+          {
+            path: 'primaryAsset',
+            model: 'Asset',
+          },
+          {
+            path: 'cardBackgroundAsset',
+            model: 'Asset',
+          },
+        ],
+      });
 
     if (!card) {
       throw new NotFoundError('Tarot card not found');
@@ -124,7 +156,23 @@ export class TarotCardResolver {
       });
 
       await card.save();
-      await card.populate('tarotDeck');
+      await card.populate({
+        path: 'tarotDeck',
+        populate: [
+          {
+            path: 'user',
+            model: 'User',
+          },
+          {
+            path: 'primaryAsset',
+            model: 'Asset',
+          },
+          {
+            path: 'cardBackgroundAsset',
+            model: 'Asset',
+          },
+        ],
+      });
       await card.populate('primaryAsset');
       await card.populate('user');
 
@@ -169,8 +217,13 @@ export class TarotCardResolver {
       if (input.name !== undefined) card.name = input.name;
       if (input.tarotCardNumber !== undefined)
         card.tarotCardNumber = input.tarotCardNumber;
-      if (input.primaryAsset !== undefined)
-        card.primaryAsset = new Types.ObjectId(input.primaryAsset);
+      if (input.primaryAsset !== undefined) {
+        if (input.primaryAsset) {
+          card.primaryAsset = new Types.ObjectId(input.primaryAsset);
+        } else {
+          card.primaryAsset = null;
+        }
+      }
       if (input.description !== undefined) card.description = input.description;
       if (input.locale !== undefined) card.locale = input.locale;
       if (input.meta !== undefined) card.meta = input.meta;
@@ -183,7 +236,23 @@ export class TarotCardResolver {
       await card.save();
       await card.populate('primaryAsset');
       await card.populate('user');
-      await card.populate('tarotDeck');
+      await card.populate({
+        path: 'tarotDeck',
+        populate: [
+          {
+            path: 'user',
+            model: 'User',
+          },
+          {
+            path: 'primaryAsset',
+            model: 'Asset',
+          },
+          {
+            path: 'cardBackgroundAsset',
+            model: 'Asset',
+          },
+        ],
+      });
 
       return {
         card: card as unknown as TarotCardType,

@@ -3,7 +3,7 @@ import { type Document, model, Schema, Types } from 'mongoose';
 export interface ITarotCard extends Document {
   name: string;
   tarotCardNumber?: string;
-  primaryAsset?: Types.ObjectId;
+  primaryAsset?: Types.ObjectId | null;
   description?: string;
   locale?: string;
   meta?: string[];
