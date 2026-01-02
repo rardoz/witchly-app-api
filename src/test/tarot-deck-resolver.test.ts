@@ -52,34 +52,36 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
   });
 
   describe('Query: tarotDecks', () => {
-    it('should return active tarot decks by default', async () => {
-      const query = `
-        query {
-          tarotDecks(status: "active") {
-            _id
-            name
-            locale
-            primaryAsset {
-              s3Key
-            }
-            cardBackgroundAsset {
-              s3Key
-            }
-            user {
-              id
-              handle
-            }
-            primaryColor
-            description
-            author
-            meta
-            layoutType
-            layoutCount
-            status
+    const query = `
+        query GetTarotDecks($status: String, $locale: String, $limit: Int, $offset: Int) {
+          tarotDecks(status: $status, locale: $locale, limit: $limit, offset: $offset) {
+              records {
+                  _id
+                  name
+                  locale
+                  user {
+                      id
+                      handle
+                  }
+                  primaryAsset { id, publicUrl }
+                  cardBackgroundAsset { id, publicUrl }
+                  primaryColor
+                  description
+                  author
+                  meta
+                  layoutType
+                  layoutCount
+                  status
+                  createdAt
+                  updatedAt
+              }
+              totalCount
+              limit
+              offset
           }
-        }
+      }
       `;
-
+    it('should return all tarot decks by default', async () => {
       const response = await global
         .adminUserAdminAppTestRequest()
         .send({ query });
@@ -88,64 +90,39 @@ describe('TarotDeckResolver GraphQL Endpoints', () => {
       expect(response.body.data.tarotDecks).toBeDefined();
 
       const decks = response.body.data.tarotDecks;
-      expect(decks[0].status).toBe('active');
 
       // Check that all required fields are present
-      expect(decks[0]).toHaveProperty('layoutType');
-      expect(decks[0]).toHaveProperty('layoutCount');
-      expect(decks[0]).toHaveProperty('status');
+      expect(decks.records[0]).toHaveProperty('layoutType');
+      expect(decks.records[0]).toHaveProperty('layoutCount');
+      expect(decks.records[0]).toHaveProperty('status');
+      expect(decks.totalCount).toBeGreaterThan(1);
+      expect(decks.limit).toBe(10);
+      expect(decks.offset).toBe(0);
     });
 
     it('should return paused decks when status is paused', async () => {
-      const query = `
-        query {
-          tarotDecks(status: "paused") {
-            _id
-            locale
-            name
-            status
-          }
-        }
-      `;
       const response = await global
         .adminUserAdminAppTestRequest()
-        .send({ query });
+        .send({ query, variables: { status: 'paused' } });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.tarotDecks).toHaveLength(2); // Two paused decks
-      expect(response.body.data.tarotDecks[0].status).toBe('paused');
+      expect(response.body.data.tarotDecks.records).toHaveLength(2); // Two paused decks
+      expect(response.body.data.tarotDecks.records[0].status).toBe('paused');
+      expect(response.body.data.tarotDecks.totalCount).toBe(2);
     });
 
     it('should respect pagination parameters', async () => {
-      const query = `
-        query {
-          tarotDecks(limit: 1, offset: 0) {
-            _id
-            name
-            locale
-          }
-        }
-      `;
+      const variables = { limit: 1, offset: 0 };
 
       const response = await global
         .adminUserAdminAppTestRequest()
-        .send({ query });
-
+        .send({ query, variables });
       expect(response.status).toBe(200);
-      expect(response.body.data.tarotDecks).toHaveLength(1);
+      expect(response.body.data.tarotDecks.records).toHaveLength(1);
+      expect(response.body.data.tarotDecks.totalCount).toBeGreaterThan(1);
     });
 
     it('should reject unauthorized requests', async () => {
-      const query = `
-        query {
-          tarotDecks {
-            _id
-            name
-            locale
-          }
-        }
-      `;
-
       const response = await testRequest.post('/graphql').send({ query });
 
       expect(response.status).toBe(401);

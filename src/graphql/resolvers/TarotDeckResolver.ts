@@ -14,24 +14,25 @@ import {
 import {
   CreateTarotDeckResponse,
   DeleteTarotDeckResponse,
+  TarotDecksResponse,
   TarotDeckType,
   UpdateTarotDeckResponse,
 } from '../types/TarotTypes';
 
-@Resolver(() => TarotDeckType)
+@Resolver(() => TarotDecksResponse)
 export class TarotDeckResolver {
-  @Query(() => [TarotDeckType])
+  @Query(() => TarotDecksResponse)
   async tarotDecks(
     @Ctx() context: GraphQLContext,
     @Arg('limit', () => Int, { nullable: true, defaultValue: 10 })
     limit: number,
     @Arg('offset', () => Int, { nullable: true, defaultValue: 0 })
     offset: number,
-    @Arg('status', () => String, { nullable: true, defaultValue: 'active' })
+    @Arg('status', () => String, { nullable: true })
     status: 'active' | 'paused' | 'deleted',
     @Arg('locale', () => String, { nullable: true })
     locale: string
-  ): Promise<TarotDeckType[]> {
+  ): Promise<TarotDecksResponse> {
     context.hasUserReadAppReadScope(context);
 
     // Validate pagination parameters
@@ -43,20 +44,26 @@ export class TarotDeckResolver {
       throw new ValidationError('Offset must be non-negative');
     }
 
-    const filter = { status } as { status: string; locale?: string };
-    if (locale) {
-      filter.locale = locale;
-    }
+    const filter: { status?: string; locale?: string } = {};
+    if (locale) filter.locale = locale;
+    if (status) filter.status = status;
 
-    const decks = await TarotDeck.find(filter)
-      .sort({ createdAt: -1 })
-      .skip(offset)
-      .limit(limit)
-      .populate('primaryAsset')
-      .populate('cardBackgroundAsset')
-      .populate('user');
-
-    return decks as unknown as TarotDeckType[];
+    const [decks, totalCount] = await Promise.all([
+      TarotDeck.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(offset)
+        .limit(limit)
+        .populate('primaryAsset')
+        .populate('cardBackgroundAsset')
+        .populate('user'),
+      TarotDeck.countDocuments(filter),
+    ]);
+    return {
+      records: decks as unknown as TarotDeckType[],
+      totalCount,
+      limit,
+      offset,
+    };
   }
 
   @Query(() => TarotDeckType)
@@ -193,12 +200,22 @@ export class TarotDeckResolver {
       // Update only provided fields
       if (input.name !== undefined) deck.name = input.name;
       if (input.locale !== undefined) deck.locale = input.locale;
-      if (input.primaryAsset !== undefined)
-        deck.primaryAsset = new Types.ObjectId(input.primaryAsset);
-      if (input.cardBackgroundAsset !== undefined)
-        deck.cardBackgroundAsset = new Types.ObjectId(
-          input.cardBackgroundAsset
-        );
+      if (input.primaryAsset !== undefined) {
+        if (!input.primaryAsset) {
+          deck.primaryAsset = null;
+        } else {
+          deck.primaryAsset = new Types.ObjectId(input.primaryAsset);
+        }
+      }
+      if (input.cardBackgroundAsset !== undefined) {
+        if (!input.cardBackgroundAsset) {
+          deck.cardBackgroundAsset = null;
+        } else {
+          deck.cardBackgroundAsset = new Types.ObjectId(
+            input.cardBackgroundAsset
+          );
+        }
+      }
       if (input.primaryColor !== undefined)
         deck.primaryColor = input.primaryColor;
       if (input.description !== undefined) deck.description = input.description;

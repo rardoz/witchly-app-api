@@ -137,9 +137,17 @@ export class UserResolver {
       throw new UnauthorizedError('Users can only update their own accounts');
     }
 
-    const user = await UserModel.findByIdAndUpdate(id, input, {
-      new: true,
-    }).populate('profileAsset backdropAsset');
+    const user = await UserModel.findByIdAndUpdate(
+      id,
+      {
+        ...input,
+        profileAsset: input.profileAsset || null,
+        backdropAsset: input.backdropAsset || null,
+      },
+      {
+        new: true,
+      }
+    ).populate('profileAsset backdropAsset');
     if (!user) {
       throw new NotFoundError('User not found');
     }

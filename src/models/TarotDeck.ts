@@ -2,8 +2,8 @@ import { type Document, model, Schema, Types } from 'mongoose';
 
 export interface ITarotDeck extends Document {
   name?: string;
-  primaryAsset?: Types.ObjectId;
-  cardBackgroundAsset?: Types.ObjectId;
+  primaryAsset?: Types.ObjectId | null;
+  cardBackgroundAsset?: Types.ObjectId | null;
   user?: Types.ObjectId;
   primaryColor?: string;
   description?: string;

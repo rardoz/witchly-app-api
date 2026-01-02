@@ -154,3 +154,18 @@ export class DeleteTarotCardResponse {
   @Field()
   message!: string;
 }
+
+@ObjectType()
+export class TarotDecksResponse {
+  @Field(() => [TarotDeckType])
+  records: TarotDeckType[];
+
+  @Field(() => Number)
+  totalCount: number;
+
+  @Field(() => Number)
+  limit: number;
+
+  @Field(() => Number)
+  offset: number;
+}
