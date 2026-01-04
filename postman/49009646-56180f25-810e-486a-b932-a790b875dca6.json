@@ -1960,8 +1960,15 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetHoroscopeSign($id: ID) {\n  getHoroscopeSign(id: $id) {\n        _id\n        sign\n        locale\n        description\n        signDateStart\n        signDateEnd\n        asset {\n            id\n            publicUrl\n        }\n        title\n        createdAt\n        updatedAt\n    }\n}",
+								"variables": "{\n    \"id\": \"\"\n}"
+							}
+						}
 					},
 					"response": []
 				},
