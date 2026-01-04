@@ -6,16 +6,22 @@ export class CreateHoroscopeSignInput {
   sign!: string;
 
   @Field()
+  signLocal!: string;
+
+  @Field()
   locale!: string;
+
+  @Field({ nullable: true, defaultValue: 'active' })
+  status: 'active' | 'paused' | 'deleted';
 
   @Field({ nullable: true })
   description?: string;
 
   @Field({ nullable: true })
-  signDateStart?: Date;
+  signDateStart?: number;
 
   @Field({ nullable: true })
-  signDateEnd?: Date;
+  signDateEnd?: number;
 
   @Field({ nullable: true })
   asset?: string;
@@ -30,16 +36,22 @@ export class UpdateHoroscopeSignInput {
   sign?: string;
 
   @Field({ nullable: true })
+  status?: 'active' | 'paused' | 'deleted';
+
+  @Field({ nullable: true })
+  signLocal?: string;
+
+  @Field({ nullable: true })
   locale?: string;
 
   @Field({ nullable: true })
   description?: string;
 
   @Field({ nullable: true })
-  signDateStart?: Date;
+  signDateStart?: number;
 
   @Field({ nullable: true })
-  signDateEnd?: Date;
+  signDateEnd?: number;
 
   @Field({ nullable: true })
   asset?: string;

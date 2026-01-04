@@ -198,6 +198,10 @@ export class HoroscopeResolver {
     @Ctx() context: GraphQLContext,
     @Arg('locale', () => String, { nullable: true }) locale?: string,
     @Arg('sign', () => String, { nullable: true }) sign?: string,
+    @Arg('status', () => String, { nullable: true }) status?:
+      | 'active'
+      | 'paused'
+      | 'deleted',
     @Arg('limit', () => Int, { nullable: true, defaultValue: 10 })
     limit: number = 10,
     @Arg('offset', () => Int, { nullable: true, defaultValue: 0 })
@@ -212,6 +216,7 @@ export class HoroscopeResolver {
     }
     const filter: Record<string, unknown> = {};
     if (locale) filter.locale = locale;
+    if (status) filter.status = status;
     if (sign) filter.sign = { $regex: sign, $options: 'i' };
 
     const [signs, totalCount] = await Promise.all([
@@ -229,6 +234,19 @@ export class HoroscopeResolver {
       limit,
       offset,
     };
+  }
+
+  @Query(() => HoroscopeSignType)
+  async getHoroscopeSign(
+    @Ctx() context: GraphQLContext,
+    @Arg('id', () => ID) id: string
+  ): Promise<HoroscopeSignType> {
+    context.hasUserReadAppReadScope(context);
+    const signDoc = await HoroscopeSign.findById(id).populate('asset');
+    if (!signDoc) {
+      throw new NotFoundError('Horoscope sign not found');
+    }
+    return signDoc as unknown as HoroscopeSignType;
   }
 
   @Mutation(() => DeleteHoroscopeSignResponse)
@@ -278,6 +296,8 @@ export class HoroscopeResolver {
     }
     try {
       if (input.sign !== undefined) signDoc.sign = input.sign;
+      if (input.signLocal !== undefined) signDoc.signLocal = input.signLocal;
+      if (input.status !== undefined) signDoc.status = input.status;
       if (input.locale !== undefined) signDoc.locale = input.locale;
       if (input.description !== undefined)
         signDoc.description = input.description;

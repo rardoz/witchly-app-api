@@ -10,16 +10,22 @@ export class HoroscopeSignType {
   sign!: string;
 
   @Field()
+  status!: 'active' | 'paused' | 'deleted';
+
+  @Field()
+  signLocal!: string;
+
+  @Field()
   locale!: string;
 
   @Field({ nullable: true })
   description?: string;
 
   @Field({ nullable: true })
-  signDateStart?: Date;
+  signDateStart?: number;
 
   @Field({ nullable: true })
-  signDateEnd?: Date;
+  signDateEnd?: number;
 
   @Field({ nullable: true })
   imageAsset?: string;

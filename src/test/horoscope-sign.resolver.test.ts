@@ -4,7 +4,7 @@ describe('HoroscopeSignResolver', () => {
   const testLocale = 'en_US';
   const testSign = 'aries';
 
-  afterAll(async () => {
+  afterEach(async () => {
     await HoroscopeSign.deleteMany({});
   });
 
@@ -17,6 +17,8 @@ describe('HoroscopeSignResolver', () => {
           sign {
             _id
             sign
+            signLocal
+            status
             locale
             description
             signDateStart
@@ -34,12 +36,14 @@ describe('HoroscopeSignResolver', () => {
     const variables = {
       input: {
         sign: testSign,
+        signLocal: 'Aries',
         locale: locale,
         description: 'The first sign of the zodiac',
-        signDateStart: '2025-03-21T00:00:00.000Z',
-        signDateEnd: '2025-04-19T00:00:00.000Z',
+        signDateStart: 123,
+        signDateEnd: 456,
         asset: '64b8f0f2c2a1f2a5d6e8b123',
         title: 'Aries the Ram',
+        status: 'active',
       },
     };
     const res = await global
@@ -55,7 +59,7 @@ describe('HoroscopeSignResolver', () => {
   });
 
   it('should get horoscope signs by locale', async () => {
-    await _createHoroscope('en_CA');
+    await _createHoroscope('en_US');
     const query = `
       query GetHoroscopeSigns($locale: String!) {
         getHoroscopeSigns(locale: $locale) {
@@ -63,6 +67,7 @@ describe('HoroscopeSignResolver', () => {
             _id
             sign
             locale
+            status
             description
             title
           }
@@ -117,6 +122,38 @@ describe('HoroscopeSignResolver', () => {
     expect(res.body.data.updateHoroscopeSign.sign.title).toBe(
       'Updated Aries Title'
     );
+  });
+
+  it('should get a horoscope sign by ID', async () => {
+    const data = await _createHoroscope('en_US');
+    const createdSignId = data.createHoroscopeSign.sign._id;
+    const query = `
+      query GetHoroscopeSign($id: ID!) {
+        getHoroscopeSign(id: $id) {
+          _id
+          sign
+          signLocal
+          locale
+          description
+          signDateStart
+          signDateEnd
+          asset {
+              id
+              publicUrl
+          }
+          title
+          createdAt
+          updatedAt
+        }
+      }
+    `;
+    const variables = { id: createdSignId };
+    const res = await global
+      .adminUserAdminAppTestRequest()
+      .send({ query, variables });
+    expect(res.body.data.getHoroscopeSign._id).toBe(createdSignId);
+    expect(res.body.data.getHoroscopeSign.sign).toBe(testSign);
+    expect(res.body.data.getHoroscopeSign.locale).toBe('en_US');
   });
 
   it('should delete a horoscope sign', async () => {
