@@ -1936,7 +1936,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetHoroscopeSigns($locale: String, $sign: String, $limit: Int, $offset: Int) {\n  getHoroscopeSigns(locale: $locale, sign: $sign, limit: $limit, offset: $offset) {\n    _id\n    sign\n    locale\n    description\n    signDateStart\n    signDateEnd\n    asset {\n        id\n        s3Key\n    }\n    title\n    createdAt\n    updatedAt\n  }\n}",
+								"query": "query GetHoroscopeSigns($locale: String, $sign: String, $limit: Int, $offset: Int) {\n  getHoroscopeSigns(locale: $locale, sign: $sign, limit: $limit, offset: $offset) {\n    records {\n        _id\n        sign\n        locale\n        description\n        signDateStart\n        signDateEnd\n        asset {\n            id\n            s3Key\n        }\n        title\n        createdAt\n        updatedAt\n    }\n    totalCount\n    limit\n    offset\n  }\n}",
 								"variables": "{\n  \"locale\": null,\n  \"sign\": null,\n  \"limit\": 1,\n  \"offset\": 0\n}"
 							}
 						},
