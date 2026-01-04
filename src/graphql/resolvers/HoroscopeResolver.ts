@@ -18,6 +18,7 @@ import {
 import {
   CreateHoroscopeSignResponse,
   DeleteHoroscopeSignResponse,
+  HoroscopeSignsResponse,
   HoroscopeSignType,
   UpdateHoroscopeSignResponse,
 } from '../types/HoroscopeSignTypes';
@@ -192,7 +193,7 @@ export class HoroscopeResolver {
     }
   }
 
-  @Query(() => [HoroscopeSignType])
+  @Query(() => HoroscopeSignsResponse)
   async getHoroscopeSigns(
     @Ctx() context: GraphQLContext,
     @Arg('locale', () => String, { nullable: true }) locale?: string,
@@ -201,7 +202,7 @@ export class HoroscopeResolver {
     limit: number = 10,
     @Arg('offset', () => Int, { nullable: true, defaultValue: 0 })
     offset: number = 0
-  ): Promise<HoroscopeSignType[]> {
+  ): Promise<HoroscopeSignsResponse> {
     context.hasUserReadAppReadScope(context);
     if (limit < 1 || limit > 100) {
       throw new ValidationError('Limit must be between 1 and 100');
@@ -211,13 +212,23 @@ export class HoroscopeResolver {
     }
     const filter: Record<string, unknown> = {};
     if (locale) filter.locale = locale;
-    if (sign) filter.sign = sign;
-    const signs = await HoroscopeSign.find(filter)
-      .sort({ sign: 1 })
-      .skip(offset)
-      .limit(limit)
-      .populate('asset');
-    return signs as unknown as HoroscopeSignType[];
+    if (sign) filter.sign = { $regex: sign, $options: 'i' };
+
+    const [signs, totalCount] = await Promise.all([
+      await HoroscopeSign.find(filter)
+        .sort({ sign: 1 })
+        .skip(offset)
+        .limit(limit)
+        .populate('asset'),
+      HoroscopeSign.countDocuments(filter),
+    ]);
+
+    return {
+      records: signs as unknown as HoroscopeSignType[],
+      totalCount,
+      limit,
+      offset,
+    };
   }
 
   @Mutation(() => DeleteHoroscopeSignResponse)

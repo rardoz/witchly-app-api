@@ -59,11 +59,16 @@ describe('HoroscopeSignResolver', () => {
     const query = `
       query GetHoroscopeSigns($locale: String!) {
         getHoroscopeSigns(locale: $locale) {
-          _id
-          sign
-          locale
-          description
-          title
+          records {
+            _id
+            sign
+            locale
+            description
+            title
+          }
+          totalCount
+          limit
+          offset
         }
       }
     `;
@@ -71,8 +76,11 @@ describe('HoroscopeSignResolver', () => {
     const res = await global
       .adminUserAdminAppTestRequest()
       .send({ query, variables });
-    expect(res.body.data.getHoroscopeSigns.length).toBeGreaterThan(0);
-    expect(res.body.data.getHoroscopeSigns[0].sign).toBe(testSign);
+    expect(res.body.data.getHoroscopeSigns.records.length).toBeGreaterThan(0);
+    expect(res.body.data.getHoroscopeSigns.records[0].sign).toBe(testSign);
+    expect(res.body.data.getHoroscopeSigns.totalCount).toBeGreaterThan(0);
+    expect(res.body.data.getHoroscopeSigns.limit).toBe(10);
+    expect(res.body.data.getHoroscopeSigns.offset).toBe(0);
   });
 
   it('should update a horoscope sign', async () => {

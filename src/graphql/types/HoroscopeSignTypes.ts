@@ -69,3 +69,18 @@ export class DeleteHoroscopeSignResponse {
   @Field()
   message!: string;
 }
+
+@ObjectType()
+export class HoroscopeSignsResponse {
+  @Field(() => [HoroscopeSignType])
+  records: HoroscopeSignType[];
+
+  @Field(() => Number)
+  totalCount: number;
+
+  @Field(() => Number)
+  limit: number;
+
+  @Field(() => Number)
+  offset: number;
+}
