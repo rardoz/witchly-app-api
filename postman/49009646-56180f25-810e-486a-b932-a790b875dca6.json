@@ -1976,7 +1976,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetHoroscopeSign($id: ID!) {\n  getHoroscopeSign(id: $id) {\n        _id\n        sign\n        locale\n        description\n        signDateStart\n        signDateEnd\n        asset {\n            id\n            publicUrl\n        }\n        title\n        createdAt\n        updatedAt\n    }\n}",
+								"query": "query GetHoroscopeSign($id: ID!) {\n  sign(id: $id) {\n        _id\n        sign\n        locale\n        description\n        signDateStart\n        signDateEnd\n        asset {\n            id\n            publicUrl\n        }\n        title\n        createdAt\n        updatedAt\n    }\n}",
 								"variables": "{\n    \"id\": \"68fff469780da321c2a5100e\"\n}"
 							}
 						},
