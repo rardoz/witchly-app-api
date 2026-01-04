@@ -1961,12 +1961,23 @@
 					},
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "graphql",
 							"graphql": {
 								"query": "query GetHoroscopeSign($id: ID!) {\n  getHoroscopeSign(id: $id) {\n        _id\n        sign\n        locale\n        description\n        signDateStart\n        signDateEnd\n        asset {\n            id\n            publicUrl\n        }\n        title\n        createdAt\n        updatedAt\n    }\n}",
-								"variables": "{\n    \"id\": \"\"\n}"
+								"variables": "{\n    \"id\": \"68fff469780da321c2a5100e\"\n}"
 							}
 						},
 						"url": {
