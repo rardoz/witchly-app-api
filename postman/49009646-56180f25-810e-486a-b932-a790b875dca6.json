@@ -2145,6 +2145,44 @@
 					"response": []
 				},
 				{
+					"name": "Get All Horoscopes Copy",
+					"id": "49009646-13e9fd40-0475-4710-baed-91a133754d85",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Session-Token",
+								"value": "{{sessionToken}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetHoroscopes($sign: String, $status: String, $locale: String, $horoscopeDate: DateTimeISO, $limit: Int, $offset: Int) {\n  horoscopes(sign: $sign, status: $status, locale: $locale, horoscopeDate: $horoscopeDate, limit: $limit, offset: $offset) {\n        records {\n            _id\n            sign\n            status\n            locale\n            horoscopeDate\n            horoscopeText\n            user {\n                id\n                handle\n                name\n            }\n            createdAt\n            updatedAt\n        }\n        totalCount\n        limit\n        offset\n    }\n}",
+								"variables": "{\n  \"sign\": \"aries\",\n  \"status\": \"pending\",\n  \"locale\": \"en\",\n  \"horoscopeDate\": \"2025-10-27T00:00:00.000Z\",\n  \"limit\": 10,\n  \"offset\": 0\n}"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						},
+						"description": "Get paginated list of horoscopes filtered by sign/status. Requires read scope."
+					},
+					"response": []
+				},
+				{
 					"name": "Create Horoscope",
 					"id": "49009646-horoscope-create",
 					"protocolProfileBehavior": {
