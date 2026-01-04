@@ -2127,7 +2127,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetHoroscopes($sign: String, $status: String, $limit: Int, $offset: Int) {\n  horoscopes(sign: $sign, status: $status, limit: $limit, offset: $offset) {\n    _id\n    sign\n    status\n    locale\n    horoscopeDate\n    horoscopeText\n    user {\n        id\n        handle\n        name\n    }\n    createdAt\n    updatedAt\n  }\n}",
+								"query": "query GetHoroscopes($sign: String, $status: String, $limit: Int, $offset: Int) {\n  horoscopes(sign: $sign, status: $status, limit: $limit, offset: $offset) {\n        records {\n            _id\n            sign\n            status\n            locale\n            horoscopeDate\n            horoscopeText\n            user {\n                id\n                handle\n                name\n            }\n            createdAt\n            updatedAt\n        }\n        totalCount\n        limit\n        offset\n    }\n}",
 								"variables": "{\n  \"sign\": \"aries\",\n  \"status\": \"pending\",\n  \"limit\": 10,\n  \"offset\": 0\n}"
 							}
 						},
