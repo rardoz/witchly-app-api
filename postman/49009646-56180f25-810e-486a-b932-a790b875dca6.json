@@ -2327,7 +2327,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query GetMoonPhases($locale: String, $status: String, $phase: String, $limit: Float, $offset: Float) {\n  moonPhases(locale: $locale, status: $status, phase: $phase, limit: $limit, offset: $offset) {\n    records {\n        _id\n        phase\n        phaseLocale\n        locale\n        description\n        number\n        moonSign\n        primaryColor\n        status\n        primaryAsset {\n            id\n            publicUrl\n        }\n        backgroundAsset {\n            id\n            publicUrl\n        }\n        user {\n            id\n            handle\n            name\n        }\n        createdAt\n        updatedAt\n    }\n    totalCount\n    limit\n    offset\n  }\n}",
+								"query": "query GetMoonPhases($locale: String, $status: String, $phase: String, $limit: Float, $offset: Float) {\n  moonPhases(locale: $locale, status: $status, phase: $phase, limit: $limit, offset: $offset) {\n    records {\n        _id\n        phase\n        phaseLocale\n        locale\n        description\n        number\n        primaryColor\n        status\n        primaryAsset {\n            id\n            publicUrl\n        }\n        backgroundAsset {\n            id\n            publicUrl\n        }\n        user {\n            id\n            handle\n            name\n        }\n        createdAt\n        updatedAt\n    }\n    totalCount\n    limit\n    offset\n  }\n}",
 								"variables": "{\n  \"locale\": \"en_US\",\n  \"status\": \"active\",\n  \"phase\": \"\",\n  \"limit\": 10,\n  \"offset\": 0\n}"
 							}
 						},
