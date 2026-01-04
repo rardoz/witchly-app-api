@@ -2145,7 +2145,7 @@
 					"response": []
 				},
 				{
-					"name": "Get All Horoscopes Copy",
+					"name": "Get Horoscope",
 					"id": "49009646-13e9fd40-0475-4710-baed-91a133754d85",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
