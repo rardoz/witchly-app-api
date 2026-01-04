@@ -2220,6 +2220,18 @@
 						"description": "Delete a horoscope by ID. Requires write scope AND admin session scope."
 					},
 					"response": []
+				},
+				{
+					"name": "New Request",
+					"id": "49009646-67f28a20-7f2c-47a1-8077-a07a29f9a13b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
 				}
 			],
 			"id": "49009646-horoscopes-section",
