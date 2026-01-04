@@ -2013,8 +2013,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation CreateHoroscopeSign($input: CreateHoroscopeSignInput!) {\n  createHoroscopeSign(input: $input) {\n    success\n    message\n    sign {\n      _id\n      sign\n      signLocal\n      locale\n      description\n      signDateStart\n      signDateEnd\n      imageAsset\n      title\n      createdAt\n      updatedAt\n      asset {\n        id\n        s3Key\n      }\n    }\n  }\n}",
-								"variables": "{\n  \"input\": {\n    \"sign\": \"ariesss\",\n    \"signLocal\": \"aries\",\n    \"status\": \"active\",\n    \"locale\": \"fr\",\n    \"description\": \"The first sign of the zodiac.\",\n    \"signDateStart\": 123,\n    \"signDateEnd\": 321,\n    \"asset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"title\": \"Aries\"\n  }\n}"
+								"query": "mutation CreateHoroscopeSign($input: CreateHoroscopeSignInput!) {\n  createHoroscopeSign(input: $input) {\n    success\n    message\n    sign {\n      _id\n      sign\n      signLocal\n      status\n      locale\n      description\n      signDateStart\n      signDateEnd\n      imageAsset\n      title\n      createdAt\n      updatedAt\n      asset {\n        id\n        s3Key\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"sign\": \"ariessss\",\n    \"signLocal\": \"aries\",\n    \"status\": \"active\",\n    \"locale\": \"fr\",\n    \"description\": \"The first sign of the zodiac.\",\n    \"signDateStart\": 123,\n    \"signDateEnd\": 321,\n    \"asset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"title\": \"Aries\"\n  }\n}"
 							}
 						},
 						"url": {
