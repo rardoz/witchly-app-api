@@ -25,6 +25,7 @@ import {
 import {
   CreateHoroscopeResponse,
   DeleteHoroscopeResponse,
+  HoroscopesResponse,
   HoroscopeType,
   UpdateHoroscopeResponse,
 } from '../types/HoroscopeTypes';
@@ -129,17 +130,31 @@ export class HoroscopeResolver {
     }
   }
 
-  @Query(() => [HoroscopeType])
+  @Query(() => HoroscopeType)
+  async horoscope(
+    @Ctx() context: GraphQLContext,
+    @Arg('id', () => ID) id: string
+  ): Promise<HoroscopeType> {
+    context.hasUserReadAppReadScope(context);
+    const horoscope = await Horoscope.findById(id).populate('user');
+    if (!horoscope) {
+      throw new NotFoundError('Horoscope not found');
+    }
+    return horoscope as unknown as HoroscopeType;
+  }
+
+  @Query(() => HoroscopesResponse)
   async horoscopes(
     @Ctx() context: GraphQLContext,
     @Arg('sign', () => String, { nullable: true }) sign?: string,
     @Arg('horoscopeDate', () => Date, { nullable: true }) horoscopeDate?: Date,
     @Arg('status', () => String, { nullable: true }) status?: string,
+    @Arg('locale', () => String, { nullable: true }) locale?: string,
     @Arg('limit', () => Int, { nullable: true, defaultValue: 10 })
     limit: number = 10,
     @Arg('offset', () => Int, { nullable: true, defaultValue: 0 })
     offset: number = 0
-  ): Promise<HoroscopeType[]> {
+  ): Promise<HoroscopesResponse> {
     context.hasUserReadAppReadScope(context);
     if (limit < 1 || limit > 100) {
       throw new ValidationError('Limit must be between 1 and 100');
@@ -151,12 +166,22 @@ export class HoroscopeResolver {
     if (sign) filter.sign = sign;
     if (horoscopeDate) filter.horoscopeDate = horoscopeDate;
     if (status) filter.status = status;
-    const horoscopes = await Horoscope.find(filter)
-      .sort({ horoscopeDate: -1 })
-      .skip(offset)
-      .limit(limit)
-      .populate('user');
-    return horoscopes as unknown as HoroscopeType[];
+    if (locale) filter.locale = locale;
+
+    const [horoscopes, totalCount] = await Promise.all([
+      Horoscope.find(filter)
+        .sort({ horoscopeDate: -1 })
+        .skip(offset)
+        .limit(limit)
+        .populate('user'),
+      Horoscope.countDocuments(filter),
+    ]);
+    return {
+      records: horoscopes as unknown as HoroscopeType[],
+      totalCount,
+      limit,
+      offset,
+    };
   }
   // --- Horoscope Sign Endpoints ---
 

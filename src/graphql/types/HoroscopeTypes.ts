@@ -64,3 +64,18 @@ export class DeleteHoroscopeResponse {
   @Field()
   message: string;
 }
+
+@ObjectType()
+export class HoroscopesResponse {
+  @Field(() => [HoroscopeType])
+  records: HoroscopeType[];
+
+  @Field(() => Number)
+  totalCount: number;
+
+  @Field(() => Number)
+  limit: number;
+
+  @Field(() => Number)
+  offset: number;
+}
