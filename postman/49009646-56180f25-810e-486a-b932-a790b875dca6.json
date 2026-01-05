@@ -2444,7 +2444,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation UpdateMoonPhase($id: ID!, $input: UpdateMoonPhaseInput!) {\n  updateMoonPhase(id: $id, input: $input) {\n    success\n    message\n    moonPhase {\n      _id\n      phase\n      phaseLocal\n      locale\n      description\n      number\n      moonSign\n      primaryColor\n      status\n      primaryAsset {\n        id\n        s3Key\n      }\n      backgroundAsset {\n        id\n        s3Key\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
+								"query": "mutation UpdateMoonPhase($id: ID!, $input: UpdateMoonPhaseInput!) {\n  updateMoonPhase(id: $id, input: $input) {\n    success\n    message\n    moonPhase {\n      _id\n      phase\n      phaseLocal\n      locale\n      description\n      number\n      primaryColor\n      status\n      primaryAsset {\n        id\n        publicUrl\n      }\n      backgroundAsset {\n        id\n        publicUrl\n      }\n      createdAt\n      updatedAt\n    }\n  }\n}",
 								"variables": "{\n  \"id\": \"6908198a1e8eb8f70efcc461\",\n  \"input\": {\n    \"phase\": \"new moon\",\n    \"phaseLocal\": \"New Moon - Updated\",\n    \"description\": \"Updated description for the new moon phase.\",\n    \"primaryAsset\": \"68ff7ebe04e43ae41ca0fc59\",\n    \"backgroundAsset\": \"68ff7ebe04e43ae41ca0fc59\"\n  }\n}"
 							}
 						},
