@@ -20,19 +20,23 @@ export class CreateMoonPhaseInput {
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
+  phaseLocal?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
   @MaxLength(10000)
   description?: string;
 
   @Field()
   @IsString()
-  @MaxLength(100)
-  name!: string;
+  phase!: string;
 
   @Field({ nullable: true })
   @IsOptional()
   @IsNumber()
   @Min(0)
-  @Max(8)
+  @Max(14)
   number?: number;
 
   @Field({ nullable: true })
@@ -50,11 +54,6 @@ export class CreateMoonPhaseInput {
   @IsString()
   @MaxLength(50)
   primaryColor?: string;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  moonSign?: string;
 
   @Field()
   @IsString()
@@ -73,20 +72,24 @@ export class UpdateMoonPhaseInput {
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
+  phaseLocal?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
   @MaxLength(10000)
   description?: string;
 
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
-  @MaxLength(100)
-  name?: string;
+  phase?: string;
 
   @Field({ nullable: true })
   @IsOptional()
   @IsNumber()
   @Min(0)
-  @Max(8)
+  @Max(14)
   number?: number;
 
   @Field({ nullable: true })
@@ -104,11 +107,6 @@ export class UpdateMoonPhaseInput {
   @IsString()
   @MaxLength(50)
   primaryColor?: string;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  moonSign?: string;
 
   @Field({ nullable: true })
   @IsOptional()

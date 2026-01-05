@@ -14,7 +14,10 @@ export class MoonPhaseType {
   description?: string;
 
   @Field()
-  name!: string;
+  phase!: string;
+
+  @Field({ nullable: true })
+  phaseLocal?: string;
 
   @Field({ nullable: true })
   number?: number;
@@ -30,9 +33,6 @@ export class MoonPhaseType {
 
   @Field(() => User, { nullable: true })
   user?: User;
-
-  @Field({ nullable: true })
-  moonSign?: string;
 
   @Field()
   status!: string;
@@ -75,4 +75,19 @@ export class DeleteMoonPhaseResponse {
 
   @Field()
   message!: string;
+}
+
+@ObjectType()
+export class MoonPhaseResponse {
+  @Field(() => [MoonPhaseType])
+  records: MoonPhaseType[];
+
+  @Field(() => Number)
+  totalCount: number;
+
+  @Field(() => Number)
+  limit: number;
+
+  @Field(() => Number)
+  offset: number;
 }

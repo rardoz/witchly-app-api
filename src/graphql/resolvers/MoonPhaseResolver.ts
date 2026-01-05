@@ -10,22 +10,24 @@ import {
 import {
   CreateMoonPhaseResponse,
   DeleteMoonPhaseResponse,
+  MoonPhaseResponse,
   MoonPhaseType,
   UpdateMoonPhaseResponse,
 } from '../types/MoonPhaseTypes';
 
 @Resolver(() => MoonPhaseType)
 export class MoonPhaseResolver {
-  @Query(() => [MoonPhaseType])
+  @Query(() => MoonPhaseResponse)
   async moonPhases(
     @Ctx() context: GraphQLContext,
     @Arg('locale', () => String, { nullable: true }) locale?: string,
     @Arg('status', () => String, { nullable: true }) status?: string,
+    @Arg('phase', () => String, { nullable: true }) phase?: string,
     @Arg('limit', () => Number, { nullable: true, defaultValue: 10 })
     limit?: number,
     @Arg('offset', () => Number, { nullable: true, defaultValue: 0 })
     offset?: number
-  ): Promise<MoonPhaseType[]> {
+  ): Promise<MoonPhaseResponse> {
     context.hasUserReadAppReadScope(context);
 
     // Validate pagination parameters
@@ -44,6 +46,10 @@ export class MoonPhaseResolver {
       filter.locale = locale;
     }
 
+    if (phase) {
+      filter.phase = phase;
+    }
+
     if (status) {
       if (!['active', 'paused', 'deleted'].includes(status)) {
         throw new ValidationError(
@@ -53,15 +59,23 @@ export class MoonPhaseResolver {
       filter.status = status;
     }
 
-    const moonPhases = await MoonPhase.find(filter)
-      .populate('primaryAsset')
-      .populate('backgroundAsset')
-      .populate('user')
-      .skip(offset || 0)
-      .limit(limit || 10)
-      .sort({ createdAt: -1 });
+    const [moonPhases, totalCount] = await Promise.all([
+      MoonPhase.find(filter)
+        .populate('primaryAsset')
+        .populate('backgroundAsset')
+        .populate('user')
+        .skip(offset || 0)
+        .limit(limit || 10)
+        .sort({ createdAt: -1 }),
+      MoonPhase.countDocuments(filter),
+    ]);
 
-    return moonPhases as unknown as MoonPhaseType[];
+    return {
+      records: moonPhases as unknown as MoonPhaseType[],
+      totalCount,
+      limit: limit || 10,
+      offset: offset || 0,
+    };
   }
 
   @Query(() => MoonPhaseType)
@@ -107,7 +121,7 @@ export class MoonPhaseResolver {
     }
 
     const moonPhaseData: Record<string, unknown> = {
-      name: input.name,
+      phase: input.phase,
       status: input.status,
     };
 
@@ -119,7 +133,7 @@ export class MoonPhaseResolver {
     if (input.backgroundAsset)
       moonPhaseData.backgroundAsset = new Types.ObjectId(input.backgroundAsset);
     if (input.primaryColor) moonPhaseData.primaryColor = input.primaryColor;
-    if (input.moonSign) moonPhaseData.moonSign = input.moonSign;
+    if (input.phaseLocal) moonPhaseData.phaseLocal = input.phaseLocal;
 
     moonPhaseData.user = new Types.ObjectId(context.userId);
 
@@ -168,20 +182,28 @@ export class MoonPhaseResolver {
     }
 
     // Update fields
-    if (input.name !== undefined) moonPhase.name = input.name;
     if (input.locale !== undefined) moonPhase.locale = input.locale;
     if (input.description !== undefined)
       moonPhase.description = input.description;
     if (input.number !== undefined) moonPhase.number = input.number;
     if (input.primaryAsset !== undefined) {
-      moonPhase.primaryAsset = new Types.ObjectId(input.primaryAsset);
+      if (!input.primaryAsset) {
+        moonPhase.primaryAsset = null;
+      } else {
+        moonPhase.primaryAsset = new Types.ObjectId(input.primaryAsset);
+      }
     }
     if (input.backgroundAsset !== undefined) {
-      moonPhase.backgroundAsset = new Types.ObjectId(input.backgroundAsset);
+      if (!input.backgroundAsset) {
+        moonPhase.backgroundAsset = null;
+      } else {
+        moonPhase.backgroundAsset = new Types.ObjectId(input.backgroundAsset);
+      }
     }
     if (input.primaryColor !== undefined)
       moonPhase.primaryColor = input.primaryColor;
-    if (input.moonSign !== undefined) moonPhase.moonSign = input.moonSign;
+    if (input.phase !== undefined) moonPhase.phase = input.phase;
+    if (input.phaseLocal !== undefined) moonPhase.phaseLocal = input.phaseLocal;
     if (input.status !== undefined)
       moonPhase.status = input.status as 'active' | 'paused' | 'deleted';
 

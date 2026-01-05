@@ -2,7 +2,40 @@ import { MoonPhase } from '../models/MoonPhase';
 
 describe('MoonPhaseResolver GraphQL Endpoints', () => {
   let testMoonPhaseId: string;
-
+  const moonPhasesQuery = `
+    query GetMoonPhases($locale: String, $status: String, $phase: String, $limit: Float, $offset: Float) {
+      moonPhases(locale: $locale, status: $status, phase: $phase, limit: $limit, offset: $offset) {
+        records {
+            _id
+            phase
+            phaseLocal
+            locale
+            description
+            number
+            primaryColor
+            status
+            primaryAsset {
+                id
+                publicUrl
+            }
+            backgroundAsset {
+                id
+                publicUrl
+            }
+            user {
+                id
+                handle
+                name
+            }
+            createdAt
+            updatedAt
+        }
+        totalCount
+        limit
+        offset
+      }
+    }
+  `;
   beforeEach(() => {
     // Reset all mocks before each test
     jest.clearAllMocks();
@@ -11,11 +44,11 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
   beforeAll(async () => {
     // Create test moon phases
     const moonPhase = await MoonPhase.create({
-      name: 'New Moon',
       locale: 'en_US',
       description: 'The new moon represents new beginnings and fresh starts.',
       number: 1,
-      moonSign: 'aries',
+      phase: 'new moon',
+      phaseLocal: 'new moon',
       primaryColor: '#1A1A2E',
       primaryAsset: '68ff7ebe04e43ae41ca0fc59',
       backgroundAsset: '68ff7ebe04e43ae41ca0fc59',
@@ -24,52 +57,43 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
     testMoonPhaseId = (moonPhase._id as string).toString();
 
     await MoonPhase.create([
-      { name: 'Waxing Crescent', locale: 'en_US', number: 2, status: 'active' },
-      { name: 'First Quarter', locale: 'en_US', number: 3, status: 'active' },
-      { name: 'Waxing Gibbous', locale: 'es_ES', number: 4, status: 'paused' },
+      {
+        phase: 'Waxing Crescent',
+        locale: 'en_US',
+        number: 2,
+        status: 'active',
+      },
+      { phase: 'First Quarter', locale: 'en_US', number: 3, status: 'active' },
+      { phase: 'Waxing Gibbous', locale: 'es_ES', number: 4, status: 'paused' },
     ]);
   });
 
   describe('createMoonPhase', () => {
     it('should create a moon phase with all fields', async () => {
       const response = await global.adminUserAdminAppTestRequest().send({
-        query: `
+        query: ` 
             mutation CreateMoonPhase($input: CreateMoonPhaseInput!) {
               createMoonPhase(input: $input) {
                 success
                 message
                 moonPhase {
                   _id
-                  name
-                  locale
-                  description
-                  number
-                  moonSign
-                  primaryColor
+                  phase
                   status
-                  primaryAsset {
-                    id
-                  }
-                  backgroundAsset {
-                    id
-                  }
-                  user {
-                    id
-                  }
-                  createdAt
-                  updatedAt
+                  locale
+                  number
                 }
               }
             }
-          `,
+        `,
         variables: {
           input: {
-            name: 'Full Moon',
             locale: 'en_US',
             description:
               'The full moon illuminates everything and brings clarity.',
             number: 5,
-            moonSign: 'leo',
+            phase: 'full moon',
+            phaseLocal: 'full moon',
             primaryColor: '#FFD700',
             primaryAsset: '68ff7ebe04e43ae41ca0fc59',
             backgroundAsset: '68ff7ebe04e43ae41ca0fc59',
@@ -80,12 +104,11 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.data.createMoonPhase.success).toBe(true);
-      expect(response.body.data.createMoonPhase.moonPhase.name).toBe(
-        'Full Moon'
+      expect(response.body.data.createMoonPhase.moonPhase.phase).toBe(
+        'full moon'
       );
       expect(response.body.data.createMoonPhase.moonPhase.locale).toBe('en_US');
       expect(response.body.data.createMoonPhase.moonPhase.number).toBe(5);
-      expect(response.body.data.createMoonPhase.moonPhase.moonSign).toBe('leo');
       expect(response.body.data.createMoonPhase.moonPhase.status).toBe(
         'active'
       );
@@ -100,7 +123,7 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
                 message
                 moonPhase {
                   _id
-                  name
+                  phase
                   status
                 }
               }
@@ -108,7 +131,7 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
           `,
         variables: {
           input: {
-            name: 'Waning Gibbous',
+            phase: 'Waning Gibbous',
             status: 'active',
           },
         },
@@ -116,7 +139,7 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.data.createMoonPhase.success).toBe(true);
-      expect(response.body.data.createMoonPhase.moonPhase.name).toBe(
+      expect(response.body.data.createMoonPhase.moonPhase.phase).toBe(
         'Waning Gibbous'
       );
     });
@@ -133,7 +156,7 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
           `,
         variables: {
           input: {
-            name: 'Waning Crescent',
+            phase: 'Waning Crescent',
             status: 'active',
           },
         },
@@ -155,7 +178,7 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
           `,
         variables: {
           input: {
-            name: 'Test Moon',
+            phase: 'Test Moon',
             status: 'active',
             primaryAsset: 'invalid-id',
           },
@@ -173,17 +196,7 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
   describe('moonPhases', () => {
     it('should get all moon phases', async () => {
       const response = await global.adminUserAdminAppTestRequest().send({
-        query: `
-            query GetMoonPhases($limit: Float, $offset: Float) {
-              moonPhases(limit: $limit, offset: $offset) {
-                _id
-                name
-                locale
-                number
-                status
-              }
-            }
-          `,
+        query: moonPhasesQuery,
         variables: {
           limit: 10,
           offset: 0,
@@ -192,21 +205,16 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.data.moonPhases).toBeDefined();
-      expect(Array.isArray(response.body.data.moonPhases)).toBe(true);
-      expect(response.body.data.moonPhases.length).toBeGreaterThan(0);
+      expect(Array.isArray(response.body.data.moonPhases.records)).toBe(true);
+      expect(response.body.data.moonPhases.records.length).toBeGreaterThan(0);
+      expect(response.body.data.moonPhases.totalCount).toBeGreaterThan(0);
+      expect(response.body.data.moonPhases.limit).toBe(10);
+      expect(response.body.data.moonPhases.offset).toBe(0);
     });
 
     it('should filter moon phases by locale', async () => {
       const response = await global.adminUserAdminAppTestRequest().send({
-        query: `
-            query GetMoonPhases($locale: String) {
-              moonPhases(locale: $locale) {
-                _id
-                name
-                locale
-              }
-            }
-          `,
+        query: moonPhasesQuery,
         variables: {
           locale: 'en_US',
         },
@@ -215,7 +223,7 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
       expect(response.status).toBe(200);
       expect(response.body.data.moonPhases).toBeDefined();
       expect(
-        response.body.data.moonPhases.every(
+        response.body.data.moonPhases.records.every(
           (mp: { locale?: string }) => mp.locale === 'en_US'
         )
       ).toBe(true);
@@ -223,15 +231,7 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
 
     it('should filter moon phases by status', async () => {
       const response = await global.adminUserAdminAppTestRequest().send({
-        query: `
-            query GetMoonPhases($status: String) {
-              moonPhases(status: $status) {
-                _id
-                name
-                status
-              }
-            }
-          `,
+        query: moonPhasesQuery,
         variables: {
           status: 'active',
         },
@@ -240,7 +240,7 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
       expect(response.status).toBe(200);
       expect(response.body.data.moonPhases).toBeDefined();
       expect(
-        response.body.data.moonPhases.every(
+        response.body.data.moonPhases.records.every(
           (mp: { status: string }) => mp.status === 'active'
         )
       ).toBe(true);
@@ -248,32 +248,21 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
 
     it('should respect pagination limits', async () => {
       const response = await global.adminUserAdminAppTestRequest().send({
-        query: `
-            query GetMoonPhases($limit: Float) {
-              moonPhases(limit: $limit) {
-                _id
-                name
-              }
-            }
-          `,
+        query: moonPhasesQuery,
         variables: {
           limit: 2,
         },
       });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.moonPhases.length).toBeLessThanOrEqual(2);
+      expect(response.body.data.moonPhases.records.length).toBeLessThanOrEqual(
+        2
+      );
     });
 
     it('should fail with invalid limit', async () => {
       const response = await global.adminUserAdminAppTestRequest().send({
-        query: `
-            query GetMoonPhases($limit: Float) {
-              moonPhases(limit: $limit) {
-                _id
-              }
-            }
-          `,
+        query: moonPhasesQuery,
         variables: {
           limit: 200,
         },
@@ -294,11 +283,11 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
             query GetMoonPhase($id: ID!) {
               moonPhase(id: $id) {
                 _id
-                name
                 locale
                 description
                 number
-                moonSign
+                phase
+                phaseLocal
                 status
               }
             }
@@ -311,7 +300,7 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
       expect(response.status).toBe(200);
       expect(response.body.data.moonPhase).toBeDefined();
       expect(response.body.data.moonPhase._id).toBe(testMoonPhaseId);
-      expect(response.body.data.moonPhase.name).toBe('New Moon');
+      expect(response.body.data.moonPhase.phase).toBe('new moon');
     });
 
     it('should fail with invalid moon phase ID', async () => {
@@ -365,9 +354,9 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
                 message
                 moonPhase {
                   _id
-                  name
+                  phase
+                  phaseLocal
                   description
-                  moonSign
                   status
                 }
               }
@@ -376,9 +365,9 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
         variables: {
           id: testMoonPhaseId,
           input: {
-            name: 'New Moon - Updated',
+            phase: 'new moon',
+            phaseLocal: 'new moon',
             description: 'Updated description for the new moon phase.',
-            moonSign: 'taurus',
             status: 'active',
           },
         },
@@ -386,11 +375,8 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.data.updateMoonPhase.success).toBe(true);
-      expect(response.body.data.updateMoonPhase.moonPhase.name).toBe(
-        'New Moon - Updated'
-      );
-      expect(response.body.data.updateMoonPhase.moonPhase.moonSign).toBe(
-        'taurus'
+      expect(response.body.data.updateMoonPhase.moonPhase.phase).toBe(
+        'new moon'
       );
     });
 
@@ -406,7 +392,7 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
         variables: {
           id: 'invalid-id',
           input: {
-            name: 'Test',
+            phase: 'Test',
           },
         },
       });
@@ -430,7 +416,7 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
         variables: {
           id: testMoonPhaseId,
           input: {
-            name: 'Test',
+            phase: 'Test',
           },
         },
       });
@@ -456,7 +442,7 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
           `,
         variables: {
           input: {
-            name: 'To Be Soft Deleted',
+            phase: 'To Be Soft Deleted',
             status: 'active',
           },
         },
@@ -523,7 +509,7 @@ describe('MoonPhaseResolver GraphQL Endpoints', () => {
           `,
         variables: {
           input: {
-            name: 'To Be Hard Deleted',
+            phase: 'To Be Hard Deleted',
             status: 'active',
           },
         },
