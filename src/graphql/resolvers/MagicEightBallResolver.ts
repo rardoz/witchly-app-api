@@ -242,9 +242,9 @@ export class MagicEightBallResolver {
       // Update only provided fields
       if (input.name !== undefined) side.name = input.name;
       if (input.locale !== undefined) side.locale = input.locale;
-      if (input.primaryAsset !== undefined)
+      if (input.primaryAsset)
         side.primaryAsset = new Types.ObjectId(input.primaryAsset);
-      if (input.backgroundAsset !== undefined)
+      if (input.backgroundAsset)
         side.backgroundAsset = new Types.ObjectId(input.backgroundAsset);
       if (input.primaryColor !== undefined)
         side.primaryColor = input.primaryColor;
