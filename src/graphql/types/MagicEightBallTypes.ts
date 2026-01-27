@@ -73,3 +73,18 @@ export class DeleteMagicEightBallResponse {
   @Field()
   message!: string;
 }
+
+@ObjectType()
+export class MagicEightBallResponse {
+  @Field(() => [MagicEightBallType])
+  records: MagicEightBallType[];
+
+  @Field(() => Number)
+  totalCount: number;
+
+  @Field(() => Number)
+  limit: number;
+
+  @Field(() => Number)
+  offset: number;
+}

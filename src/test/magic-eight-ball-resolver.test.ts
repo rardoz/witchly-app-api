@@ -204,19 +204,23 @@ describe('MagicEightBallResolver GraphQL Endpoints', () => {
   });
 
   describe('magicEightBallSides', () => {
-    it('should get all magic eight ball sides', async () => {
-      const query = `
-        query GetMagicEightBallSides($limit: Int, $offset: Int, $status: String) {
-          magicEightBallSides(limit: $limit, offset: $offset, status: $status) {
-            _id
-            name
-            locale
-            diceNumber
-            status
+    const query = `
+        query GetMagicEightBallSides($limit: Int, $offset: Int, $status: String, $locale: String) {
+          magicEightBallSides(limit: $limit, offset: $offset, status: $status, locale: $locale) {
+            records {
+              _id
+              name
+              locale
+              diceNumber
+              status
+            }
+            totalCount
+            limit
+            offset
           }
         }
       `;
-
+    it('should get all magic eight ball sides', async () => {
       const response = await global.adminUserAdminAppTestRequest().send({
         query,
         variables: {
@@ -227,22 +231,21 @@ describe('MagicEightBallResolver GraphQL Endpoints', () => {
       });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.magicEightBallSides).toBeDefined();
-      expect(Array.isArray(response.body.data.magicEightBallSides)).toBe(true);
-      expect(response.body.data.magicEightBallSides.length).toBeGreaterThan(0);
+      expect(response.body.data.magicEightBallSides.records).toBeDefined();
+      expect(
+        Array.isArray(response.body.data.magicEightBallSides.records)
+      ).toBe(true);
+      expect(
+        response.body.data.magicEightBallSides.records.length
+      ).toBeGreaterThan(0);
+      expect(response.body.data.magicEightBallSides.totalCount).toBeGreaterThan(
+        0
+      );
+      expect(response.body.data.magicEightBallSides.limit).toBe(10);
+      expect(response.body.data.magicEightBallSides.offset).toBe(0);
     });
 
     it('should filter sides by locale', async () => {
-      const query = `
-        query GetMagicEightBallSides($locale: String) {
-          magicEightBallSides(locale: $locale) {
-            _id
-            name
-            locale
-          }
-        }
-      `;
-
       const response = await global.adminUserAdminAppTestRequest().send({
         query,
         variables: {
@@ -251,25 +254,15 @@ describe('MagicEightBallResolver GraphQL Endpoints', () => {
       });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.magicEightBallSides).toBeDefined();
+      expect(response.body.data.magicEightBallSides.records).toBeDefined();
       expect(
-        response.body.data.magicEightBallSides.every(
+        response.body.data.magicEightBallSides.records.every(
           (side: { locale?: string }) => side.locale === 'en_US'
         )
       ).toBe(true);
     });
 
     it('should filter sides by status', async () => {
-      const query = `
-        query GetMagicEightBallSides($status: String) {
-          magicEightBallSides(status: $status) {
-            _id
-            name
-            status
-          }
-        }
-      `;
-
       const response = await global.adminUserAdminAppTestRequest().send({
         query,
         variables: {
@@ -278,23 +271,15 @@ describe('MagicEightBallResolver GraphQL Endpoints', () => {
       });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.magicEightBallSides).toBeDefined();
+      expect(response.body.data.magicEightBallSides.records).toBeDefined();
       expect(
-        response.body.data.magicEightBallSides.every(
+        response.body.data.magicEightBallSides.records.every(
           (side: { status: string }) => side.status === 'active'
         )
       ).toBe(true);
     });
 
     it('should respect pagination limits', async () => {
-      const query = `
-        query GetMagicEightBallSides($limit: Int) {
-          magicEightBallSides(limit: $limit) {
-            _id
-          }
-        }
-      `;
-
       const response = await global.adminUserAdminAppTestRequest().send({
         query,
         variables: {
@@ -303,20 +288,12 @@ describe('MagicEightBallResolver GraphQL Endpoints', () => {
       });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.magicEightBallSides.length).toBeLessThanOrEqual(
-        2
-      );
+      expect(
+        response.body.data.magicEightBallSides.records.length
+      ).toBeLessThanOrEqual(2);
     });
 
     it('should fail with invalid limit', async () => {
-      const query = `
-        query GetMagicEightBallSides($limit: Int) {
-          magicEightBallSides(limit: $limit) {
-            _id
-          }
-        }
-      `;
-
       const response = await global.adminUserAdminAppTestRequest().send({
         query,
         variables: {

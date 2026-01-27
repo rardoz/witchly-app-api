@@ -14,13 +14,14 @@ import {
 import {
   CreateMagicEightBallResponse,
   DeleteMagicEightBallResponse,
+  MagicEightBallResponse,
   MagicEightBallType,
   UpdateMagicEightBallResponse,
 } from '../types/MagicEightBallTypes';
 
 @Resolver(() => MagicEightBallType)
 export class MagicEightBallResolver {
-  @Query(() => [MagicEightBallType])
+  @Query(() => MagicEightBallResponse)
   async magicEightBallSides(
     @Ctx() context: GraphQLContext,
     @Arg('limit', () => Int, { nullable: true, defaultValue: 10 })
@@ -31,7 +32,7 @@ export class MagicEightBallResolver {
     status: 'active' | 'paused' | 'deleted',
     @Arg('locale', () => String, { nullable: true })
     locale?: string
-  ): Promise<MagicEightBallType[]> {
+  ): Promise<MagicEightBallResponse> {
     context.hasUserReadAppReadScope(context);
 
     // Validate pagination parameters
@@ -51,15 +52,24 @@ export class MagicEightBallResolver {
       filter.status = status;
     }
 
-    const sides = await MagicEightBall.find(filter)
-      .sort({ diceNumber: 1 })
-      .skip(offset)
-      .limit(limit)
-      .populate('primaryAsset')
-      .populate('backgroundAsset')
-      .populate('user');
+    const [sides, totalCount] = await Promise.all([
+      MagicEightBall.find(filter)
+        .sort({ diceNumber: 1 })
+        .skip(offset)
+        .limit(limit)
+        .populate('primaryAsset')
+        .populate('backgroundAsset')
+        .populate('user'),
 
-    return sides as unknown as MagicEightBallType[];
+      MagicEightBall.countDocuments(filter),
+    ]);
+
+    return {
+      records: sides as unknown as MagicEightBallType[],
+      totalCount,
+      limit,
+      offset,
+    };
   }
 
   @Query(() => MagicEightBallType)
