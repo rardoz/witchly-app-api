@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { Types } from 'mongoose';
-import { Arg, Ctx, ID, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, Ctx, ID, Int, Mutation, Query, Resolver } from 'type-graphql';
 import { GraphQLContext } from '../../middleware/auth.middleware';
 import { Spellbook } from '../../models/Spellbook';
 import { SpellbookPage } from '../../models/SpellbookPage';
@@ -18,23 +18,27 @@ import {
 import {
   DeleteResponse,
   SpellbookPageResponse,
+  SpellbookPagesResponse,
   SpellbookPageType,
   SpellbookResponse,
+  SpellbooksResponse,
   SpellbookType,
 } from '../types/SpellbookTypes';
 
 @Resolver(() => SpellbookType)
 export class SpellbookResolver {
   // Query: Get all spellbooks with pagination and filters
-  @Query(() => [SpellbookType])
+  @Query(() => SpellbooksResponse)
   async spellbooks(
     @Ctx() context: GraphQLContext,
-    @Arg('limit', { nullable: true, defaultValue: 10 }) limit: number,
-    @Arg('offset', { nullable: true, defaultValue: 0 }) offset: number,
-    @Arg('status', { nullable: true }) status?: string,
-    @Arg('visibility', { nullable: true }) visibility?: string
-  ): Promise<SpellbookType[]> {
-    context.hasUserWriteAppWriteScope(context);
+    @Arg('limit', () => Int, { nullable: true, defaultValue: 10 })
+    limit: number,
+    @Arg('offset', () => Int, { nullable: true, defaultValue: 0 })
+    offset: number,
+    @Arg('status', () => String, { nullable: true }) status?: string,
+    @Arg('visibility', () => String, { nullable: true }) visibility?: string
+  ): Promise<SpellbooksResponse> {
+    context.hasUserReadAppReadScope(context);
 
     // Validate pagination
     if (limit < 1 || limit > 100) {
@@ -64,10 +68,6 @@ export class SpellbookResolver {
 
     // If not admin, apply permission filters
     if (!isAdmin && context.userId) {
-      // Non-admin users can only see:
-      // 1. Public spellbooks
-      // 2. Private spellbooks where they are the owner
-      // 3. Private spellbooks where they are in allowedUsers
       filter.$or = [
         { visibility: 'public' },
         { user: new Types.ObjectId(context.userId) },
@@ -75,15 +75,23 @@ export class SpellbookResolver {
       ];
     }
 
-    const spellbooks = await Spellbook.find(filter)
-      .sort({ createdAt: -1 })
-      .skip(offset)
-      .limit(limit)
-      .populate('user')
-      .populate('primaryAsset')
-      .populate('backgroundAsset');
+    const [records, totalCount] = await Promise.all([
+      Spellbook.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(offset)
+        .limit(limit)
+        .populate('user')
+        .populate('primaryAsset')
+        .populate('backgroundAsset'),
+      Spellbook.countDocuments(filter),
+    ]);
 
-    return spellbooks as unknown as SpellbookType[];
+    return {
+      records: records as unknown as SpellbookType[],
+      totalCount,
+      limit,
+      offset,
+    };
   }
 
   // Query: Get single spellbook by ID
@@ -92,7 +100,7 @@ export class SpellbookResolver {
     @Ctx() context: GraphQLContext,
     @Arg('id', () => ID) id: string
   ): Promise<SpellbookType | null> {
-    context.hasUserWriteAppWriteScope(context);
+    context.hasUserReadAppReadScope(context);
 
     const spellbook = await Spellbook.findById(id)
       .populate('user')
@@ -123,17 +131,18 @@ export class SpellbookResolver {
     return spellbook as unknown as SpellbookType;
   }
 
-  // Query: Get pages for a specific spellbook
-  @Query(() => [SpellbookPageType])
+  @Query(() => SpellbookPagesResponse)
   async spellbookPages(
     @Ctx() context: GraphQLContext,
     @Arg('spellbookId', () => ID) spellbookId: string,
-    @Arg('limit', { nullable: true, defaultValue: 10 }) limit: number,
-    @Arg('offset', { nullable: true, defaultValue: 0 }) offset: number,
-    @Arg('status', { nullable: true }) status?: string,
-    @Arg('visibility', { nullable: true }) visibility?: string
-  ): Promise<SpellbookPageType[]> {
-    context.hasUserWriteAppWriteScope(context);
+    @Arg('limit', () => Int, { nullable: true, defaultValue: 10 })
+    limit: number,
+    @Arg('offset', () => Int, { nullable: true, defaultValue: 0 })
+    offset: number,
+    @Arg('status', () => String, { nullable: true }) status?: string,
+    @Arg('visibility', () => String, { nullable: true }) visibility?: string
+  ): Promise<SpellbookPagesResponse> {
+    context.hasUserReadAppReadScope(context);
     // Validate pagination
     if (limit < 1 || limit > 100) {
       throw new ValidationError('Limit must be between 1 and 100');
@@ -182,10 +191,6 @@ export class SpellbookResolver {
 
     // If not admin, apply page-level permission filters
     if (!isAdmin && context.userId) {
-      // Non-admin users can only see pages that are:
-      // 1. Public pages
-      // 2. Private pages where they are the owner
-      // 3. Private pages where they are in allowedUsers
       filter.$or = [
         { visibility: 'public' },
         { user: new Types.ObjectId(context.userId) },
@@ -193,15 +198,23 @@ export class SpellbookResolver {
       ];
     }
 
-    const pages = await SpellbookPage.find(filter)
-      .sort({ createdAt: -1 })
-      .skip(offset)
-      .limit(limit)
-      .populate('user')
-      .populate('primaryAsset')
-      .populate('backgroundAsset');
+    const [records, totalCount] = await Promise.all([
+      SpellbookPage.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(offset)
+        .limit(limit)
+        .populate('user')
+        .populate('primaryAsset')
+        .populate('backgroundAsset'),
+      SpellbookPage.countDocuments(filter),
+    ]);
 
-    return pages as unknown as SpellbookPageType[];
+    return {
+      records: records as unknown as SpellbookPageType[],
+      totalCount,
+      limit,
+      offset,
+    };
   }
 
   @Query(() => SpellbookPageType, { nullable: true })
@@ -209,7 +222,7 @@ export class SpellbookResolver {
     @Ctx() context: GraphQLContext,
     @Arg('id', () => ID) id: string
   ): Promise<SpellbookPageType | null> {
-    context.hasUserWriteAppWriteScope(context);
+    context.hasUserReadAppReadScope(context);
 
     const page = await SpellbookPage.findById(id)
       .populate('user')

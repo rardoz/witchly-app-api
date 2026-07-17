@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Field, ID, ObjectType } from 'type-graphql';
+import { Field, ID, Int, ObjectType } from 'type-graphql';
 import { Asset } from './AssetTypes';
 import { User } from './User';
 
@@ -142,4 +142,34 @@ export class DeleteResponse {
 
   @Field()
   message: string;
+}
+
+@ObjectType()
+export class SpellbooksResponse {
+  @Field(() => [SpellbookType])
+  records: SpellbookType[];
+
+  @Field(() => Int)
+  totalCount: number;
+
+  @Field(() => Int)
+  limit: number;
+
+  @Field(() => Int)
+  offset: number;
+}
+
+@ObjectType()
+export class SpellbookPagesResponse {
+  @Field(() => [SpellbookPageType])
+  records: SpellbookPageType[];
+
+  @Field(() => Int)
+  totalCount: number;
+
+  @Field(() => Int)
+  limit: number;
+
+  @Field(() => Int)
+  offset: number;
 }

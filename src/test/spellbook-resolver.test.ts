@@ -59,6 +59,8 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
       const query = `
         query {
           spellbooks(status: "active") {
+            records {
+
             id
             title
             description
@@ -80,7 +82,11 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
             meta
             allowedUsers
             pages
-          }
+                      }
+            totalCount
+            limit
+            offset
+            }
         }
       `;
 
@@ -89,9 +95,9 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
         .send({ query });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.spellbooks).toBeDefined();
+      expect(response.body.data.spellbooks.records).toBeDefined();
 
-      const spellbooks = response.body.data.spellbooks;
+      const spellbooks = response.body.data.spellbooks.records;
       expect(spellbooks[0].status).toBe('active');
 
       // Check that all required fields are present
@@ -104,10 +110,16 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
       const query = `
         query {
           spellbooks(status: "pending") {
+            records {
+
             id
             title
             status
-          }
+                      }
+            totalCount
+            limit
+            offset
+            }
         }
       `;
       const response = await global
@@ -115,18 +127,24 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
         .send({ query });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.spellbooks).toHaveLength(1);
-      expect(response.body.data.spellbooks[0].status).toBe('pending');
+      expect(response.body.data.spellbooks.records).toHaveLength(1);
+      expect(response.body.data.spellbooks.records[0].status).toBe('pending');
     });
 
     it('should filter by visibility', async () => {
       const query = `
         query {
           spellbooks(visibility: "public") {
+            records {
+
             id
             title
             visibility
-          }
+                      }
+            totalCount
+            limit
+            offset
+            }
         }
       `;
       const response = await global
@@ -134,16 +152,24 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
         .send({ query });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.spellbooks[0].visibility).toBe('public');
+      expect(response.body.data.spellbooks.records[0].visibility).toBe(
+        'public'
+      );
     });
 
     it('should respect pagination parameters', async () => {
       const query = `
         query {
           spellbooks(limit: 1, offset: 0) {
+            records {
+
             id
             title
-          }
+                      }
+            totalCount
+            limit
+            offset
+            }
         }
       `;
 
@@ -152,16 +178,22 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
         .send({ query });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.spellbooks).toHaveLength(1);
+      expect(response.body.data.spellbooks.records).toHaveLength(1);
     });
 
     it('should reject unauthorized requests', async () => {
       const query = `
         query {
           spellbooks {
+            records {
+
             id
             title
-          }
+                      }
+            totalCount
+            limit
+            offset
+            }
         }
       `;
 
@@ -177,13 +209,19 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
       const query = `
         query {
           spellbooks(limit: 100) {
+            records {
+
             id
             title
             visibility
             user {
               id
             }
-          }
+                      }
+            totalCount
+            limit
+            offset
+            }
         }
       `;
 
@@ -192,9 +230,9 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
         .send({ query });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.spellbooks).toBeDefined();
+      expect(response.body.data.spellbooks.records).toBeDefined();
       // Admin should see both public and private spellbooks
-      const spellbooks = response.body.data.spellbooks;
+      const spellbooks = response.body.data.spellbooks.records;
       expect(spellbooks.length).toBeGreaterThan(0);
       const hasPrivate = spellbooks.some(
         (s: { visibility: string }) => s.visibility === 'private'
@@ -228,13 +266,19 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
       const query = `
         query {
           spellbooks(limit: 100) {
+            records {
+
             id
             title
             visibility
             user {
               id
             }
-          }
+                      }
+            totalCount
+            limit
+            offset
+            }
         }
       `;
 
@@ -243,9 +287,9 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
         .send({ query });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.spellbooks).toBeDefined();
+      expect(response.body.data.spellbooks.records).toBeDefined();
 
-      const spellbooks = response.body.data.spellbooks;
+      const spellbooks = response.body.data.spellbooks.records;
       // Non-admin should only see public spellbooks
       spellbooks.forEach((s: { visibility: string }) => {
         expect(s.visibility).toBe('public');
@@ -266,13 +310,19 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
       const query = `
         query {
           spellbooks(limit: 100, visibility: "private") {
+            records {
+
             id
             title
             visibility
             user {
               id
             }
-          }
+                      }
+            totalCount
+            limit
+            offset
+            }
         }
       `;
 
@@ -281,9 +331,9 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
         .send({ query });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.spellbooks).toBeDefined();
+      expect(response.body.data.spellbooks.records).toBeDefined();
 
-      const spellbooks = response.body.data.spellbooks;
+      const spellbooks = response.body.data.spellbooks.records;
       // Should find at least one private spellbook they own
       const ownedPrivate = spellbooks.find(
         (s: { user: { id: string }; visibility: string }) =>
@@ -306,6 +356,8 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
       const query = `
         query {
           spellbooks(limit: 100) {
+            records {
+
             id
             title
             visibility
@@ -313,7 +365,11 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
             user {
               id
             }
-          }
+                      }
+            totalCount
+            limit
+            offset
+            }
         }
       `;
 
@@ -322,9 +378,9 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
         .send({ query });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.spellbooks).toBeDefined();
+      expect(response.body.data.spellbooks.records).toBeDefined();
 
-      const spellbooks = response.body.data.spellbooks;
+      const spellbooks = response.body.data.spellbooks.records;
       // Should find the shared private spellbook
       const sharedSpellbook = spellbooks.find(
         (s: { title: string; visibility: string; allowedUsers: string[] }) =>
@@ -349,13 +405,19 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
       const query = `
         query {
           spellbooks(limit: 100) {
+            records {
+
             id
             title
             visibility
             user {
               id
             }
-          }
+                      }
+            totalCount
+            limit
+            offset
+            }
         }
       `;
 
@@ -364,9 +426,9 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
         .send({ query });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.spellbooks).toBeDefined();
+      expect(response.body.data.spellbooks.records).toBeDefined();
 
-      const spellbooks = response.body.data.spellbooks;
+      const spellbooks = response.body.data.spellbooks.records;
       // Should NOT find the restricted private spellbook
       const restrictedSpellbook = spellbooks.find(
         (s: { title: string }) => s.title === 'Restricted Private Spellbook'
@@ -1052,6 +1114,8 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
       const query = `
         query {
           spellbookPages(spellbookId: "${testSpellbookId}") {
+            records {
+
             id
             title
             richText
@@ -1059,7 +1123,11 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
             status
             visibility
             spellbook
-          }
+                      }
+            totalCount
+            limit
+            offset
+            }
         }
       `;
 
@@ -1068,9 +1136,11 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
         .send({ query });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.spellbookPages).toBeDefined();
-      expect(response.body.data.spellbookPages).toHaveLength(1);
-      expect(response.body.data.spellbookPages[0].title).toBe('Test Page 1');
+      expect(response.body.data.spellbookPages.records).toBeDefined();
+      expect(response.body.data.spellbookPages.records).toHaveLength(1);
+      expect(response.body.data.spellbookPages.records[0].title).toBe(
+        'Test Page 1'
+      );
     });
 
     it('should filter pages by status', async () => {
@@ -1086,10 +1156,16 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
       const query = `
         query {
           spellbookPages(spellbookId: "${testSpellbookId}", status: "pending") {
+            records {
+
             id
             title
             status
-          }
+                      }
+            totalCount
+            limit
+            offset
+            }
         }
       `;
 
@@ -1098,7 +1174,9 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
         .send({ query });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.spellbookPages[0].status).toBe('pending');
+      expect(response.body.data.spellbookPages.records[0].status).toBe(
+        'pending'
+      );
     });
 
     it('should return error for non-existent spellbook', async () => {
@@ -1106,9 +1184,15 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
       const query = `
         query {
           spellbookPages(spellbookId: "${fakeId}") {
+            records {
+
             id
             title
-          }
+                      }
+            totalCount
+            limit
+            offset
+            }
         }
       `;
 
@@ -1142,10 +1226,16 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
       const query = `
         query {
           spellbookPages(spellbookId: "${privateSpellbook._id}") {
+            records {
+
             id
             title
             visibility
-          }
+                      }
+            totalCount
+            limit
+            offset
+            }
         }
       `;
 
@@ -1154,19 +1244,27 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
         .send({ query });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.spellbookPages).toBeDefined();
-      expect(response.body.data.spellbookPages).toHaveLength(1);
-      expect(response.body.data.spellbookPages[0].title).toBe('Private Page');
+      expect(response.body.data.spellbookPages.records).toBeDefined();
+      expect(response.body.data.spellbookPages.records).toHaveLength(1);
+      expect(response.body.data.spellbookPages.records[0].title).toBe(
+        'Private Page'
+      );
     });
 
     it('should allow non-admin users to view pages from public spellbooks', async () => {
       const query = `
         query {
           spellbookPages(spellbookId: "${testSpellbookId}") {
+            records {
+
             id
             title
             visibility
-          }
+                      }
+            totalCount
+            limit
+            offset
+            }
         }
       `;
 
@@ -1175,9 +1273,11 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
         .send({ query });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.spellbookPages).toBeDefined();
-      expect(response.body.data.spellbookPages).toHaveLength(1);
-      expect(response.body.data.spellbookPages[0].title).toBe('Test Page 1');
+      expect(response.body.data.spellbookPages.records).toBeDefined();
+      expect(response.body.data.spellbookPages.records).toHaveLength(1);
+      expect(response.body.data.spellbookPages.records[0].title).toBe(
+        'Test Page 1'
+      );
     });
 
     it('should allow non-admin users to view pages from their own private spellbooks', async () => {
@@ -1202,10 +1302,16 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
       const query = `
         query {
           spellbookPages(spellbookId: "${ownSpellbook._id}") {
+            records {
+
             id
             title
             visibility
-          }
+                      }
+            totalCount
+            limit
+            offset
+            }
         }
       `;
 
@@ -1214,9 +1320,9 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
         .send({ query });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.spellbookPages).toBeDefined();
-      expect(response.body.data.spellbookPages).toHaveLength(1);
-      expect(response.body.data.spellbookPages[0].title).toBe(
+      expect(response.body.data.spellbookPages.records).toBeDefined();
+      expect(response.body.data.spellbookPages.records).toHaveLength(1);
+      expect(response.body.data.spellbookPages.records[0].title).toBe(
         'Own Private Page'
       );
     });
@@ -1245,10 +1351,16 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
       const query = `
         query {
           spellbookPages(spellbookId: "${sharedSpellbook._id}") {
+            records {
+
             id
             title
             visibility
-          }
+                      }
+            totalCount
+            limit
+            offset
+            }
         }
       `;
 
@@ -1257,9 +1369,9 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
         .send({ query });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.spellbookPages).toBeDefined();
-      expect(response.body.data.spellbookPages).toHaveLength(1);
-      expect(response.body.data.spellbookPages[0].title).toBe(
+      expect(response.body.data.spellbookPages.records).toBeDefined();
+      expect(response.body.data.spellbookPages.records).toHaveLength(1);
+      expect(response.body.data.spellbookPages.records[0].title).toBe(
         'Shared Private Page'
       );
     });
@@ -1287,10 +1399,16 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
       const query = `
         query {
           spellbookPages(spellbookId: "${restrictedSpellbook._id}") {
+            records {
+
             id
             title
             visibility
-          }
+                      }
+            totalCount
+            limit
+            offset
+            }
         }
       `;
 
@@ -1335,10 +1453,16 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
       const query = `
         query {
           spellbookPages(spellbookId: "${publicSpellbook._id}") {
+            records {
+
             id
             title
             visibility
-          }
+                      }
+            totalCount
+            limit
+            offset
+            }
         }
       `;
 
@@ -1347,9 +1471,9 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
         .send({ query });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.spellbookPages).toBeDefined();
-      expect(response.body.data.spellbookPages).toHaveLength(1);
-      expect(response.body.data.spellbookPages[0].title).toBe(
+      expect(response.body.data.spellbookPages.records).toBeDefined();
+      expect(response.body.data.spellbookPages.records).toHaveLength(1);
+      expect(response.body.data.spellbookPages.records[0].title).toBe(
         'Public Page in Public Spellbook'
       );
     });
@@ -1377,10 +1501,16 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
       const query = `
         query {
           spellbookPages(spellbookId: "${publicSpellbook._id}") {
+            records {
+
             id
             title
             visibility
-          }
+                      }
+            totalCount
+            limit
+            offset
+            }
         }
       `;
 
@@ -1389,9 +1519,9 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
         .send({ query });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.spellbookPages).toBeDefined();
-      expect(response.body.data.spellbookPages).toHaveLength(1);
-      expect(response.body.data.spellbookPages[0].title).toBe(
+      expect(response.body.data.spellbookPages.records).toBeDefined();
+      expect(response.body.data.spellbookPages.records).toHaveLength(1);
+      expect(response.body.data.spellbookPages.records[0].title).toBe(
         'My Private Page in Public Spellbook'
       );
     });
@@ -1420,10 +1550,16 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
       const query = `
         query {
           spellbookPages(spellbookId: "${publicSpellbook._id}") {
+            records {
+
             id
             title
             visibility
-          }
+                      }
+            totalCount
+            limit
+            offset
+            }
         }
       `;
 
@@ -1432,9 +1568,9 @@ describe('SpellbookResolver GraphQL Endpoints', () => {
         .send({ query });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.spellbookPages).toBeDefined();
-      expect(response.body.data.spellbookPages).toHaveLength(1);
-      expect(response.body.data.spellbookPages[0].title).toBe(
+      expect(response.body.data.spellbookPages.records).toBeDefined();
+      expect(response.body.data.spellbookPages.records).toHaveLength(1);
+      expect(response.body.data.spellbookPages.records[0].title).toBe(
         'Shared Private Page'
       );
     });
