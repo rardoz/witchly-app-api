@@ -339,6 +339,9 @@ export class SpellbookResolver {
 
     try {
       // Update fields
+      if (!input.primaryAsset) delete input.primaryAsset;
+      if (!input.backgroundAsset) delete input.backgroundAsset;
+
       Object.assign(spellbook, input);
       await spellbook.save();
 
