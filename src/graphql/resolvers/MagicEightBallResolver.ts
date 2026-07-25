@@ -31,7 +31,9 @@ export class MagicEightBallResolver {
     @Arg('status', () => String, { nullable: true })
     status: 'active' | 'paused' | 'deleted',
     @Arg('locale', () => String, { nullable: true })
-    locale?: string
+    locale?: string,
+    @Arg('diceNumber', () => Int, { nullable: true })
+    diceNumber?: number
   ): Promise<MagicEightBallResponse> {
     context.hasUserReadAppReadScope(context);
 
@@ -44,7 +46,11 @@ export class MagicEightBallResolver {
       throw new ValidationError('Offset must be non-negative');
     }
 
-    const filter = {} as { status?: string; locale?: string };
+    const filter = {} as {
+      status?: string;
+      locale?: string;
+      diceNumber?: number;
+    };
     if (locale) {
       filter.locale = locale;
     }
@@ -52,9 +58,10 @@ export class MagicEightBallResolver {
       filter.status = status;
     }
 
+    if (diceNumber) filter.diceNumber = diceNumber;
+
     const [sides, totalCount] = await Promise.all([
       MagicEightBall.find(filter)
-        .sort({ diceNumber: 1 })
         .skip(offset)
         .limit(limit)
         .populate('primaryAsset')

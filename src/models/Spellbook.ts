@@ -3,8 +3,8 @@ import { type Document, model, Schema, Types } from 'mongoose';
 export interface ISpellbook extends Document {
   title: string;
   description?: string;
-  primaryAsset?: Types.ObjectId;
-  backgroundAsset?: Types.ObjectId;
+  primaryAsset?: Types.ObjectId | null;
+  backgroundAsset?: Types.ObjectId | null;
   font?: string;
   primaryColor?: string;
   textColor?: string;

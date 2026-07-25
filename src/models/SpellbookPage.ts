@@ -4,8 +4,8 @@ export interface ISpellbookPage extends Document {
   title: string;
   shortDescription?: string;
   richText?: string;
-  primaryAsset?: Types.ObjectId;
-  backgroundAsset?: Types.ObjectId;
+  primaryAsset?: Types.ObjectId | null;
+  backgroundAsset?: Types.ObjectId | null;
   font?: string;
   backgroundColor?: string;
   textColor?: string;
